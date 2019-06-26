@@ -36,6 +36,10 @@ CREATE TABLE `item` (
   PRIMARY KEY (`ItemGID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+insert into `item` (`ItemGID`, `ItemID`, `ItemName`, `ItemDesc`, `Weight`, `Volumn`, `UDF01`, `UDF02`, `UDF03`, `CreatedDate`, `UpdatedDate`, `TS`) values('33333','33333','333333',NULL,'1.000000','2.000000',NULL,NULL,NULL,'2019-06-24 10:20:58',NULL,'2019-06-24 10:21:00.271133');
+insert into `item` (`ItemGID`, `ItemID`, `ItemName`, `ItemDesc`, `Weight`, `Volumn`, `UDF01`, `UDF02`, `UDF03`, `CreatedDate`, `UpdatedDate`, `TS`) values('999','999','9999--0ppppp',NULL,'1.000000','2.000000',NULL,NULL,NULL,'2019-06-24 10:19:59',NULL,'2019-06-24 10:20:00.971924');
+insert into `item` (`ItemGID`, `ItemID`, `ItemName`, `ItemDesc`, `Weight`, `Volumn`, `UDF01`, `UDF02`, `UDF03`, `CreatedDate`, `UpdatedDate`, `TS`) values('TestPK1','TestPK1','111',NULL,'1.000000','2.000000',NULL,NULL,NULL,'2019-06-21 15:18:29',NULL,'2019-06-21 15:18:30.233589');
+
 /*Table structure for table `item_detail` */
 
 DROP TABLE IF EXISTS `item_detail`;
@@ -53,7 +57,11 @@ CREATE TABLE `item_detail` (
   PRIMARY KEY (`GUID`),
   KEY `ItemGID` (`ItemGID`),
   CONSTRAINT `item_detail_ibfk_1` FOREIGN KEY (`ItemGID`) REFERENCES `item` (`ItemGID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+insert into `item_detail` (`GUID`, `ItemGID`, `LINE_ID`, `LineName`, `LineName2`, `LineName3`, `Content`, `REMARK_CONTENT`, `TS`) values('7d23880dc97a4c36add5552e636f8e42','TestPK1','3','new_LineName',NULL,NULL,NULL,NULL,'2019-06-25 15:33:07.122394');
+insert into `item_detail` (`GUID`, `ItemGID`, `LINE_ID`, `LineName`, `LineName2`, `LineName3`, `Content`, `REMARK_CONTENT`, `TS`) values('ad77e10b0cd54ddfa8375b8b27c1e09d','TestPK1','1','new_LineName',NULL,NULL,NULL,NULL,'2019-06-26 10:07:27.216877');
+insert into `item_detail` (`GUID`, `ItemGID`, `LINE_ID`, `LineName`, `LineName2`, `LineName3`, `Content`, `REMARK_CONTENT`, `TS`) values('ff21890caa3441c39c2895e45931e0b6','TestPK1','2','ttttt','32','12',NULL,NULL,'2019-06-26 10:07:28.604774');
 
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
