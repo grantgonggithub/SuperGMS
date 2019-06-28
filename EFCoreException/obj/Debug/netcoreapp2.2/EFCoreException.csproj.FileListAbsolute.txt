@@ -20,3 +20,14 @@ D:\EFCoreSameKeyException\EFCoreException\obj\Debug\netcoreapp2.2\EFCoreExceptio
 D:\EFCoreSameKeyException\EFCoreException\obj\Debug\netcoreapp2.2\EFCoreException.AssemblyInfo.cs
 D:\EFCoreSameKeyException\EFCoreException\obj\Debug\netcoreapp2.2\EFCoreException.dll
 D:\EFCoreSameKeyException\EFCoreException\obj\Debug\netcoreapp2.2\EFCoreException.pdb
+E:\mytestProj\EFCoreException\bin\Debug\netcoreapp2.2\EFCoreException.deps.json
+E:\mytestProj\EFCoreException\bin\Debug\netcoreapp2.2\EFCoreException.runtimeconfig.json
+E:\mytestProj\EFCoreException\bin\Debug\netcoreapp2.2\EFCoreException.runtimeconfig.dev.json
+E:\mytestProj\EFCoreException\bin\Debug\netcoreapp2.2\EFCoreException.dll
+E:\mytestProj\EFCoreException\bin\Debug\netcoreapp2.2\EFCoreException.pdb
+E:\mytestProj\EFCoreException\obj\Debug\netcoreapp2.2\EFCoreException.csprojAssemblyReference.cache
+E:\mytestProj\EFCoreException\obj\Debug\netcoreapp2.2\EFCoreException.csproj.CoreCompileInputs.cache
+E:\mytestProj\EFCoreException\obj\Debug\netcoreapp2.2\EFCoreException.AssemblyInfoInputs.cache
+E:\mytestProj\EFCoreException\obj\Debug\netcoreapp2.2\EFCoreException.AssemblyInfo.cs
+E:\mytestProj\EFCoreException\obj\Debug\netcoreapp2.2\EFCoreException.dll
+E:\mytestProj\EFCoreException\obj\Debug\netcoreapp2.2\EFCoreException.pdb

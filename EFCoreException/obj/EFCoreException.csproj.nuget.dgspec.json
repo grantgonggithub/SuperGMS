@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\EFCoreException\\EFCoreException\\EFCoreException.csproj": {}
+    "E:\\mytestProj\\EFCoreException\\EFCoreException.csproj": {}
   },
   "projects": {
-    "E:\\EFCoreException\\EFCoreException\\EFCoreException.csproj": {
+    "E:\\mytestProj\\EFCoreException\\EFCoreException.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\EFCoreException\\EFCoreException\\EFCoreException.csproj",
+        "projectUniqueName": "E:\\mytestProj\\EFCoreException\\EFCoreException.csproj",
         "projectName": "EFCoreException",
-        "projectPath": "E:\\EFCoreException\\EFCoreException\\EFCoreException.csproj",
+        "projectPath": "E:\\mytestProj\\EFCoreException\\EFCoreException.csproj",
         "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "E:\\EFCoreException\\EFCoreException\\obj\\",
+        "outputPath": "E:\\mytestProj\\EFCoreException\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
