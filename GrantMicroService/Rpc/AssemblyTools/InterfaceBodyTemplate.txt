@@ -1,0 +1,3 @@
+﻿		 #return_type# #clazz_name#(#args_type# valueArgs,out StatusCode code,RpcContext context);
+
+
