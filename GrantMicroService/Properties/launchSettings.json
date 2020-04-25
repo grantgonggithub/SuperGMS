@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "GrantMicroService": {
+      "commandName": "Project"
+    }
+  }
+}

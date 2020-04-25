@@ -1,0 +1,189 @@
+{
+  // 所有微服务本地必须配置的节点
+  "GrantConfig": {
+    "RpcService": {
+      "Pool": 1,
+      "Ip": "192.168.100.121",
+      "Port": 20001,
+      "PortList": { "grantxx": 20003, "grantyy": 20004 },
+      "ServerType": 2, // Thrift=2,WCF=1,Grpc=3, TaskWorker=4,HttpProxy = 5
+      "TimeOut": 5000, // 客户端调用rpc超时时间  
+      "AssemblyPath": "grantUserDefine.dll",
+      "Enable": true
+    },
+    "ConfigCenter": {
+      "ConfigType": 2, // Local = 1, zk=2 本地调试用1,集群用2
+      "Ip": "192.168.100.121:2181",
+      "SessionTimeout": 10000
+    }
+  },
+  // log配置
+  "ConfigLog": {
+    "LogLocation": "local", // 默认是local，remote 远程
+    "Filter": [
+      {
+        "FilterGroup": "FilterGroup",
+        "FilterApiName": "FilterApiName",
+        "FilterServiceName": "FilterServiceName",
+        "FilterWords": "FilterWords",
+        "LogLevel": "LogLevel",
+        "MaxSize": 1000
+      },
+      {
+        "FilterGroup": "FilterGroup",
+        "FilterApiName": "FilterApiName",
+        "FilterServiceName": "FilterServiceName",
+        "FilterWords": "FilterWords",
+        "LogLevel": "LogLevel",
+        "MaxSize": 1000
+      }
+    ]
+  },
+  // 用户需要配置的值
+  "ConstKeyValue": {
+    "Items": [
+      {
+        "Key": "Key1",
+        "Value": "Value1"
+      },
+      {
+        "Key": "Key1",
+        "Value": "Value1"
+      }
+    ]
+  },
+  // DataBase节点在文件配置和zk配置中是有区别的，一定要注意
+  "DataBase": {
+    "RefFile": "true",
+    "DbFile": "F://database.config",
+    "SqlFile": "F://mysql.config"
+  },
+  // 文件服务器的配置
+  "FileServer": {
+    "Items": [
+      {
+        "Pool": 1,
+        "Url": "http://192.168.100.121:5002"
+      },
+      {
+        "Pool": 1,
+        "Url": "http://192.168.100.121:5002"
+      }
+    ]
+  },
+  // 代理层的配置
+  "HttpProxy": {
+    "Items": [
+      {
+        "Name": "grantOMSService"
+      },
+      {
+        "Name": "grantUserDefineService"
+      },
+      {
+        "Name": "grantOrderCenterService"
+      }
+    ]
+  },
+  // rabbitMQ
+  "RabbitMQ": {
+    "Host": [
+      {
+        "Name": "Default",
+        "Ip": "192.168.100.106",
+        "Port": 5673,
+        "UserName": "Grant",
+        "PassWord": "Grant123",
+        "NoAckMsgCount": 3
+      },
+      {
+        "Name": "Log",
+        "Ip": "192.168.100.106",
+        "Port": 5673,
+        "UserName": "Grant",
+        "PassWord": "Grant123",
+        "NoAckMsgCount": 3
+      }
+    ]
+  },
+  // redis配置
+  "RedisConfig": {
+    "Nodes": [
+      {
+        "NodeName": "resource",
+        "IsMasterSlave": false,
+        "Items": [
+          {
+            "Pool": 1,
+            "IsMaster": false,
+            "Server": "192.168.100.106",
+            "Port": 6379,
+            "AllowAdmin": true,
+            "ConnectTimeout": 4000,
+            "Ssl": true,
+            "Pwd": "devMySql6379"
+          },
+          {
+            "Pool": 1,
+            "IsMaster": false,
+            "Server": "192.168.100.106",
+            "Port": 6372,
+            "AllowAdmin": true,
+            "ConnectTimeout": 4000,
+            "Ssl": true,
+            "Pwd": "devMySql6372"
+          }
+        ]
+      }
+    ]
+  },
+  // rpcclient的配置，这个只有文件配置才需要，zk配置不用
+  "RpcClients": {
+    "Clients": [
+      {
+        "ServerName": "grantUserDefineService",
+        "RouterType": 2, // Hash=1, Random=2 当前只支持 2
+        "Items": [
+          {
+            "Pool": 1,
+            "Ip": "192.168.100.121",
+            "Port": 20001,
+            "ServerType": 2,
+            "TimeOut": 4000, 
+            "Enable": true
+          },
+          {
+            "Pool": 1,
+            "Ip": "192.168.100.122",
+            "Port": 20001,
+            "ServerType": 2,
+            "TimeOut": 4000,
+            "Enable": true
+          }
+        ]
+      },
+      {
+        "ServerName": "grantOMSService",
+        "RouterType": 2,
+        "Items": [
+          {
+            "Pool": 1,
+            "Ip": "192.168.100.121",
+            "Port": 20002,
+            "ServerType": 2,
+            "TimeOut": 4000,
+            "Enable": true
+          },
+          {
+            "Pool": 1,
+            "Ip": "192.168.100.122",
+            "Port": 20002,
+            "ServerType": 2,
+            "TimeOut": 4000,
+            "Enable": true
+          }
+        ]
+      }
+    ]
+  }
+}
