@@ -1,0 +1,8 @@
+﻿{
+  "GrantConfig": {
+      "ConfigCenter": {
+          "ConfigType": 3,
+          "Ip": "http://localhost/grant.json"
+      }
+  }
+}
