@@ -1,0 +1,28 @@
+﻿1、理论上在任何服务初始化之前请先ServerSetting.Initlize(appName);
+2、因为我们做的微服务是自动注册的，所以这个appName是在启动前自动生成的所以初始化：ServerProxy.Register();里面已经主动初始化了ServerSetting,
+所以如果是发布成微服务的，第1点是不需要的
+3、在初始化完ServerProxy之后，才可以继续初始化其他的，如：CacheManager.Initlize(),MQHostConfigManager.Initlize()
+
+这里是重点：
+系统支持三种配置类型来适应不同部署场景：
+1、单机部署所有微服务：
+    在所有微服务部署的同级目录配置Conf目录，里面包含grant.json的完整配置，这里说的完整是指所有微服务的配置集中到一个文件，包括DataBase.config，MySql.config,通过这三个文件配置所有本台机器上的服务
+	ConfigType=1 PortList必须配置；
+2、Zookeeper在线上要求灵活部署，自动配置和容灾时这样配置，详见Zookeeper的配置；
+   ConfigType=2 Ip="本机Ip" PortList必须配置 Ip="zk地址" timeout="连接zk超时时间"
+3、私有化多机器集群配置：
+   在所有机器的微服务同级目录Conf，里面配置grant.json配置内容如下：
+					{
+					  "GrantConfig": {
+						"ConfigCenter": {
+						  "ConfigType": 3,
+						  "Ip": "http://a.com/OMS/config/grant.json"
+						}
+				   }
+   ConfigType=3 Ip="配置中心文件地址"  配置中心这个文件需要放置在当前集群所有机器都可以访问的一个web站点中(IIS,或者Nginx) 这个配置文件可以是前两种配置类型，但是一定不能是第三种类型，防止配置死循环
+}
+4、最后说明，配置文件的优先级问题：
+     a、程序启动会先检查当前运行目录下的grant.json ，
+	 b、如果找不到然后会找同级目录是否有Conf中grant.json
+	 c、如果这两个地方都没有，则保持找不到配置文件，如果找到则配置文件正常；
+	 d、如果c步骤正常，会根据配置的ConfigType是否为3 即 httpFile 如果是 则根据配置Ip 其实这里是个完整的url 指向了另外一个grant.json ，会下载这个配置进行初始化
