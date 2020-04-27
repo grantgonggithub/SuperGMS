@@ -16,3 +16,11 @@
 （二）、扩展类库
 
 ![扩展类库](https://github.com/grantgonggithub/GMS/blob/master/class_ext.png)
+
+
+作者:     grant (巩建春)
+email:   nnn987@126.com
+QQ:      406333743
+
+
+欢迎交流！
