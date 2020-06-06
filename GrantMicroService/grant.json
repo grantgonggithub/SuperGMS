@@ -163,7 +163,7 @@
         ]
       },
       {
-        "ServerName": "grantOMSService",
+        "ServerName": "grantService",
         "RouterType": 2,
         "Items": [
           {

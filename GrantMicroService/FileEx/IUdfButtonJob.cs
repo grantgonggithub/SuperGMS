@@ -21,8 +21,6 @@ namespace GrantMicroService.FileEx
         /// 自定义按钮ID
         /// </param>
         /// <returns>
-        /// 当返回 xxx订单执行成功 ,页面将自动弹出右下角消息"xxx订单执行成功"给用户
-        /// 当返回http://xxxx/xxxx时,页面将自动跳转到此页面
         /// </returns>
         string Excute(List<string> listObject, string buttonId);
     }

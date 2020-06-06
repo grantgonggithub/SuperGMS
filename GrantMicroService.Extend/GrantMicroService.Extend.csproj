@@ -19,13 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="PackageIcon.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\GrantMicroService\GrantMicroService.csproj" />
   </ItemGroup>
 

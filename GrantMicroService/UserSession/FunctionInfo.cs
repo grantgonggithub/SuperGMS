@@ -6,7 +6,6 @@ namespace GrantMicroService.UserSession
 {
     /// <summary>
     /// 功能列表信息
-    /// 按12.5会议精神修改
     /// </summary>
     public class FunctionInfo
     {

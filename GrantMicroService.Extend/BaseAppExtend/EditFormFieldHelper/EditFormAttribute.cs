@@ -24,7 +24,7 @@ namespace GrantMicroService.Extend.BaseAppExtend.EditFormFieldHelper
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="EditFormAttribute"/> class.
-        /// 表单DTO的标记,例如：grantomsContext
+        /// 表单DTO的标记,例如：grantContext
         /// 这里之所以要用字符串，是想grant.RpcProxy跟业务的Model解耦合
         /// <param name="dbContextFullName">所在的dbContext</param>
         /// </summary>

@@ -89,7 +89,6 @@ namespace GrantMicroService.JsonEx
         }
 
         /// <summary>
-        /// XML文档转对象,Add By Celi 2017.6.16
         /// </summary>
         /// <typeparam name="T">类型</typeparam>
         /// <param name="xml">xml文档</param>

@@ -830,7 +830,6 @@ namespace GrantMicroService.DB.EFEx.QueryFilterRule
 
         #endregion
 
-        #region QT 扩展
 
         private static Expression ContainsAny(Type type, string value, Expression propertyExp)
         {
@@ -900,8 +899,6 @@ namespace GrantMicroService.DB.EFEx.QueryFilterRule
         {
             return Expression.Equal(Expression.Constant(true, typeof(bool)), Expression.Constant(false, typeof(bool)));
         }
-
-        #endregion
 
         private static bool IsGenericList(this Type o)
         {

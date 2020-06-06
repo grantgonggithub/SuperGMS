@@ -45,9 +45,6 @@ namespace GrantMicroService.Rpc
         string Send(string my_args, object appContext);
     }
 
-    /// <summary>
-    /// 预留, 不知道有什么用处.
-    /// </summary>
     public interface Iface : ISync
     {
     }

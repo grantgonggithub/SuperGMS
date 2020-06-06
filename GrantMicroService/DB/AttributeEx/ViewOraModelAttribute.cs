@@ -10,12 +10,6 @@ using System.Threading.Tasks;
 
 namespace GrantMicroService.DB.AttributeEx
 {
-    /// <summary>
-    /// 视图对应的原始模型,
-    /// 如果在调用CurdRepository.GetByPage(SearchParemeters) 方法时设置了此属性，
-    /// 并且SearchParemeters的 IsGetTotalCount 为 true，并且 PageSize 小于等于1，并且查询条件都在OraModel中
-    /// 则会自动切换到单表进行查询统计，提高性能
-    /// </summary>
     public class ViewOraModelAttribute : Attribute
     {
         /// <summary>
