@@ -14,12 +14,12 @@
 namespace GrantMicroService.Extend.Tools
 {
     /// <summary>
-    /// EntityHumpHelper  add by nick
+    /// EntityHumpHelper
     /// </summary>
     public class EntityHumpHelper
     {
         /// <summary>
-        /// 转成驼峰命名 add by nick
+        /// 转成驼峰命名
         /// </summary>
         /// <param name="fieldName">需要转换为驼峰的字段名称</param>
         /// <returns>string</returns>

@@ -9,7 +9,6 @@ namespace GrantMicroService.DB.AttributeEx
 {
     /// <summary>
     /// 转换值属性
-    /// 用来转换SysCode,Status等值类型,通过Value体现Name,QtJqGrid会自动使用并组织查询下拉框,QtForm也会自动使用并组织下拉框
     /// </summary>
     public class ConvertValueAttribute : Attribute
     {
@@ -78,24 +77,7 @@ namespace GrantMicroService.DB.AttributeEx
             }
         }
 
-        /// <summary>
-        /// 如果你看到了这里, 说明你正在研究为毛线DTO就可以生成列表,
-        /// But 不要高兴的太早,这才刚刚开始,慢慢研究吧~~我是不会告诉你我写这块代码的时候脑子里想的是"有个SB我怎么这么不喜欢他"
-        /// </summary>
-        /// <param name="t">实现了ICovertValue接口的类型</param>
-        /// <param name="invokeParams">调用iCovertValue时的参数,例如:如果此数据是从SysCode中加载,那么invokeParams应该是获取SysCode的过滤参数</param>
-        public ConvertValueAttribute(Type t, string invokeParams)
-        {
-            this._invokeParams = invokeParams;
-            this._t = t;
-        }
-        /// <summary>
-        /// 如果你看到了这里, 说明你正在研究为毛线DTO就可以生成列表,
-        /// But 不要高兴的太早,这才刚刚开始,慢慢研究吧~~我是不会告诉你我写这块代码的时候脑子里想的是"有个SB我怎么这么不喜欢他"
-        /// </summary>
-        /// <param name="t">实现了ICovertValue接口的类型</param>
-        /// <param name="invokeParams">调用iCovertValue时的参数,例如:如果此数据是从SysCode中加载,那么invokeParams应该是获取SysCode的过滤参数</param>
-        /// <param name="isResource">是否通过资源文件转换</param>
+
         public ConvertValueAttribute(Type t, string invokeParams, bool isResource = true)
         {
             this._invokeParams = invokeParams;
@@ -119,7 +101,6 @@ namespace GrantMicroService.DB.AttributeEx
         public string GetName(string key)
         {
             key = key.Trim();
-            //updated by key 2016-06-24,增加,列表代码转换为名称
             if (!string.IsNullOrEmpty(key))
             {
                 if (key.Contains("\n") || key.Contains(","))

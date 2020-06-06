@@ -37,19 +37,7 @@ namespace GrantMicroService.DB.EFEx.DynamicSearch
             Contract.Requires(table != null);
             return Where(table, model.Items, prefix);
         }
-        /// <summary>
-        ///     重载IQueryable 的Where方法，以便支持QueryModel 参数
-        /// </summary>
-        /// <typeparam name="TEntity"></typeparam>
-        /// <param name="table">IQueryable的查询对象</param>
-        /// <returns></returns>
-        public static IQueryable<TEntity> DomainFilter<TEntity>(this IQueryable<TEntity> table)
-        {
-            Contract.Requires(table != null);
-            var searchParameters = new SearchParameters();
-            ForceFilterCondition.FilterByTenantDomainWearHouse<TEntity>(searchParameters);
-            return Where(table, searchParameters.QueryModel.Items, "");
-        }
+
         /// <summary>
         ///     排序
         /// </summary>

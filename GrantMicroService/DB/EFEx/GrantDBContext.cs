@@ -29,15 +29,15 @@ namespace GrantMicroService.DB.EFEx
 {
     public delegate void DbDapperCommit(GrantDBConnection GrantDBConnection, SqlPara auditSql);
     public delegate void DbEFCommit(DbContext dbContext, Z.EntityFramework.Plus.Audit audit);
-    public delegate void QtDapperCommit(RpcContext rpcContext, GrantDBConnection GrantDBConnection, DbInfo dbInfo, SqlPara auditSql);
-    public delegate void QtEFCommit(RpcContext rpcContext, DbContext dbContext, DbInfo dbInfo, Z.EntityFramework.Plus.Audit audit);
+    public delegate void DapperCommit(RpcContext rpcContext, GrantDBConnection GrantDBConnection, DbInfo dbInfo, SqlPara auditSql);
+    public delegate void EFCommit(RpcContext rpcContext, DbContext dbContext, DbInfo dbInfo, Z.EntityFramework.Plus.Audit audit);
     /// <summary>
     /// GrantDBContext
     /// </summary>
     public class GrantDBContext
     {
-        public static event QtDapperCommit OnQtDapperCommit;
-        public static event QtEFCommit OnQtEFCommit;
+        public static event DapperCommit OnQtDapperCommit;
+        public static event EFCommit OnQtEFCommit;
         private readonly static ILogger logger = LogFactory.CreateLogger<GrantDBContext>();
 
         private static DbInfo GetDbInfo(RpcContext rpcContext, string dbName)

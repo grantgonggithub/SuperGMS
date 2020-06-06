@@ -5,7 +5,7 @@ using System.Text;
 namespace GrantMicroService.Extend.Tools
 {
     /// <summary>
-    /// 系统资源文件，以oms为先，兼顾其他系统
+    /// 系统资源文件，兼顾其他系统
     /// </summary>
     public class SysResourceDto
     {

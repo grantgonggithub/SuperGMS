@@ -33,7 +33,7 @@ namespace GrantMicroService.DB.EFEx
         /// <returns></returns>
         public virtual UnitOfWork<TContext> GetUnitOfWork(string sysId, UserContext user)
         {
-            return GetUnitOfWork("192.168.100.201", "Grant", "admin", "grant_oms1");
+            return GetUnitOfWork("192.168.100.201", "Grant", "admin", "grant");
         }
 
         /// <summary>
