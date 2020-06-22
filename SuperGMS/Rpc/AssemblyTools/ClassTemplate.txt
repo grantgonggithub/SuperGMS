@@ -1,0 +1,83 @@
+﻿/*----------------------------------------------------------------
+ Copyright (C) 2018 SuperGMS (Grant 巩建春)  本软件的所有源码都可以免费的进行学习交流,切勿用于商业用途 
+ 创建者：Create by GrantRpcProxyTools grant
+ 说明：本工具生成的命名空间只是跟节点grant.RpcProxy,需要注意修改为具体项目的命名空间，
+       如：grant.RpcProxy.OMS
+	   另外要注意为了最少改动所有Args和Result所在的命名空间必须跟项目的命名空间一致，不能出现目录名称
+	   如：grant.RpcProxy.OMS下的所有类都是这个命名空间，但是你可以创建文件夹来便于管理
+	   如果此文件已经存在，生成完毕将自己写的那个接口拷贝到已有文件，不能直接覆盖，防止覆盖别人的改动
+----------------------------------------------------------------*/
+using SuperGMS.Protocol.RpcProtocol;
+using SuperGMS.Rpc.Client;
+using SuperGMS.Rpc.Server;
+
+namespace grant.RpcProxy
+{
+    internal class #assembly_name# : I#assembly_name#
+	{
+	      #class_part#
+
+		public void Initlize()
+        {
+            GrantRpcClientManager.Register(serviceName);
+        }
+	}
+
+
+	public interface  I#assembly_name#
+	{
+	   #interface_part#
+
+	   void Initlize();
+
+	}
+
+	[InitlizeMethod]
+	public class #assembly_name#Manager
+	{
+	     private static object root = new object();
+         private static I#assembly_name# _proxy;
+
+
+		         /// <summary>
+        /// 主要用来让测试用的
+        /// </summary>
+        /// <param name="proxy"></param>
+        public static void Initlize(I#assembly_name# proxy)
+        {
+            if (_proxy == null)
+            {
+                lock (root)
+                {
+                    if (_proxy == null)
+                        _proxy = proxy;
+                }
+            }
+            _proxy.Initlize();
+        }
+
+
+		#region  这里的东西是工具自动生成的，千万不能动
+
+        /// <summary>
+        /// 默认构造是用来注册的
+        /// 用来自动注册当前调用的服务的配置路由，工具自动生成，千万不能动
+        /// </summary>
+        [InitlizeMethod]
+        public static void Initlize()
+        {
+            I#assembly_name# p = new #assembly_name#();
+            Initlize(p);
+        }
+
+        public static I#assembly_name# Proxy
+        {
+            get { return _proxy; }
+        }
+
+        #endregion
+
+
+	}
+
+}
