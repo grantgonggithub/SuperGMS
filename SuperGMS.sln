@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 16.0.29709.97
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrantMicroService", "GrantMicroService\GrantMicroService.csproj", "{A926A511-DFEB-408F-81CD-7F0D7E3B1817}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperGMS", "SuperGMS\SuperGMS.csproj", "{A926A511-DFEB-408F-81CD-7F0D7E3B1817}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrantMicroService.Extend", "GrantMicroService.Extend\GrantMicroService.Extend.csproj", "{B185FE50-E57C-4816-8B96-C8A37024F062}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperGMS.Extend", "SuperGMS.Extend\SuperGMS.Extend.csproj", "{B185FE50-E57C-4816-8B96-C8A37024F062}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrantMicroService.HttpProxy", "GrantMicroService.HttpProxy\GrantMicroService.HttpProxy.csproj", "{A660E5D0-3C6B-45AB-A45F-B132492318D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperGMS.HttpProxy", "SuperGMS.HttpProxy\SuperGMS.HttpProxy.csproj", "{A660E5D0-3C6B-45AB-A45F-B132492318D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
