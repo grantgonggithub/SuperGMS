@@ -7,7 +7,7 @@
     <Version>3.0.0</Version>
     <Authors>Grant</Authors>
     <Company>Grant</Company>
-    <Description>GrantMicroService</Description>
+    <Description>SuperGMS</Description>
     <PackageIconUrl />
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
@@ -18,10 +18,10 @@
     <!--<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <TreatSpecificWarningsAsErrors />-->
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>bin\Release\netcoreapp3.1\GrantMicroService.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\netcoreapp3.1\SuperGMS.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp3.1\GrantMicroService.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\netcoreapp3.1\SuperGMS.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

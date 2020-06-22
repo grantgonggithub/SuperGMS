@@ -3,13 +3,13 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Version>3.0.0</Version>
-    <Authors>GrantMicroService</Authors>
-    <Product>GrantMicroService</Product>
-    <Description>GrantMicroService</Description>
+    <Authors>SuperGMS</Authors>
+    <Product>SuperGMS</Product>
+    <Description>SuperGMS</Description>
     <PackageIcon>PackageIcon.png</PackageIcon>
     <PackageIconUrl />
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Company>GrantMicroService</Company>
+    <Company>SuperGMS</Company>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GrantMicroService\GrantMicroService.csproj" />
+    <ProjectReference Include="..\SuperGMS\SuperGMS.csproj" />
   </ItemGroup>
 
 </Project>

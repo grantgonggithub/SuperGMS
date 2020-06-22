@@ -4,8 +4,8 @@
     <ServerGarbageCollection>false</ServerGarbageCollection>
     <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Authors>GrantMicroService</Authors>
-    <Product>GrantMicroService</Product>
+    <Authors>SuperGMS</Authors>
+    <Product>SuperGMS</Product>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GrantMicroService\GrantMicroService.csproj" />
+    <ProjectReference Include="..\SuperGMS\SuperGMS.csproj" />
   </ItemGroup>
 
   <ItemGroup>
