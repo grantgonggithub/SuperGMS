@@ -39,11 +39,6 @@ namespace SuperGMS.UserSession
         public string Token { get; set; }
 
         /// <summary>
-        /// 要求加的
-        /// </summary>
-        public string Ssid { get; set; }
-
-        /// <summary>
         ///   Gets or sets  客户端渠道类型Key
         /// </summary>
         public string ClientType { get; set; }
@@ -222,7 +217,15 @@ namespace SuperGMS.UserSession
         /// <returns>用户上下文</returns>
         internal static UserContext GetUserContext(string token)
         {
-            return CacheManager.Get<UserContext>(token);
+            try
+            {
+                return CacheManager.Get<UserContext>(token);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"UserContext.GetUserContext.Error.{token}");
+                return null;
+            }
         }
     }
 }
