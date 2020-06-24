@@ -23,7 +23,7 @@ namespace SuperGMS.Rpc.Thrift.Server
     /// <summary>
     ///
     /// </summary>
-    public class GrantThriftServer : GrantBaseServer
+    public class GrantThriftServer : SuperGMSBaseServer
     {
         private TServer ts;
         private TServerSocket serverTransport;
@@ -34,7 +34,7 @@ namespace SuperGMS.Rpc.Thrift.Server
             serverTransport.Close();
         }
 
-        protected override void ServerRegister(GrantServerConfig server)
+        protected override void ServerRegister(SuperGMSServerConfig server)
         {
             try
             {

@@ -42,7 +42,7 @@ namespace SuperGMS.Rpc
                     : programNamespace + ".dll";
             if (rpcServer != null)
             {
-                GrantServerConfig s = new GrantServerConfig()
+                SuperGMSServerConfig s = new SuperGMSServerConfig()
                 {
                     Port = rpcServer.Port,
                     ServerType = rpcServer.ServerType,
@@ -63,9 +63,9 @@ namespace SuperGMS.Rpc
             server.QtDispose();
         }
 
-        private static GrantBaseServer server = null;
+        private static SuperGMSBaseServer server = null;
 
-        public static void Register(GrantServerConfig config)
+        public static void Register(SuperGMSServerConfig config)
         {
             switch (config.ServerType)
             {
@@ -81,7 +81,7 @@ namespace SuperGMS.Rpc
                     server = new TaskWorker.TaskWorker();
                     break;
                 case ServerType.HttpWebApi:
-                    server=new GrantWebApiServer();
+                    server=new WebApiServer();
                     break;
             }
 

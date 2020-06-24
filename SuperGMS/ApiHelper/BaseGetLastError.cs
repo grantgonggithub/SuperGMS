@@ -21,7 +21,7 @@ namespace SuperGMS.ApiHelper
     /// <summary>
     /// 得到微服务接口列表帮助信息
     /// </summary>
-    public abstract class BaseGetLastError : GrantRpcBaseServer<Nullables, List<string>>
+    public abstract class BaseGetLastError : RpcBaseServer<Nullables, List<string>>
     {
         /// <summary>
         /// GetAddress接口实现

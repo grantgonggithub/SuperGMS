@@ -25,8 +25,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Audit\**" />
     <Compile Remove="BatBuildCopyDll\**" />
+    <EmbeddedResource Remove="Audit\**" />
     <EmbeddedResource Remove="BatBuildCopyDll\**" />
+    <None Remove="Audit\**" />
     <None Remove="BatBuildCopyDll\**" />
   </ItemGroup>
 
