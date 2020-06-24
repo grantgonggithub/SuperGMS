@@ -40,7 +40,7 @@ namespace SuperGMS.Rpc.AssemblyTools
                 body.AppendLine();
 
                 // 加载所有继承了AppBase的类
-                var useTypes = types.Where(t => GrantRpcDistributer.isChildAppBase(t) && !t.IsAbstract).ToList();
+                var useTypes = types.Where(t => RpcDistributer.isChildAppBase(t) && !t.IsAbstract).ToList();
                 return WriteFile(outPutDir, template, templateBody, interfaceBody, useTypes, body, interfaceBodySb, assShortName);
             }
             catch (ReflectionTypeLoadException rtlEx)

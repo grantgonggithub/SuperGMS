@@ -48,7 +48,7 @@ namespace SuperGMS.Extend.BackGroundMessage
                 // 订阅所有的routerKey
                 foreach (var item in bussinessTypes)
                 {
-                    GrantMQManager<SetBackGroudMessageArgs>.ConsumeRegister(
+                    MQManager<SetBackGroudMessageArgs>.ConsumeRegister(
                         GetRouter(item),
                         GetQueue(item),
                         false,
@@ -88,7 +88,7 @@ namespace SuperGMS.Extend.BackGroundMessage
         {
             var msg = new MQProtocol<SetBackGroudMessageArgs>("SetBackGroudMessage", valueArgs, valueArgs.Args.rid);
             var routeKey = GetRouter(valueArgs.BussinessType);
-            var mq = GrantMQManager<SetBackGroudMessageArgs>.Publish(msg, routeKey);
+            var mq = MQManager<SetBackGroudMessageArgs>.Publish(msg, routeKey);
 
             if (!mq)
             {

@@ -27,7 +27,7 @@ namespace SuperGMS.Extend.EditFormFieldHelper
     /// <summary>
     /// GetFormFieldAttribute
     /// </summary>
-    public abstract class GetFormFieldAttribute : GrantRpcBaseServer<EditFormApiArgs, EditFormApiResult[]>
+    public abstract class GetFormFieldAttribute : RpcBaseServer<EditFormApiArgs, EditFormApiResult[]>
     {
         private static Dictionary<string, List<EditFormApiResult>> apiArgs = null;
 
