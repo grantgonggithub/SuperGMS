@@ -30,17 +30,17 @@ namespace SuperGMS.HttpProxy
     /// <summary>
     /// GrantHttpProxy
     /// </summary>
-    public class GrantHttpProxy
+    public class SuperHttpProxy
     {
         public static string HttpProxyName = HttpProxy; // 这个是做为webApi时，可能就会被改变
         public const string HttpProxy = "HttpProxy"; // 这个指的httpProxy这个服务，是个固定的名称，也指配置
-        private readonly static ILogger logger = LogFactory.CreateLogger<GrantHttpProxy>();
+        private readonly static ILogger logger = LogFactory.CreateLogger<SuperHttpProxy>();
         public static void Register()
         {
-            ServerSetting.Initlize(GrantHttpProxy.HttpProxyName, 0);
+            ServerSetting.Initlize(SuperGMS.HttpProxy.SuperHttpProxy.HttpProxyName, 0);
             string[] server = GetAllServer();
             Reg(server);
-            ServerSetting.RegisterRouter(GrantHttpProxy.HttpProxyName,
+            ServerSetting.RegisterRouter(SuperGMS.HttpProxy.SuperHttpProxy.HttpProxyName,
                 ServerSetting.Config.GrantConfig.RpcService.Ip,
                 ServerSetting.Config.GrantConfig.RpcService.Port,
                 ServerSetting.Config.GrantConfig.RpcService.Enable,

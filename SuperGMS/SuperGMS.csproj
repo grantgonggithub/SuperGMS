@@ -25,26 +25,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Audit\**" />
-    <Compile Remove="BatBuildCopyDll\**" />
-    <EmbeddedResource Remove="Audit\**" />
-    <EmbeddedResource Remove="BatBuildCopyDll\**" />
-    <None Remove="Audit\**" />
-    <None Remove="BatBuildCopyDll\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="GlobalSuppressions.cs" />
-    <Compile Remove="UserSession\DTO_LOGIN_USER_INFO.cs" />
-    <Compile Remove="UserSession\UserFunction.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Rpc\AssemblyTools\ClassBodyTemplate.txt" />
-    <None Remove="Rpc\AssemblyTools\ClassTemplate.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="Rpc\AssemblyTools\ClassBodyTemplate.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

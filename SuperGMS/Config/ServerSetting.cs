@@ -151,11 +151,11 @@ namespace SuperGMS.Config
             {
                 return; // 本地配置不走zookeeper;
             } 
-           string path = GrantZookeeperManager.SetRouter(serverName, ip, port, enable, timeout);
+           string path = ZookeeperManager.SetRouter(serverName, ip, port, enable, timeout);
             var cfgWatcher = new ConfigWatcher();
             cfgWatcher.OnChange += (string p) =>
             {
-                var changeData = GrantZookeeperManager.GetNodeData(path, cfgWatcher);
+                var changeData = ZookeeperManager.GetNodeData(path, cfgWatcher);
                 if (!string.IsNullOrEmpty(changeData))
                 {
                     try
@@ -187,7 +187,7 @@ namespace SuperGMS.Config
                 }
                
             };
-            GrantZookeeperManager.GetNodeData(path, cfgWatcher); // 监控自己router节点的内容，有可能被置为下线；
+            ZookeeperManager.GetNodeData(path, cfgWatcher); // 监控自己router节点的内容，有可能被置为下线；
         }
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace SuperGMS.Config
                     {
                         if (updateAction != null && !string.IsNullOrEmpty(path))
                         {
-                            var proxyStr = GrantZookeeperManager.GetNodeData(path, router);
+                            var proxyStr = ZookeeperManager.GetNodeData(path, router);
                             if (string.IsNullOrEmpty(proxyStr))
                             {
                                 return;
@@ -226,8 +226,8 @@ namespace SuperGMS.Config
                             updateAction(config);
                         }
                     };
-                    string p = GrantZookeeperManager.getConfigPath(proxyName);
-                    var cfg = GrantZookeeperManager.GetNodeData(p+"/"+GrantHttpProxy.HttpProxy, router);
+                    string p = ZookeeperManager.getConfigPath(proxyName);
+                    var cfg = ZookeeperManager.GetNodeData(p + "/" + SuperHttpProxy.HttpProxy, router);
                     if (string.IsNullOrEmpty(cfg))
                     {
                         logger.LogWarning("获取代理层配置为空，这个代理层将无法提供代理服务 ServerSetting.GetHttpProxy is Null");
@@ -279,7 +279,7 @@ namespace SuperGMS.Config
 
                     config.RpcClients = getRouters(appName, serviceRouterWatcher);
 
-                    GrantZookeeperManager.SetRelation(appName, _appName); // 设置调用关系
+                    ZookeeperManager.SetRelation(appName, _appName); // 设置调用关系
 
                     return config;
                 default:
@@ -288,7 +288,7 @@ namespace SuperGMS.Config
         }
 
         /// <summary>
-        /// 获取某个服务在集群中的所有负载地址，包括自己,注意必须是基于zk部署，或者集中配置中心才行，单个grant.json的配置是无法知道负载地址的
+        /// 获取某个服务在集群中的所有负载地址，包括自己,注意必须是基于zk部署，或者集中配置中心才行，单个super.json的配置是无法知道负载地址的
         /// </summary>
         /// <param name="serviceName">服务名称</param>
         /// <returns></returns>
@@ -299,7 +299,7 @@ namespace SuperGMS.Config
 
         private static RpcClients getRouters(string appName,Watcher serviceRouterWatcher)
         {
-            List<string> nodeList = GrantZookeeperManager.GetRouterChildren(appName,serviceRouterWatcher); // 路由是整个获取节点整个跟节点监控，因为子节点是虚拟的
+            List<string> nodeList = ZookeeperManager.GetRouterChildren(appName,serviceRouterWatcher); // 路由是整个获取节点整个跟节点监控，因为子节点是虚拟的
             if (nodeList == null || nodeList.Count < 1)
             {
                 string msg = $"你代码里面调用了 {appName} ,但是从zookeeper中取不到这个服务的路由信息，GetAppClient.appName={appName}.GetChildrenNode==null";
@@ -312,14 +312,14 @@ namespace SuperGMS.Config
             Client client = new Client() { RouterType = RouterType.Random, ServerName = appName };
             client.Items = new List<ClientItem>();
             rpcClients.Clients.Add(client);
-            string p = GrantZookeeperManager.getRouterPath(appName);
+            string p = ZookeeperManager.getRouterPath(appName);
             if (string.IsNullOrEmpty(p))
             {
                 return null;
             }
             foreach (var item in nodeList)
             {
-                string nodeData = GrantZookeeperManager.GetNodeData(p + "/" + item,serviceRouterWatcher);
+                string nodeData = ZookeeperManager.GetNodeData(p + "/" + item,serviceRouterWatcher);
                 if (string.IsNullOrEmpty(nodeData))
                 {
                     continue;
@@ -362,7 +362,7 @@ namespace SuperGMS.Config
                         ZKConnectionWatcher connectionWatcher = new ZKConnectionWatcher();
                         connectionWatcher.OnChange += (string path) =>
                         {
-                            GrantZookeeperManager.reConnection(new KeeperException.SessionExpiredException(),
+                            ZookeeperManager.reConnection(new KeeperException.SessionExpiredException(),
                                 () =>
                                 {
                                     try
@@ -399,7 +399,7 @@ namespace SuperGMS.Config
 
                                 });
                         };
-                        GrantZookeeperManager.Initlize(
+                        ZookeeperManager.Initlize(
                             configCenter.Ip,
                             configCenter.SessionTimeout, connectionWatcher);
 
@@ -420,7 +420,7 @@ namespace SuperGMS.Config
             // 检查标准配置，第一次可能zk是空
             // 检查标准配置节点，帮助初始化
             var standConfig = getStandConfig();
-            GrantZookeeperManager.CheckConfig(appName, standConfig);
+            ZookeeperManager.CheckConfig(appName, standConfig);
 
 
             // 拉取当前AppName的配置，需要注册watcher
@@ -428,7 +428,7 @@ namespace SuperGMS.Config
 
             dataWatcher.OnChange += (string path) =>
             {
-                string configData = GrantZookeeperManager.GetNodeData(path, dataWatcher);
+                string configData = ZookeeperManager.GetNodeData(path, dataWatcher);
                 if (string.IsNullOrEmpty(configData))
                 {
                     return;
@@ -437,11 +437,11 @@ namespace SuperGMS.Config
             };
 
             List<string>
-                childrens = GrantZookeeperManager.GetConfigChildren(appName,
+                childrens = ZookeeperManager.GetConfigChildren(appName,
                     null); // 配置是整个获取节点，分别获取配置和分别增加watcher
             if (childrens != null && childrens.Count > 0)
             {
-                string root = GrantZookeeperManager.getConfigPath(appName);
+                string root = ZookeeperManager.getConfigPath(appName);
                 if (string.IsNullOrEmpty(root))
                 {
                     return;
@@ -450,7 +450,7 @@ namespace SuperGMS.Config
                 {
                     // 需要根据节点路径来判断是哪个节点变化了
                     string path = root + "/" + item;
-                    string configData = GrantZookeeperManager.GetNodeData(path, dataWatcher);
+                    string configData = ZookeeperManager.GetNodeData(path, dataWatcher);
                     UpdateZookeeper(path, configData);
                 }
             }
@@ -466,7 +466,7 @@ namespace SuperGMS.Config
                     NullValueHandling = NullValueHandling.Ignore,
                     Formatting = Formatting.Indented
                 };
-                standConfig.Add(GrantHttpProxy.HttpProxy, config.HttpProxy == null ? string.Empty : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration(){ HttpProxy = config.HttpProxy}, jsonSerializerSettings));
+                standConfig.Add(SuperGMS.HttpProxy.SuperHttpProxy.HttpProxy, config.HttpProxy == null ? string.Empty : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration(){ HttpProxy = config.HttpProxy}, jsonSerializerSettings));
                 string dbStr = string.Empty;
                 if (config.DataBase != null && !string.IsNullOrEmpty(config.DataBase.DbFile))
                 {
@@ -587,7 +587,7 @@ namespace SuperGMS.Config
                             FileServerManager.Initlize(fs.FileServer);
                             Config.FileServer = fs.FileServer;
                             break;
-                        case GrantHttpProxy.HttpProxy: //HttpProxy
+                        case SuperGMS.HttpProxy.SuperHttpProxy.HttpProxy: //HttpProxy
                             var pxyName = Newtonsoft.Json.JsonConvert.DeserializeObject<Configuration>(configData);
                             Config.HttpProxy = pxyName.HttpProxy;
                             break;
@@ -665,14 +665,14 @@ namespace SuperGMS.Config
             return SqlMapManager.GetSql(dbContextName, sqlKey);
         }
         /// <summary>
-        /// 初始化服务配置(本地grant.json中必须指明读取的配置源)
+        /// 初始化服务配置(本地super.json中必须指明读取的配置源)
         /// </summary>
         /// <returns></returns>
         private static void InitgrantConfiguration()
         {
-            //配置源优先从服务本地根目录下的grant.json获取,
+            //配置源优先从服务本地根目录下的super.json获取,
             IConfiguration configSource = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
-              .AddJsonFile("grant.json", optional: true, reloadOnChange: false).Build();
+              .AddJsonFile("super.json", optional: true, reloadOnChange: false).Build();
             ServerSetting.configCenter = configSource.GetSection("GrantConfig:ConfigCenter").Get<ConfigCenter>();
             //如未获取到,则配置源默认为ConfigType.Local
             if (ServerSetting.configCenter == null)
@@ -682,15 +682,15 @@ namespace SuperGMS.Config
             var settingConfigBuilder = new ConfigurationBuilder();
             switch (ServerSetting.configCenter.ConfigType)
             {
-                //配置源为ConfigType.Local时,优先读取内部grantsettings.json文件,不存在则读取上级目录Conf下的grantsettings.json
+                //配置源为ConfigType.Local时,优先读取内部grantsettings.json文件,不存在则读取上级目录Conf下的super.json
                 case ConfigType.Local:
-                    if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "grantsettings.json")))
+                    if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "super.json")))
                     {
-                        settingConfigBuilder.SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("grantsettings.json", optional: false, reloadOnChange: false);
+                        settingConfigBuilder.SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("super.json", optional: false, reloadOnChange: false);
                     }
                     else
                     {
-                        settingConfigBuilder.SetBasePath(Path.Combine(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.FullName, "Conf")).AddJsonFile("grantsettings.json", optional: false, reloadOnChange: false);
+                        settingConfigBuilder.SetBasePath(Path.Combine(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.FullName, "Conf")).AddJsonFile("super.json", optional: false, reloadOnChange: false);
                     }
                     break;
                 case ConfigType.HttpFile:
@@ -707,7 +707,7 @@ namespace SuperGMS.Config
             ServerSetting.config = settingsConfig.Get<Configuration>();
             if (config.GrantConfig.RpcService == null)
             {
-                string msg = "请检查配置中GrantConfig的配置是否正确，保证子节点RpcService的配置完整....";
+                string msg = "请检查配置中super.json的配置是否正确，保证子节点RpcService的配置完整....";
                 logger.LogCritical(msg);
                 Thread.Sleep(1000);
                 throw new Exception(msg);
