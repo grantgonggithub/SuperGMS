@@ -183,32 +183,6 @@ namespace SuperGMS.UserSession
             }
         }
 
-        /// <summary>
-        ///     获取扩展信息
-        /// </summary>
-        /// <returns>扩展信息</returns>
-        public UserContextEx GetExInfo()
-        {
-            try
-            {
-                if (userContextEx==null)
-                {
-                    lock (rootLock)
-                    {
-                        if (userContextEx == null)
-                        {
-                            userContextEx = CacheManager.Get<UserContextEx>($"{Token}.UserContextEx");
-                        }
-                    }
-                }
-                return userContextEx;
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, $"UserContext.UserContextEx.Error.{Token}");
-                return new UserContextEx();
-            }
-        }
 
         /// <summary>
         ///     這個方法只能框架里用，外面看不到，框架的RpcContext通過此方法初始化UserContext

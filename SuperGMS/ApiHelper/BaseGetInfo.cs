@@ -18,7 +18,7 @@ namespace SuperGMS.ApiHelper
     /// <summary>
     /// 得到微服务接口列表帮助信息
     /// </summary>
-    public abstract class BaseGetInfo : GrantRpcBaseServer<Nullables, ServiceInfo>
+    public abstract class BaseGetInfo : RpcBaseServer<Nullables, ServiceInfo>
     {
         private static ServiceInfo _info = null;
         /// <summary>

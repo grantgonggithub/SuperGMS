@@ -12,7 +12,7 @@ namespace SuperGMS.ApiHelper
     /// <summary>
     /// 得到微服务接口列表帮助信息
     /// </summary>
-    public abstract class BaseGetApiHelp : GrantRpcBaseServer<Nullables, List<ClassInfo>>
+    public abstract class BaseGetApiHelp : RpcBaseServer<Nullables, List<ClassInfo>>
     {
         /// <summary>
         /// Gets 需实现的属性
