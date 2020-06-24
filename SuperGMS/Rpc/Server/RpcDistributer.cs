@@ -396,7 +396,7 @@ namespace SuperGMS.Rpc.Server
                 return false;
             }
 
-            if (t.Name.StartsWith("GrantRpcBaseServer"))
+            if (t.Name.StartsWith("RpcBaseServer"))
             {
                 return true;
             }
