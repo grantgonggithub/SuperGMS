@@ -27,10 +27,13 @@
   <ItemGroup>
     <Compile Remove="Audit\**" />
     <Compile Remove="BatBuildCopyDll\**" />
+    <Compile Remove="Log\**" />
     <EmbeddedResource Remove="Audit\**" />
     <EmbeddedResource Remove="BatBuildCopyDll\**" />
+    <EmbeddedResource Remove="Log\**" />
     <None Remove="Audit\**" />
     <None Remove="BatBuildCopyDll\**" />
+    <None Remove="Log\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,6 +45,14 @@
   <ItemGroup>
     <None Remove="Rpc\AssemblyTools\ClassBodyTemplate.txt" />
     <None Remove="Rpc\AssemblyTools\ClassTemplate.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Log\LogBase.cs" />
+    <Compile Include="Log\LogFactory.cs" />
+    <Compile Include="Log\LogInfo.cs" />
+    <Compile Include="Log\LogRequest.cs" />
+    <Compile Include="Log\LogStat.cs" />
   </ItemGroup>
 
   <ItemGroup>
