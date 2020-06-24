@@ -103,7 +103,7 @@ namespace SuperGMS.GrantLock
         /// </summary>
         public void ReleaseLock()
         {
-            GrantLockManager.ReleaseLock(this);
+            LockManager.ReleaseLock(this);
         }
 
         private bool TryAcquireOnce()

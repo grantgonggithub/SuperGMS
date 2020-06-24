@@ -5,9 +5,9 @@ namespace SuperGMS.Rpc.TaskWorker
     /// <summary>
     /// 长轮询的一个Base服务
     /// </summary>
-    public class TaskWorker : GrantBaseServer
+    public class TaskWorker : SuperGMSBaseServer
     {
-        private GrantServerConfig server;
+        private SuperGMSServerConfig server;
 
         /// <summary>
         ///
@@ -20,7 +20,7 @@ namespace SuperGMS.Rpc.TaskWorker
         /// 定时任务的服务不需要注册，直接通过InitlizeMethodAttribute属性初始化
         /// </summary>
         /// <param name="server"></param>
-        protected override void ServerRegister(GrantServerConfig server)
+        protected override void ServerRegister(SuperGMSServerConfig server)
         {
             this.server = server;
         }

@@ -16,7 +16,7 @@ namespace SuperGMS.Extend
         /// <summary>
         /// RPC 基类
         /// </summary>
-        private static readonly string RpcBaseName = typeof(GrantRpcBaseServer<object, object>).GetGenericTypeDefinition().FullName;
+        private static readonly string RpcBaseName = typeof(RpcBaseServer<object, object>).GetGenericTypeDefinition().FullName;
         private static List<Type> ApiInterfaces;
 
         static MicroServiceAssembly()
