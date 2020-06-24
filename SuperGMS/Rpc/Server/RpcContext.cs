@@ -33,7 +33,7 @@ namespace SuperGMS.Rpc.Server
         private readonly object rootLock = new object();
         private Dictionary<string, HeaderValue> headers;
         private UserContext userContext;
-        private Dictionary<string, IGrantEFDbContext> dbContexts = new Dictionary<string, IGrantEFDbContext>();
+        private Dictionary<string, IEFDbContext> dbContexts = new Dictionary<string, IEFDbContext>();
         private List<DistributedLock> locks=new List<DistributedLock>();
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace SuperGMS.Rpc.Server
         /// <param name="newOne">是否新创建，不共享，在多线程相互隔离的上下文中使用</param>
         /// <typeparam name="TContext">tcontext</typeparam>
         /// <returns>IGrantDbContext</returns>
-        public IGrantEFDbContext GetDbContext<TContext>(bool newOne = false)
+        public IEFDbContext GetDbContext<TContext>(bool newOne = false)
             where TContext : DbContext
         {
             var key = typeof(TContext).FullName.ToLower();
@@ -137,7 +137,7 @@ namespace SuperGMS.Rpc.Server
                 lock (rootLock)
                 {
                     key = Guid.NewGuid().ToString("N");
-                    IGrantEFDbContext newOneValue = GrantDBContext.GetEFContext<TContext>(this);
+                    IEFDbContext newOneValue = SuperGMSDBContext.GetEFContext<TContext>(this);
                     // 这里不加 lock 放入是为了回收，不用关心脏不脏 , 如果丢了, 则不能手工回收调用Dispose, 只能靠系统自动回收
                     dbContexts.Add(key, newOneValue);
                     return newOneValue;
@@ -158,7 +158,7 @@ namespace SuperGMS.Rpc.Server
                         return dbContexts[key];
                     }
 
-                    var dbctx = GrantDBContext.GetEFContext<TContext>(this);
+                    var dbctx = SuperGMSDBContext.GetEFContext<TContext>(this);
                     dbContexts.Add(key, dbctx);
                     return dbctx;
                 }
@@ -171,10 +171,10 @@ namespace SuperGMS.Rpc.Server
         /// </summary>
         /// <typeparam name="TContext">TContext</typeparam>
         /// <returns>IGrantDapperDbContext</returns>
-        public IGrantDapperDbContext GetDapperDbContext<TContext>()
+        public IDapperDbContext GetDapperDbContext<TContext>()
         {
             // Dapper的DbContext不需要换成，只是一个空壳引用，没有任何性能问题，唯一的数据库连接使用连接池
-            return GrantDBContext.GetDapperContext(this, typeof(TContext).Name);
+            return SuperGMSDBContext.GetDapperContext(this, typeof(TContext).Name);
         }
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace SuperGMS.Rpc.Server
         /// </summary>
         public void Dispose()
         {
-            locks.ForEach(x => { GrantLockManager.ReleaseLock(x);});
+            locks.ForEach(x => { LockManager.ReleaseLock(x);});
             if (dbContexts != null && dbContexts.Count > 0)
             {
                 foreach (var db in dbContexts.Keys)
@@ -214,7 +214,7 @@ namespace SuperGMS.Rpc.Server
         public DistributedLock TryGetLock(string lockKey, int timeOut = 0,
             int autoReleaseTime = 60 * 1000)
         {
-            var l= GrantLockManager.TryGetLock(lockKey, timeOut, autoReleaseTime);
+            var l= LockManager.TryGetLock(lockKey, timeOut, autoReleaseTime);
             if (l==null)
             {
                 return null;

@@ -15,7 +15,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using SuperGMS.Audit.Model;
 
 namespace SuperGMS.Tools
 {

@@ -34,7 +34,7 @@ namespace SuperGMS.Rpc.Client
         /// 根据服务器的ip和端口来保存当前客户端到这台服务器的所有连接, DataTime 是最后连接时间
         /// </summary>
         /// <example> <![CDATA[ Dictionary<ip, List<一个连接>> ]]></example>
-        private static readonly Dictionary<string, List<ComboxClass<DateTime, IGrantRpcClient>>> ConnectionPools = new Dictionary<string, List<ComboxClass<DateTime, IGrantRpcClient>>>();
+        private static readonly Dictionary<string, List<ComboxClass<DateTime, ISuperGMSRpcClient>>> ConnectionPools = new Dictionary<string, List<ComboxClass<DateTime, ISuperGMSRpcClient>>>();
         private readonly static ILogger logger = LogFactory.CreateLogger<ClientConnectionManager>();
         private static object root = new object();
         private static bool runing = false;
@@ -44,7 +44,7 @@ namespace SuperGMS.Rpc.Client
         /// </summary>
         /// <param name="item">配置信息</param>
         /// <returns>rpc连接</returns>
-        public static IGrantRpcClient GetClient(ClientItem item)
+        public static ISuperGMSRpcClient GetClient(ClientItem item)
         {
             if (item.Pool > 0) return Register(item);// 0,表示开启连接池（默认），1，表示关闭连接池
             string key = GetConnectionPoolKey(item.Ip, item.Port);
@@ -58,11 +58,11 @@ namespace SuperGMS.Rpc.Client
 
                 if (ConnectionPools.ContainsKey(key))
                 {
-                    List<ComboxClass<DateTime, IGrantRpcClient>> cls = ConnectionPools[key];
+                    List<ComboxClass<DateTime, ISuperGMSRpcClient>> cls = ConnectionPools[key];
                     if (cls.Count > 0)
                     {
                         // 从队列中取一个连接，并移除掉，防止二次分配
-                        IGrantRpcClient c = cls[0].V2;
+                        ISuperGMSRpcClient c = cls[0].V2;
                         cls.Remove(cls[0]);
                         return c;
                     }
@@ -78,7 +78,7 @@ namespace SuperGMS.Rpc.Client
         /// 连接只有在用的时候才会检查状态
         /// </summary>
         /// <param name="client"> 客户端</param>
-        public static void ReleaseClient(IGrantRpcClient client)
+        public static void ReleaseClient(ISuperGMSRpcClient client)
         {
             if (client.Item.Pool > 0){
                 client.Close();
@@ -90,13 +90,13 @@ namespace SuperGMS.Rpc.Client
                 if (ConnectionPools.ContainsKey(key))
                 {
                     ConnectionPools[key]
-                        .Add(new ComboxClass<DateTime, IGrantRpcClient> { V1 = DateTime.Now, V2 = client });
+                        .Add(new ComboxClass<DateTime, ISuperGMSRpcClient> { V1 = DateTime.Now, V2 = client });
                 }
                 else
                 {
-                    List<ComboxClass<DateTime, IGrantRpcClient>> cls = new List<ComboxClass<DateTime, IGrantRpcClient>>(1)
+                    List<ComboxClass<DateTime, ISuperGMSRpcClient>> cls = new List<ComboxClass<DateTime, ISuperGMSRpcClient>>(1)
                     {
-                        new ComboxClass<DateTime, IGrantRpcClient> { V1 = DateTime.Now, V2 = client },
+                        new ComboxClass<DateTime, ISuperGMSRpcClient> { V1 = DateTime.Now, V2 = client },
                     };
                     ConnectionPools.Add(key, cls);
                 }
@@ -117,7 +117,7 @@ namespace SuperGMS.Rpc.Client
                         string[] keys = ConnectionPools.Keys.ToArray();
                         foreach (string s in keys)
                         {
-                            ComboxClass<DateTime, IGrantRpcClient>[] clients = ConnectionPools[s].ToArray();
+                            ComboxClass<DateTime, ISuperGMSRpcClient>[] clients = ConnectionPools[s].ToArray();
                             foreach (var c in clients)
                             {
                                 c.V2.Close();
@@ -140,18 +140,18 @@ namespace SuperGMS.Rpc.Client
         /// </summary>
         /// <param name="item">连接配置</param>
         /// <returns>连接</returns>
-        private static IGrantRpcClient Register(ClientItem item)
+        private static ISuperGMSRpcClient Register(ClientItem item)
         {
             try
             {
-                IGrantRpcClient client = null;
+                ISuperGMSRpcClient client = null;
                 switch (item.ServerType)
                 {
                     case ServerType.Thrift:
-                        client = new GrantThriftClient(item);
+                        client = new ThriftClient(item);
                         break;
                     case ServerType.HttpWebApi:
-                        client=new GrantWebApiClient(item);
+                        client=new WebApiClient(item);
                         break;
                     default:
                         throw new Exception($"ClientConnectionManager.Register(), ClientItem.ServerType:'{item.ServerType}' is invalid");

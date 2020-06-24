@@ -396,7 +396,7 @@ namespace SuperGMS.Extend.Extensions
         //    return list.Distinct<T>()?.ToList();
         //}
 
-        public static DataSet GetData(this IGrantDapperDbContext dbContext, string sql)
+        public static DataSet GetData(this IDapperDbContext dbContext, string sql)
         {
             var rep = dbContext.GetRepository();
             var data = rep.QueryDataSetBySql(sql);

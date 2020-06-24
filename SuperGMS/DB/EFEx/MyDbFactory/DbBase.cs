@@ -78,9 +78,9 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             trans.Dispose();
         }
 
-        protected GrantDBConnection GetConnection()
+        protected DBConnection GetConnection()
         {
-            return new GrantDBConnection(getDbConnection());
+            return new DBConnection(getDbConnection());
         }
 
         /// <summary>

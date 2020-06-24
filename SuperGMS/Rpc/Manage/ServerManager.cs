@@ -32,12 +32,12 @@ namespace SuperGMS.Rpc.Manage
         /// 要注册的服务器列表，注意一个服务只能注册一次，否则会失败（port不能重复注册）
         /// </summary>
         /// <param name="servers"></param>
-        public void Register(GrantServer[] servers)
+        public void Register(SuperGMSServer[] servers)
         {
             try
             {
                 if (servers == null || servers.Length < 1) throw new Exception("no Server can Register");
-                foreach (GrantServer s in servers)
+                foreach (SuperGMSServer s in servers)
                 {
                     TServerSocket serverTransport = new TServerSocket(s.Config.Port);
                     TBinaryProtocol.Factory factory = new TBinaryProtocol.Factory();//传输协议
@@ -59,7 +59,7 @@ namespace SuperGMS.Rpc.Manage
         /// 主从RpcServer
         /// </summary>
         /// <param name="servers"></param>
-        public static void RegisterServer(GrantServer[] servers)
+        public static void RegisterServer(SuperGMSServer[] servers)
         {
             if (_instance == null)
             {

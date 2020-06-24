@@ -51,7 +51,7 @@ namespace SuperGMS.HttpProxy
         {
             foreach (string app in servers)
             {
-                GrantRpcClientManager.Register(app);
+                RpcClientManager.Register(app);
             }
         }
 
@@ -82,7 +82,7 @@ namespace SuperGMS.HttpProxy
                     a.rid = Guid.NewGuid().ToString("N");
                 }
 
-                var rtn = GrantRpcClientManager.Send(a, context.Request.Path);
+                var rtn = RpcClientManager.Send(a, context.Request.Path);
 
                 using (var strStream = new StreamWriter(context.Response.Body))
                 {
