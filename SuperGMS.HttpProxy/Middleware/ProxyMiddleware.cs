@@ -57,7 +57,7 @@ namespace Grant.HttpProxy.Middleware
             {
                 if (ServerSetting.Config.GrantConfig.RpcService.ServerType == ServerType.HttpWebApi)
                 {
-                    string constResp = GrantHttpProxy.SendHttp(context);
+                    string constResp = SuperGMS.HttpProxy.SuperHttpProxy.SendHttp(context);
                     using (var strStream = new StreamWriter(context.Response.Body))
                     {
                         strStream.Write(constResp);
@@ -66,7 +66,7 @@ namespace Grant.HttpProxy.Middleware
                 }
                 else
                 {
-                    GrantHttpProxy.Send(context);
+                    SuperGMS.HttpProxy.SuperHttpProxy.Send(context);
                 }
             });
             task.Start();

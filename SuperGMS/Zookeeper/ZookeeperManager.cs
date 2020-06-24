@@ -29,7 +29,7 @@ namespace SuperGMS.Zookeeper
     /// <summary>
     /// GrantZookeeper
     /// </summary>
-    public class GrantZookeeperManager
+    public class ZookeeperManager
     {
         private static ZooKeeper currentZookeeper;
         private static string ConnectionString;
@@ -39,7 +39,7 @@ namespace SuperGMS.Zookeeper
         private const string QTCONFIG = "/config";
         private const string QTROUTER = "/router";
         private const string RELATION = "/relation";
-        private readonly static ILogger logger = LogFactory.CreateLogger<GrantZookeeperManager>();
+        private readonly static ILogger logger = LogFactory.CreateLogger<ZookeeperManager>();
         private static object rootLock = new object();
 
 
