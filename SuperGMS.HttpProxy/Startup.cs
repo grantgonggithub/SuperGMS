@@ -7,7 +7,7 @@ using SuperGMS.HttpProxy;
 using SuperGMS.Rpc;
 using Grant.HttpProxy.Middleware;
 
-namespace Grant.HttpProxy
+namespace SuperGMS.HttpProxy
 {
     public class Startup
     {
@@ -37,14 +37,14 @@ namespace Grant.HttpProxy
             }
 
             // app.UseResponseCompression();
-            var server = ServerSetting.GetRpcServer(GrantHttpProxy.HttpProxyName);
+            var server = ServerSetting.GetRpcServer(SuperGMS.HttpProxy.SuperHttpProxy.HttpProxyName);
             if (server.ServerType == ServerType.HttpWebApi)
             {
                 ServerProxy.Register(server.AssemblyPath);
             }
             else
             {
-                GrantHttpProxy.Register();
+                SuperGMS.HttpProxy.SuperHttpProxy.Register();
             }
             app.UseCors("AllowAll");
             app.UseMiddleware<ProxyMiddleware>();

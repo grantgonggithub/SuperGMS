@@ -4,7 +4,7 @@ using SuperGMS.Config;
 using SuperGMS.HttpProxy;
 using System.Linq;
 
-namespace Grant.HttpProxy
+namespace SuperGMS.HttpProxy
 {
     public class Program
     {
@@ -18,12 +18,12 @@ namespace Grant.HttpProxy
             // 要做weapi就需要指定服务名，因为根据服务名才能知道相关配置，这个是因为webapi在启动前首先要指定端口
             if (args != null && args.Length > 0)
             {
-                GrantHttpProxy.HttpProxyName = args[0];
+                SuperGMS.HttpProxy.SuperHttpProxy.HttpProxyName = args[0];
             }
 
             var host = WebHost.CreateDefaultBuilder()
                 .UseUrls(
-                    $"http://{ServerSetting.GetRpcServer(GrantHttpProxy.HttpProxyName).Ip}:{ServerSetting.GetRpcServer(GrantHttpProxy.HttpProxyName).Port}/")
+                    $"http://{ServerSetting.GetRpcServer(SuperHttpProxy.HttpProxyName).Ip}:{ServerSetting.GetRpcServer(SuperHttpProxy.HttpProxyName).Port}/")
                 .UseStartup<Startup>().UseKestrel(options=> {
                     //请求内容长度限制(单位B)
                     int maxLength = 0;
