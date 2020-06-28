@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperGMS.Extend", "SuperGMS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperGMS.HttpProxy", "SuperGMS.HttpProxy\SuperGMS.HttpProxy.csproj", "{A660E5D0-3C6B-45AB-A45F-B132492318D6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{BEA5D961-2B47-4634-B188-698D5EEB0208}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperGMS.RpcProxyTools", "SuperGMS.RpcProxyTools\SuperGMS.RpcProxyTools.csproj", "{6D075BFB-95C3-41A8-A131-656C006007AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,9 +31,16 @@ Global
 		{A660E5D0-3C6B-45AB-A45F-B132492318D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A660E5D0-3C6B-45AB-A45F-B132492318D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A660E5D0-3C6B-45AB-A45F-B132492318D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D075BFB-95C3-41A8-A131-656C006007AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D075BFB-95C3-41A8-A131-656C006007AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D075BFB-95C3-41A8-A131-656C006007AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D075BFB-95C3-41A8-A131-656C006007AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6D075BFB-95C3-41A8-A131-656C006007AA} = {BEA5D961-2B47-4634-B188-698D5EEB0208}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {187E39BE-DD59-4E33-A3A4-A4167C1CA6F1}
