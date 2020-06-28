@@ -73,13 +73,12 @@ namespace SuperGMS.Rpc.Server
         /// <returns>string</returns>
         public string Distributer(string args, object context)
         {
-            //内部虚拟事件ID
-            EventId internalEventId = new EventId(0, Guid.NewGuid().ToString("N"));
-            logger.LogInformation(internalEventId, $"收到请求\r\n\targs={args}\r\n\tcontext={JsonConvert.SerializeObject(context)}");
+            var msg = $"收到请求：\r\n\targs={args}\r\n\tcontext={JsonConvert.SerializeObject(context)}";
+            logger.LogInformation(msg);
             // 构造一个请求日志
             var requestLog = new LogRequest()
             {
-                Parameters = $"参见[{internalEventId.Name}]"
+                Parameters = msg
             };
             StatusCode code = StatusCode.OK;
             string rid = string.Empty;
@@ -91,7 +90,7 @@ namespace SuperGMS.Rpc.Server
             catch (Exception ex)
             {
                 code = StatusCode.ArgesError;
-                logger.LogError(internalEventId, ex, "反序列化参数[args]异常");
+                logger.LogError(ex, "反序列化参数[args]异常");
             }
 
             ComboxClass<Type, MethodInfo> tInfo = null;
@@ -101,8 +100,6 @@ namespace SuperGMS.Rpc.Server
             }
             else
             {
-                //外部事件ID(外部传入的rid)
-                EventId externalEventId = new EventId(0, a.rid);
                 if (!servers.TryGetValue(a.m.ToLower(), out tInfo))
                 {
                     code = StatusCode.MethodNotExist;
@@ -124,15 +121,15 @@ namespace SuperGMS.Rpc.Server
                                 c = code.code,
                                 msg = code.msg,
                             });                          
-                            logger.LogInformation(externalEventId, $"请求处理正常结束\r\n\t{requestLog.ToString()}");
+                            logger.LogInformation($"请求处理正常结束，返回值是：{rr}");
                             return rr;
-                        }   
+                        }
                     }
                     catch (Exception ex)
                     {
                         code = StatusCode.ServerError;
-                        code.msg = $"{ex.Message}:{ex.StackTrace}";
-                        logger.LogError(externalEventId, ex, "请求处理异常结束");
+                        code.msg = $"{ex.Message}:{ex.StackTrace},rid={a.rid}";
+                        logger.LogError(ex, $"请求处理异常结束,{code.msg}");
                     }
                 }
 
@@ -143,7 +140,7 @@ namespace SuperGMS.Rpc.Server
             rst.c = code.code;
             rst.msg = code.msg.ToLower();
             string rs = JsonConvert.SerializeObject(rst, resultJsonSetting);
-            logger.LogInformation(internalEventId, $"请求未处理返回:{rs}");
+            logger.LogInformation($"请求异常返回:{rs}");
             return rs;
         }
 
