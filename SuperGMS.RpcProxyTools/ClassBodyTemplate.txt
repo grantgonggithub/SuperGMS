@@ -1,0 +1,6 @@
+﻿		 public  #return_type# #clazz_name#(#args_type# valueArgs,out StatusCode code,RpcContext context)
+		 {
+			 return RpcClientManager.Send<#args_type#,#return_type#>(serviceName, "#clazz_name#",valueArgs, context, out code);
+		 }
+
+
