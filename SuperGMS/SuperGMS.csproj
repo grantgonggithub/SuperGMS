@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <LangVersion>7.1</LangVersion>
     <PackageReleaseNotes>2019-03-29</PackageReleaseNotes>
-    <Version>3.0.3</Version>
+    <Version>3.0.4</Version>
     <Authors>Grant</Authors>
     <Company>Grant</Company>
     <Description>SuperGMS</Description>
@@ -23,18 +23,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\netcoreapp3.1\SuperGMS.xml</DocumentationFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Content Include="Rpc\AssemblyTools\ClassBodyTemplate.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Rpc\AssemblyTools\ClassTemplate.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Rpc\AssemblyTools\InterfaceBodyTemplate.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
 
   <ItemGroup>
     <None Include="UserSession\RoleFunction.cs" />
@@ -74,5 +62,17 @@
     <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="3.0.39" />
     <!--<PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta004" />-->
     <PackageReference Include="ZooKeeperNetEx" Version="3.4.12.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Rpc\AssemblyTools\ClassBodyTemplate.txt">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Rpc\AssemblyTools\ClassTemplate.txt">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="Rpc\AssemblyTools\InterfaceBodyTemplate.txt">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
