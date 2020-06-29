@@ -41,7 +41,7 @@ namespace SuperGMS.Rpc.Manage
                 {
                     TServerSocket serverTransport = new TServerSocket(s.Config.Port);
                     TBinaryProtocol.Factory factory = new TBinaryProtocol.Factory();//传输协议
-                    TProcessor processor = new GrantService.Processor(s.Server);
+                    TProcessor processor = new ThriftService.Processor(s.Server);
                     TServer server = new TThreadPoolServer(processor, serverTransport, new TTransportFactory(), factory);
                 }
             }

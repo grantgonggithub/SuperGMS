@@ -30,7 +30,7 @@ namespace SuperGMS.Config
         /// <summary>
         /// 基础配置
         /// </summary>
-        public GrantConfig GrantConfig { get; set; }
+        public ServerConfig ServerConfig { get; set; }
 
         /// <summary>
         /// 数据库
@@ -109,7 +109,7 @@ namespace SuperGMS.Config
             });
             var cfg = new Configuration
             {
-                GrantConfig = this.GrantConfig,
+                ServerConfig = this.ServerConfig,
                 DataBase = this.DataBase,
                 ConfigLog = this.ConfigLog,
                 ConstKeyValue = this.ConstKeyValue,

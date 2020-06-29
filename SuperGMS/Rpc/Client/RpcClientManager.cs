@@ -78,7 +78,7 @@ namespace SuperGMS.Rpc.Client
             }
             catch (Exception ex)
             {
-                logger.LogCritical(ex, "SuperGMS.GrantRpc.Client.GrantRpcClientManager.Register.Error");
+                logger.LogError(ex, "SuperGMS.GrantRpc.Client.GrantRpcClientManager.Register.Error");
             }
             finally
             {
@@ -232,7 +232,7 @@ namespace SuperGMS.Rpc.Client
                     rr.c = cc.code;
                     rr.msg = cc.msg;
                     rr.v = default(R);
-                    logger.LogCritical(eventId, new LogInfo()
+                    logger.LogError(eventId, new LogInfo()
                     {
                         ServiceName = server,
                         ApiName = a.m,
@@ -447,7 +447,7 @@ namespace SuperGMS.Rpc.Client
                         jSetting.DateFormatHandling = Newtonsoft.Json.DateFormatHandling.MicrosoftDateFormat;
                         jSetting.DateFormatString = "yyyy-MM-dd HH:mm:ss";
                         var msg = JsonConvert.SerializeObject(args,jSetting);
-                        logger.LogTrace(eventId, new LogInfo
+                        logger.LogInformation(eventId, new LogInfo
                         {
                             ServiceName = server,
                             ApiName = args.m,
@@ -465,7 +465,7 @@ namespace SuperGMS.Rpc.Client
                             if (rpcClient.Send(msg,args.m, out result))
                             {
                                 var resultObj = JsonConvert.DeserializeObject<Result<object>>(result);
-                                logger.LogTrace(eventId, new LogInfo
+                                logger.LogInformation(eventId, new LogInfo
                                 {
                                     ServiceName = server,
                                     ApiName = args.m,

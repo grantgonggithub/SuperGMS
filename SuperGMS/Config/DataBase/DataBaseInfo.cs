@@ -21,14 +21,6 @@ namespace SuperGMS.Config
     /// </summary>
     public class DataBaseInfo
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        //public grantOmsDBContext grantOmsDBContext { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-       // public grantUUIDDBContext grantUUIDDBContext { get; set; }
     }
 }

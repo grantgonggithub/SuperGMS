@@ -90,10 +90,10 @@ namespace SuperGMS.Config
                     string dbPath = string.Empty;
                     try
                     {
-                        string downloadPath = Path.Combine(Directory.GetCurrentDirectory(), "Downloads");
+                        string downloadPath = Path.Combine(Directory.GetCurrentDirectory(), "temp");
                         if (!Directory.Exists(downloadPath))
                             Directory.CreateDirectory(downloadPath);
-                        dbPath = Path.Combine(downloadPath, "DataBase.config");
+                        dbPath = Path.Combine(downloadPath, "database.config");
                         using (var webClient = new WebClient())
                         {
                             var dataBytes = webClient.DownloadData(dbFile);
@@ -107,7 +107,7 @@ namespace SuperGMS.Config
                     }
                     catch (Exception e)
                     {
-                        throw new Exception($"下载数据库配置DataBase.config异常:{dbFile}", e);
+                        throw new Exception($"下载数据库配置database.config异常:{dbFile}", e);
                     }
                     dbFile = dbPath;
                 }
@@ -152,11 +152,15 @@ namespace SuperGMS.Config
         }
         public static XElement GetSqlMap()
         {
-            var mapFilePath = $"{AppContext.BaseDirectory}Config{Path.DirectorySeparatorChar}MySql.config";
+            var mapFilePath = $"{AppContext.BaseDirectory}config{Path.DirectorySeparatorChar}sqlmap.config";
             if (!File.Exists(mapFilePath))
             {
-                logger.LogInformation($"找不到配置文件{mapFilePath}");
-                throw new Exception($"找不到配置文件{mapFilePath}");
+                mapFilePath = $"{AppContext.BaseDirectory}Config{Path.DirectorySeparatorChar}sqlmap.config";
+                if (!File.Exists(mapFilePath))
+                {
+                    logger.LogInformation($"找不到配置文件{mapFilePath}");
+                    throw new Exception($"找不到配置文件{mapFilePath}");
+                }
             }
             try
             {

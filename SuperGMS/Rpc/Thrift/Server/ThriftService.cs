@@ -22,7 +22,7 @@ using Microsoft.Extensions.Logging;
 
 namespace SuperGMS.Rpc.Thrift.Server
 {
-    public partial class GrantService
+    public partial class ThriftService
     {
         public class Client : IDisposable, Iface
         {
