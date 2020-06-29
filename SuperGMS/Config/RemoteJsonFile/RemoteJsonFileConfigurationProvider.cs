@@ -80,10 +80,10 @@ namespace SuperGMS.Config.RemoteJsonFile
                     Task.Run(() =>
                     {
                         var configStr = Encoding.UTF8.GetString(dataBytes);
-                        string rootPath = Path.Combine(Directory.GetCurrentDirectory(), "Downloads");
+                        string rootPath = Path.Combine(Directory.GetCurrentDirectory(), "temp");
                         if (!Directory.Exists(rootPath))
                             Directory.CreateDirectory(rootPath);
-                        using (var fileWriter = File.CreateText(Path.Combine(rootPath, "grantsettings.json")))
+                        using (var fileWriter = File.CreateText(Path.Combine(rootPath, "config.json")))
                         {
                             fileWriter.Write(configStr);
                         }

@@ -55,7 +55,7 @@ namespace Grant.HttpProxy.Middleware
 
             Task task = new Task(() =>
             {
-                if (ServerSetting.Config.GrantConfig.RpcService.ServerType == ServerType.HttpWebApi)
+                if (ServerSetting.Config.ServerConfig.RpcService.ServerType == ServerType.HttpWebApi)
                 {
                     string constResp = SuperGMS.HttpProxy.SuperHttpProxy.SendHttp(context);
                     using (var strStream = new StreamWriter(context.Response.Body))

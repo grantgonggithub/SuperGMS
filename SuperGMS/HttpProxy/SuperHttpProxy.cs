@@ -41,10 +41,10 @@ namespace SuperGMS.HttpProxy
             string[] server = GetAllServer();
             Reg(server);
             ServerSetting.RegisterRouter(SuperGMS.HttpProxy.SuperHttpProxy.HttpProxyName,
-                ServerSetting.Config.GrantConfig.RpcService.Ip,
-                ServerSetting.Config.GrantConfig.RpcService.Port,
-                ServerSetting.Config.GrantConfig.RpcService.Enable,
-                ServerSetting.Config.GrantConfig.RpcService.TimeOut);
+                ServerSetting.Config.ServerConfig.RpcService.Ip,
+                ServerSetting.Config.ServerConfig.RpcService.Port,
+                ServerSetting.Config.ServerConfig.RpcService.Enable,
+                ServerSetting.Config.ServerConfig.RpcService.TimeOut);
         }
 
         private static void Reg(string[] servers)
