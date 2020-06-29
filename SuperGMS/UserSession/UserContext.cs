@@ -29,10 +29,6 @@ namespace SuperGMS.UserSession
 
         private List<string> roleList;
 
-        private UserContextEx userContextEx;
-
-        //private List<UserSysInfo> sysList;
-
         /// <summary>
         ///     Gets or sets 用户登录后分配的Token
         /// </summary>

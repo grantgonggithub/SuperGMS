@@ -173,11 +173,11 @@ namespace SuperGMS.Config
                         }
                         // 在这里修改本地配置快照
                         if(clientItem==null||string.IsNullOrEmpty(clientItem.Ip)||clientItem.Port<1) return;
-                        config.GrantConfig.RpcService.Ip = clientItem.Ip;
-                        config.GrantConfig.RpcService.Port = clientItem.Port;
-                        config.GrantConfig.RpcService.Pool = clientItem.Pool;
-                        config.GrantConfig.RpcService.Enable = clientItem.Enable;
-                        config.GrantConfig.RpcService.TimeOut = clientItem.TimeOut;
+                        config.ServerConfig.RpcService.Ip = clientItem.Ip;
+                        config.ServerConfig.RpcService.Port = clientItem.Port;
+                        config.ServerConfig.RpcService.Pool = clientItem.Pool;
+                        config.ServerConfig.RpcService.Enable = clientItem.Enable;
+                        config.ServerConfig.RpcService.TimeOut = clientItem.TimeOut;
                         //copyConfig(); 暂时注掉，这里还没思考好
                     }
                     catch (Exception e)
@@ -392,10 +392,10 @@ namespace SuperGMS.Config
 
                                     // 断线重连，注册自己
                                     RegisterRouter(ServerSetting.AppName,
-                                        ServerSetting.Config.GrantConfig.RpcService.Ip,
-                                        ServerSetting.Config.GrantConfig.RpcService.Port,
-                                        ServerSetting.Config.GrantConfig.RpcService.Enable,
-                                        ServerSetting.Config.GrantConfig.RpcService.TimeOut);
+                                        ServerSetting.Config.ServerConfig.RpcService.Ip,
+                                        ServerSetting.Config.ServerConfig.RpcService.Port,
+                                        ServerSetting.Config.ServerConfig.RpcService.Enable,
+                                        ServerSetting.Config.ServerConfig.RpcService.TimeOut);
 
                                 });
                         };
@@ -614,31 +614,31 @@ namespace SuperGMS.Config
             checkInitlize();
             if (string.IsNullOrEmpty(servserName))
             {
-                return config.GrantConfig.RpcService;
+                return config.ServerConfig.RpcService;
             }
             else
             {
-                var ports = config.GrantConfig.RpcService.PortList;
+                var ports = config.ServerConfig.RpcService.PortList;
                 if (ports!=null&&ports.Count>0)
                 {
                     if (ports.ContainsKey(servserName))
                     {
-                        config.GrantConfig.RpcService.Port = ports[servserName];
+                        config.ServerConfig.RpcService.Port = ports[servserName];
                     }
                 }
             }
-            return config.GrantConfig.RpcService;
+            return config.ServerConfig.RpcService;
         }
 
         private static void checkInitlize()
         {
-            if (config?.GrantConfig == null)
+            if (config?.ServerConfig == null)
             {
                 lock (_objLock)
                 {
-                    if (config?.GrantConfig == null)
+                    if (config?.ServerConfig == null)
                     {
-                        InitgrantConfiguration();
+                        InitConfiguration();
                     }
                 }
             }
@@ -664,16 +664,20 @@ namespace SuperGMS.Config
         {
             return SqlMapManager.GetSql(dbContextName, sqlKey);
         }
+        private const string configFile = "config.json";
         /// <summary>
         /// 初始化服务配置(本地super.json中必须指明读取的配置源)
         /// </summary>
         /// <returns></returns>
-        private static void InitgrantConfiguration()
+        private static void InitConfiguration()
         {
-            //配置源优先从服务本地根目录下的super.json获取,
-            IConfiguration configSource = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
-              .AddJsonFile("super.json", optional: true, reloadOnChange: false).Build();
-            ServerSetting.configCenter = configSource.GetSection("GrantConfig:ConfigCenter").Get<ConfigCenter>();
+            var configJson = Path.Combine(AppContext.BaseDirectory, configFile);
+            if (!File.Exists(configJson))
+                throw new Exception($"在当前服务运行目录中找不到配置文件{configFile}");
+            //配置源优先从服务本地根目录下的config.json获取,
+            IConfiguration configSource = new ConfigurationBuilder().SetBasePath(AppContext.BaseDirectory)
+              .AddJsonFile("config.json", optional: true, reloadOnChange: false).Build();
+            ServerSetting.configCenter = configSource.GetSection("ServerConfig:ConfigCenter").Get<ConfigCenter>();
             //如未获取到,则配置源默认为ConfigType.Local
             if (ServerSetting.configCenter == null)
             {
@@ -682,15 +686,28 @@ namespace SuperGMS.Config
             var settingConfigBuilder = new ConfigurationBuilder();
             switch (ServerSetting.configCenter.ConfigType)
             {
-                //配置源为ConfigType.Local时,优先读取内部grantsettings.json文件,不存在则读取上级目录Conf下的super.json
+                //配置源为ConfigType.Local时,优先读取内部config.json文件,不存在则读取上级目录Conf下的config.json
                 case ConfigType.Local:
-                    if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "super.json")))
+                    if (File.Exists(Path.Combine(AppContext.BaseDirectory, "config.json")))
                     {
-                        settingConfigBuilder.SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("super.json", optional: false, reloadOnChange: false);
+                        settingConfigBuilder.SetBasePath(AppContext.BaseDirectory).AddJsonFile("config.json", optional: false, reloadOnChange: false);
                     }
                     else
                     {
-                        settingConfigBuilder.SetBasePath(Path.Combine(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.FullName, "Conf")).AddJsonFile("super.json", optional: false, reloadOnChange: false);
+                        var dirInfo = new DirectoryInfo(AppContext.BaseDirectory);
+                        var conf = Path.Combine(dirInfo.Parent.Parent.FullName, "conf");
+                        bool isExist = false;
+                        if (Directory.Exists(conf))
+                        {
+                            var configPath = Path.Combine(conf, "config.json");
+                            if (File.Exists(configPath))
+                            {
+                                settingConfigBuilder.SetBasePath(conf).AddJsonFile("config.json", optional: false, reloadOnChange: false);
+                                isExist = true;
+                            }
+                        }
+                        if (!isExist)
+                            throw new Exception($"请检查配置文件的路径是否存在{conf}/config.json");
                     }
                     break;
                 case ConfigType.HttpFile:
@@ -705,7 +722,8 @@ namespace SuperGMS.Config
             logger = LogFactory.CreateLogger<ServerSetting>();
             //加载服务配置项
             ServerSetting.config = settingsConfig.Get<Configuration>();
-            if (config.GrantConfig.RpcService == null)
+            ServerSetting.configCenter = config.ServerConfig.ConfigCenter;
+            if (config.ServerConfig.RpcService == null)
             {
                 string msg = "请检查配置中super.json的配置是否正确，保证子节点RpcService的配置完整....";
                 logger.LogCritical(msg);
@@ -720,11 +738,11 @@ namespace SuperGMS.Config
         /// </summary>
         private static void getLocalIp()
         {
-            if (string.IsNullOrEmpty(config.GrantConfig.RpcService.Ip))
-                config.GrantConfig.RpcService.Ip = ServiceEnvironment.ComputerAddress;
+            if (string.IsNullOrEmpty(config.ServerConfig.RpcService.Ip))
+                config.ServerConfig.RpcService.Ip = ServiceEnvironment.ComputerAddress;
             else
             {
-                string configIp = config.GrantConfig.RpcService.Ip.Trim().Replace(" ", "");
+                string configIp = config.ServerConfig.RpcService.Ip.Trim().Replace(" ", "");
                 logger.LogInformation($"获取到的本机Ip列表是:{string.Join(",", ServiceEnvironment.IpList)},配置文件中的IP是：{configIp}");
                 int endPos = configIp.IndexOf("*");
                 if (endPos > 0) // 通配符
@@ -739,7 +757,7 @@ namespace SuperGMS.Config
                             if (orgIp.StartsWith(ipPart))
                             {
                                 ServiceEnvironment.ComputerAddress = orgIp;
-                                config.GrantConfig.RpcService.Ip = orgIp;
+                                config.ServerConfig.RpcService.Ip = orgIp;
                                 isFind = true;
                                 break;
                             }
@@ -752,14 +770,14 @@ namespace SuperGMS.Config
                 }
                 else // 说明是完整Ip
                 {
-                    ServiceEnvironment.ComputerAddress = config.GrantConfig.RpcService.Ip;
+                    ServiceEnvironment.ComputerAddress = config.ServerConfig.RpcService.Ip;
                 }
             }
-            logger.LogInformation($"最终使用的Ip是：{config.GrantConfig.RpcService.Ip}");
+            logger.LogInformation($"最终使用的Ip是：{config.ServerConfig.RpcService.Ip}");
         }
         internal static void UpdateRpcPort(int port)
         {
-            config.GrantConfig.RpcService.Port = port;
+            config.ServerConfig.RpcService.Port = port;
         }
     }
 }

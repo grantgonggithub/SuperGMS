@@ -23,7 +23,7 @@ namespace SuperGMS.Rpc.Thrift.Server
     /// <summary>
     ///
     /// </summary>
-    public class GrantThriftServer : SuperGMSBaseServer
+    public class ThriftRpcServer : SuperGMSBaseServer
     {
         private TServer ts;
         private TServerSocket serverTransport;
@@ -42,18 +42,18 @@ namespace SuperGMS.Rpc.Thrift.Server
 
                 // 传输协议
                 TBinaryProtocol.Factory factory = new TBinaryProtocol.Factory();
-                TProcessor processor = new GrantService.Processor(this);
+                TProcessor processor = new ThriftService.Processor(this);
                 ts = new TThreadedServer(processor, serverTransport, new TTransportFactory(), factory);
                 ts.Serve();
             }
             catch (TTransportException tex)
             {
-                logger.LogError(tex, "GrantThriftServer.ServerRegister.TTransportException.Error");
+                logger.LogError(tex, "ThriftServer.ServerRegister.TTransportException.Error");
                 throw tex;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "GrantThriftServer.ServerRegister.Exception.Error");
+                logger.LogError(ex, "ThriftServer.ServerRegister.Exception.Error");
                 throw ex;
             }
         }

@@ -71,7 +71,7 @@ namespace SuperGMS.Rpc
             {
                 default:
                 case ServerType.Thrift:
-                    server = new GrantThriftServer();
+                    server = new ThriftRpcServer();
                     break;
                 case ServerType.Grpc:
                     break;
