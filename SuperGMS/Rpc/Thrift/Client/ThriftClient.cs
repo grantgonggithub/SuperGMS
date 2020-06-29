@@ -27,7 +27,7 @@ namespace SuperGMS.Rpc.Thrift.Client
     /// </summary>
     public class ThriftClient : ISuperGMSRpcClient
     {
-        private GrantService.Client client;
+        private ThriftService.Client client;
         private TTransport transport;
         private ClientItem clientItem;
         //标记客户端到服务端的连接是否可用,发送异常时将标记为fasle
@@ -50,9 +50,8 @@ namespace SuperGMS.Rpc.Thrift.Client
                 clientItem = client;
                 transport = new TSocket(client.Ip, client.Port, client.TimeOut);
                 transport.Open();
-                this.client = new GrantService.Client(new TBinaryProtocol(transport));
+                this.client = new ThriftService.Client(new TBinaryProtocol(transport));
                 isConnected = true;
-                logger.LogDebug($"创建链接:{transport.GetHashCode()},{client.Ip}:{client.Port},");
             }
             catch (Exception ex)
             {
@@ -67,7 +66,6 @@ namespace SuperGMS.Rpc.Thrift.Client
             try
             {
                 result = client.Send(args, null);
-                logger.LogDebug($"使用链接:{transport.GetHashCode()}发送数据");
                 return true;
             }
             catch (Exception ex)
@@ -112,7 +110,6 @@ namespace SuperGMS.Rpc.Thrift.Client
                         transport.Close();
                     }
                     transport.Dispose();
-                    logger.LogDebug($"关闭链接:{transport.GetHashCode()},{clientItem.Ip}:{clientItem.Port}");
                     transport = null;
                 }
                 if (client != null)

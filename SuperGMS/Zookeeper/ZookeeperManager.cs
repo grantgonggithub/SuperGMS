@@ -35,7 +35,7 @@ namespace SuperGMS.Zookeeper
         private static string ConnectionString;
         private static int SessionTimeout;
         private static Watcher Watcher;
-        private const string ZKROOT = "/Grant";
+        private const string ZKROOT = "/ServerConfig";
         private const string QTCONFIG = "/config";
         private const string QTROUTER = "/router";
         private const string RELATION = "/relation";

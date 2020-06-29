@@ -20,10 +20,10 @@ namespace SuperGMS.HttpProxy
             {
                 SuperGMS.HttpProxy.SuperHttpProxy.HttpProxyName = args[0];
             }
-
+            var server = ServerSetting.GetRpcServer(SuperHttpProxy.HttpProxyName);
             var host = WebHost.CreateDefaultBuilder()
                 .UseUrls(
-                    $"http://{ServerSetting.GetRpcServer(SuperHttpProxy.HttpProxyName).Ip}:{ServerSetting.GetRpcServer(SuperHttpProxy.HttpProxyName).Port}/")
+                    $"http://*:{server.Port}/")
                 .UseStartup<Startup>().UseKestrel(options=> {
                     //请求内容长度限制(单位B)
                     int maxLength = 0;

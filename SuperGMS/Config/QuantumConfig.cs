@@ -15,11 +15,13 @@ using System;
 
 namespace SuperGMS.Config
 {
-    public class GrantConfig
+    public class ServerConfig
     {
         /// <summary>
         ///  rpcService
         /// </summary>
         public RpcService RpcService { get; set; }
+
+        public ConfigCenter ConfigCenter { get; set; }
     }
 }
