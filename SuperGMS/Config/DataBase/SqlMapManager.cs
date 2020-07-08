@@ -94,7 +94,11 @@ namespace SuperGMS.Config
                 }
                 foreach (var file in sqlFiles)
                 {
-                    if (file.Name != "SqlFile") continue;
+                    if (file.Name != "SqlFile") { // 脚本直接写在sqlmap中
+                        if(!string.IsNullOrEmpty(file.Value))
+                          AddSqlMap(item.Name.ToString(), file.Name.ToString(), file.Value);
+                        continue;
+                    };
                     if (string.IsNullOrEmpty(file.Value)) continue;
                     var filePath = $"{AppContext.BaseDirectory}Config{Path.DirectorySeparatorChar}{item.Name}{Path.DirectorySeparatorChar}{file.Value}";
                     if (!File.Exists(filePath))
