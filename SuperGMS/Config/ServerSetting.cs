@@ -664,19 +664,42 @@ namespace SuperGMS.Config
         {
             return SqlMapManager.GetSql(dbContextName, sqlKey);
         }
-        private const string configFile = "config.json";
+        private static string configFile = "config{0}.json";
         /// <summary>
         /// 初始化服务配置(本地super.json中必须指明读取的配置源)
         /// </summary>
         /// <returns></returns>
         private static void InitConfiguration()
         {
+            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (string.IsNullOrEmpty(env)) // 不配置就走config.json
+                configFile = string.Format(configFile, "");
+            else
+            {
+                env = env.ToLower().Trim();
+                switch (env)
+                {
+                    case "dev":
+                        configFile = string.Format(configFile, ".dev");
+                        break;
+                    case "test":
+                        configFile = string.Format(configFile, ".test");
+                        break;
+                    case "prod":
+                        configFile = string.Format(configFile, ".prod");
+                        break;
+                    default:
+                        configFile = string.Format(configFile, "");
+                        break;
+                }
+            }
             var configJson = Path.Combine(AppContext.BaseDirectory, configFile);
+            logger.LogInformation($"当前的环境变量是:{env},加载的指向配置文件是:{configJson}");
             if (!File.Exists(configJson))
                 throw new Exception($"在当前服务运行目录中找不到配置文件{configFile}");
             //配置源优先从服务本地根目录下的config.json获取,
             IConfiguration configSource = new ConfigurationBuilder().SetBasePath(AppContext.BaseDirectory)
-              .AddJsonFile("config.json", optional: true, reloadOnChange: false).Build();
+              .AddJsonFile(configFile, optional: true, reloadOnChange: false).Build();
             ServerSetting.configCenter = configSource.GetSection("ServerConfig:ConfigCenter").Get<ConfigCenter>();
             //如未获取到,则配置源默认为ConfigType.Local
             if (ServerSetting.configCenter == null)
@@ -684,13 +707,15 @@ namespace SuperGMS.Config
                 ServerSetting.configCenter = new ConfigCenter() { ConfigType = ConfigType.Local};
             }
             var settingConfigBuilder = new ConfigurationBuilder();
+            string configPath = string.Empty;
             switch (ServerSetting.configCenter.ConfigType)
             {
                 //配置源为ConfigType.Local时,优先读取内部config.json文件,不存在则读取上级目录Conf下的config.json
                 case ConfigType.Local:
-                    if (File.Exists(Path.Combine(AppContext.BaseDirectory, "config.json")))
+                    configPath = Path.Combine(AppContext.BaseDirectory, configFile);
+                    if (File.Exists(configPath))
                     {
-                        settingConfigBuilder.SetBasePath(AppContext.BaseDirectory).AddJsonFile("config.json", optional: false, reloadOnChange: false);
+                        settingConfigBuilder.SetBasePath(AppContext.BaseDirectory).AddJsonFile(configFile, optional: false, reloadOnChange: false);
                     }
                     else
                     {
@@ -699,23 +724,25 @@ namespace SuperGMS.Config
                         bool isExist = false;
                         if (Directory.Exists(conf))
                         {
-                            var configPath = Path.Combine(conf, "config.json");
+                            configPath = Path.Combine(conf, configFile);
                             if (File.Exists(configPath))
                             {
-                                settingConfigBuilder.SetBasePath(conf).AddJsonFile("config.json", optional: false, reloadOnChange: false);
+                                settingConfigBuilder.SetBasePath(conf).AddJsonFile(configFile, optional: false, reloadOnChange: false);
                                 isExist = true;
                             }
                         }
                         if (!isExist)
-                            throw new Exception($"请检查配置文件的路径是否存在{conf}/config.json");
+                            throw new Exception($"请检查配置文件的路径是否存在{conf}/{configFile}");
                     }
                     break;
                 case ConfigType.HttpFile:
                     settingConfigBuilder.Sources.Add(new RemoteJsonFileConfigurationSource() { Uri = ServerSetting.configCenter.Ip, Optional = false });
+                    configPath = ServerSetting.configCenter.Ip;
                     break;
                 default:
                     throw new Exception($"The setting 'ConfigCenter.ConfigType':'{(int)ServerSetting.configCenter.ConfigType}' not support now!");
             }
+             logger.LogInformation($"最终的配置类型是:{ServerSetting.configCenter.ConfigType}, 最终的配置文件路径是:{configPath}");
             var settingsConfig = settingConfigBuilder.Build();
             //加载Nlog配置
             NLog.LogManager.Configuration = new NLogLoggingConfiguration(settingsConfig.GetSection("NLog"));
