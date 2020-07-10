@@ -694,7 +694,8 @@ namespace SuperGMS.Config
                 }
             }
             var configJson = Path.Combine(AppContext.BaseDirectory, configFile);
-            logger.LogInformation($"当前的环境变量是:{env},加载的指向配置文件是:{configJson}");
+            // 在NLog配置没有初始化之前，只能靠Console输出日志
+            Console.WriteLine($"当前的环境变量是:{env},加载的指向配置文件是:{configJson}\r\n");
             if (!File.Exists(configJson))
                 throw new Exception($"在当前服务运行目录中找不到配置文件{configFile}");
             //配置源优先从服务本地根目录下的config.json获取,
@@ -742,7 +743,7 @@ namespace SuperGMS.Config
                 default:
                     throw new Exception($"The setting 'ConfigCenter.ConfigType':'{(int)ServerSetting.configCenter.ConfigType}' not support now!");
             }
-             logger.LogInformation($"最终的配置类型是:{ServerSetting.configCenter.ConfigType}, 最终的配置文件路径是:{configPath}");
+            Console.WriteLine($"最终的配置类型是:{ServerSetting.configCenter.ConfigType}, 最终的配置文件路径是:{configPath}\r\n");
             var settingsConfig = settingConfigBuilder.Build();
             //加载Nlog配置
             NLog.LogManager.Configuration = new NLogLoggingConfiguration(settingsConfig.GetSection("NLog"));
