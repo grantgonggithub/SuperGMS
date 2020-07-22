@@ -25,12 +25,12 @@ namespace SuperGMS.Protocol.RpcProtocol
         /// <summary>
         /// web前端，需要检查接入ip或者域名
         /// </summary>
-        QtWeb,
+        Web,
 
         /// <summary>
         /// 移动app
         /// </summary>
-        QtApp,
+        App,
 
         /// <summary>
         /// 微信

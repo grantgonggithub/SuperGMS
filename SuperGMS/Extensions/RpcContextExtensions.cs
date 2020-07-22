@@ -36,7 +36,7 @@ namespace SuperGMS.Extensions
             else
             {
                 // 从Redis先获取 租户级别的Key,如果没有
-                var ttField = CacheTools.GetUdfResourceKey(user.TTID, context.Language);
+                var ttField = CacheTools.GetUdfResourceKey(user.UserInfo.TenantInfo.TTID, context.Language);
                 res = ResourceCache.Instance.GetHash<string>(ttField, key);
                 if (res == null)
                 {
@@ -48,7 +48,7 @@ namespace SuperGMS.Extensions
                     {
                         ResourceCache.Instance.SetHash<string>(ttField, new KeyValuePair<string, string>(key, defaultRes));
                         var keyTtids = CacheTools.GetUdfTtidsKey();
-                        ResourceCache.Instance.SetHash<string>(keyTtids, new KeyValuePair<string, string>($"{user.TTID}.{context.Language}", string.Empty));
+                        ResourceCache.Instance.SetHash<string>(keyTtids, new KeyValuePair<string, string>($"{user.UserInfo.TenantInfo.TTID}.{context.Language}", string.Empty));
                         res = defaultRes;
                     }
                 }

@@ -5,34 +5,16 @@ using System.Text;
 namespace SuperGMS.UserSession
 {
     /// <summary>
-    /// 用户子系统权限，数据库信息
+    /// 租户数据库信息
     /// </summary>
-    public class UserSysInfo
+    public class SysDbInfo
     {
-        /// <summary>
-        /// Gets or sets 扩展系统ID
-        /// </summary>
-        public string ExSysID { get; set; }
 
         /// <summary>
         /// Gets or sets 系统ID
         /// </summary>
         public string SysID { get; set; }
 
-        /// <summary>
-        /// Gets or sets 系统ID
-        /// </summary>
-        public string ExSysName { get; set; }
-
-        /// <summary>
-        /// Gets or sets 系统地址
-        /// </summary>
-        public string SysUrl { get; set; }
-
-        /// <summary>
-        /// Gets or sets 系统图标
-        /// </summary>
-        public string SysMICon { get; set; }
 
         /// <summary>
         /// Gets or sets 数据库User
@@ -58,11 +40,6 @@ namespace SuperGMS.UserSession
         /// Gets or sets 数据库类型
         /// </summary>
         public string DBType { get; set; }
-
-        /// <summary>
-        /// Gets or sets 排序字段
-        /// </summary>
-        public int SortID { get; set; }
 
         /// <summary>
         /// Gets or sets 跟dbcontext对应数据库模型名称，用于获取dbcontext的连接信息
