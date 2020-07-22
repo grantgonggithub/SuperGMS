@@ -332,8 +332,8 @@ namespace SuperGMS.Rpc.Client
                 {
                     case ClientType.InnerRpc: // 需要拦截
                         throw new Exception("你想干什么？");
-                    case ClientType.QtApp:
-                    case ClientType.QtWeb: // 需要要做来源ip和reffer网站，都来着grant的域名
+                    case ClientType.App:
+                    case ClientType.Web: // 需要要做来源ip和reffer网站
                     case ClientType.Unkunwn: // 未知的和第三方都必须验证appkey
                     case ClientType.ThirdPart:
                         break;

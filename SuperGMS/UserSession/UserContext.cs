@@ -7,6 +7,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+
+using NPOI.SS.Formula;
+using NPOI.SS.Util;
+
+using org.apache.zookeeper.data;
+
 using SuperGMS.Cache;
 using SuperGMS.Config;
 using SuperGMS.ExceptionEx;
@@ -24,10 +30,10 @@ namespace SuperGMS.UserSession
         private readonly object rootLock = new object();
 
         private readonly static ILogger logger = LogFactory.CreateLogger<UserContext>();
-
-        private List<UserSysInfo> sysInfo;
-
-        private List<string> roleList;
+        /// <summary>
+        /// 登录用户信息
+        /// </summary>
+        public UserInfo UserInfo { get; set; }
 
         /// <summary>
         ///     Gets or sets 用户登录后分配的Token
@@ -45,138 +51,111 @@ namespace SuperGMS.UserSession
         public string ClientVersion { get; set; }
 
         /// <summary>
-        ///   Gets or sets  Token过期时间
-        /// </summary>
-        public DateTime ExpireTime { get; set; }
-
-        /// <summary>
-        ///  Gets or sets   Token请求授权IP
-        /// </summary>
-        public string AccessIpAddress { get; set; }
-
-        /// <summary>
-        ///     Gets or sets token建立日期
-        /// </summary>
-        public DateTime CreateTime { get; set; }
-
-        /// <summary>
-        ///  Gets or sets   租户ID
-        /// </summary>
-        public string TTID { get; set; }
-
-        /// <summary>
-        ///  Gets or sets   用户唯一ID
-        /// </summary>
-        public int UserId { get; set; }
-
-        /// <summary>
-        ///  Gets or sets   用户登录账号
-        /// </summary>
-        public string LoginName { get; set; }
-
-        /// <summary>
-        ///   Gets or sets  用户语言设置
-        /// </summary>
-        public string Lang { get; set; }
-
-        /// <summary>
         ///     判断当前用户有没有访问当前接口的权限
         /// </summary>
         /// <param name="funName">当前接口名称</param>
         /// <returns>是否有权限</returns>
         public bool HavRights(string funName)
         {
-            var roleFunctionList = GetRpcRoleFunctionList();
+            var roleFunctionList = GetRoleFunctionList();
 
             if (roleFunctionList == null)
             {
                 return false;
             }
-
-            return roleFunctionList.Exists(x =>
-                x.FunctionList.Exists(
-                    y => (string.Compare(y?.ServiceName, ServerSetting.AppName, StringComparison.OrdinalIgnoreCase) == 0) &&
-                         (string.Compare(y?.ApiName, funName, StringComparison.OrdinalIgnoreCase) == 0)));
+            return roleFunctionList.Any(x => string.Compare(x?.ServiceName, ServerSetting.AppName,StringComparison.OrdinalIgnoreCase)==0 &&
+            string.Compare(x?.ApiName,funName,StringComparison.OrdinalIgnoreCase)==0);
         }
 
         /// <summary>
         /// 拉取用户的子系统权限，包含数据库信息
         /// </summary>
         /// <returns>用户子系统信息 </returns>
-        public List<UserSysInfo> GetSysInfo()
+        public List<SysDbInfo> GetSysInfo()
         {
-            try
-            {
-                if (sysInfo==null)
-                {
-                    lock (rootLock)
-                    {
-                        if (sysInfo == null)
-                        {
-                            sysInfo = CacheManager.Get<List<UserSysInfo>>($"{Token}.SysInfo");
-                        }
-                    }
-                }
-                return sysInfo;
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, $"UserContext.GetUserSysInfo.Error.{Token}");
-                return new List<UserSysInfo>();
-            }
+            return UserInfo?.SysDbInfos;
         }
 
         /// <summary>
         ///     拉去用户的角色列表
         /// </summary>
         /// <returns>角色集合</returns>
-        public List<string> GetRoleList()
+        public List<Role> GetRoleList()
         {
-            try
-            {
-                if (roleList == null)
-                {
-                    lock (rootLock)
-                    {
-                        if (roleList == null)
-                        {
-                            roleList = CacheManager.Get<List<string>>($"{Token}.RoleList");
-                        }
-                    }
-                }
-                return roleList;
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, $"UserContext.GetRoleList.Error.{Token}");
-                return new List<string>();
-            }
+            return UserInfo?.Roles;
         }
 
         /// <summary>
-        ///     根据用户的角色集合，拉取所有的功能列表
-        ///     从Redis 获取,  grantCloud Function_List, ex_function_list 表 增加 RpcRoleFunction, RoleMange 的rolefunction 增加
-        ///     RpcRoleFunction, rolemanage 初始化的时候把缓存写入到Redis, Key 为 TTID+ RoleID
+        /// 功能按钮列表 ，这个量可能比较大，所以分开存
         /// </summary>
         /// <returns>角色权限</returns>
-        public List<RoleFunction> GetRpcRoleFunctionList()
+        public List<FunctionInfo> GetRoleFunctionList()
         {
-            var roleList = GetRoleList();
-            if (roleList == null)
+            if (UserInfo.FunctionInfos == null)
             {
-                return new List<RoleFunction>();
+                lock (rootLock)
+                {
+                    if (UserInfo.FunctionInfos == null)
+                    {
+                        try
+                        {
+                            UserInfo.FunctionInfos = CacheManager.Get<List<FunctionInfo>>(GetRoleFunctionKey(Token));
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, $"UserContext.GetRoleFunctionList.Error.{Token}");
+                            return new List<FunctionInfo>();
+                        }                    
+                    }
+                }
             }
+            return UserInfo.FunctionInfos;
+        }
 
-            try
+        /// <summary>
+        /// 获取functionkey用于登录设置和获取function
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public static string GetRoleFunctionKey(string token)
+        {
+            return $"{token}.functionlist";
+        }
+        /// <summary>
+        /// 获取Menukey用于登录设置和获取Menu
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public static string GetRoleMenuKey(string token)
+        {
+            return $"{token}.menulist";
+        }
+
+        /// <summary>
+        /// 获取菜单列表
+        /// </summary>
+        /// <returns></returns>
+        public List<Menu> GetRoleMenuList()
+        {
+            if (UserInfo.Menus == null)
             {
-                var funs = CacheManager.Get<List<RoleFunction>>($"{Token}.FunctionList");
-                return funs;
+                lock (rootLock)
+                {
+                    if (UserInfo.Menus == null)
+                    {
+                        try
+                        {
+                            UserInfo.FunctionInfos = CacheManager.Get<List<FunctionInfo>>(GetRoleMenuKey(Token));
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, $"UserContext.GetRoleMenuList.Error.{Token}");
+                            return new List<Menu>();
+                        }
+                    }
+                }
             }
-            catch (Exception e)
-            {
-                logger.LogError(e, $"UserContext.GetRpcRoleFunctionList.Error.{Token}");
-                return new List<RoleFunction>();
-            }
+            return UserInfo.Menus;
         }
 
 

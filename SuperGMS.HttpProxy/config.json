@@ -2,7 +2,7 @@
   "ServerConfig": {
     "ConfigCenter": {
       "ConfigType": 3,
-      "Ip": "http://localhost/config.json"
+      "Ip": "http://192.168.7.201/config/config.json"
     }
   }
 }
