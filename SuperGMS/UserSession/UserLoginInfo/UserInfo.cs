@@ -54,11 +54,11 @@ namespace SuperGMS.UserSession
         /// <summary>
         /// 租户用户菜单
         /// </summary>
-        public List<Menu> Menus { get; set; }
+        internal List<Menu> Menus { get; set; }
 
         /// <summary>
         /// 租户功能按钮列表
         /// </summary>
-        public List<FunctionInfo> FunctionInfos { get; set; }
+        internal List<FunctionInfo> FunctionInfos { get; set; }
     }
 }
