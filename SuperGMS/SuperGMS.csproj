@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <LangVersion>7.1</LangVersion>
     <PackageReleaseNotes>2019-03-29</PackageReleaseNotes>
-    <Version>3.0.9</Version>
+    <Version>4.0.8</Version>
     <Authors>SuperGMS</Authors>
     <Company>SuperGMS</Company>
     <Description>SuperGMS</Description>
@@ -25,7 +25,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="UserSession\RoleFunction.cs" />
+    <None Include="UserSession\UserLoginInfo\Role.cs" />
   </ItemGroup>
 
   <ItemGroup>
