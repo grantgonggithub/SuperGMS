@@ -96,7 +96,7 @@ namespace SuperGMS.Rpc.Server
             }
 
             var userCxt = ctx.GetUserContext();
-            if (userCxt == null || userCxt.UserId < 1)
+            if (userCxt == null || userCxt.UserInfo==null||userCxt.UserInfo.UserId < 1)
             {
                 loginCode = StatusCode.LoginFailed;
                 return false;
@@ -121,7 +121,7 @@ namespace SuperGMS.Rpc.Server
             }
 
             var userCxt = ctx.GetUserContext();
-            if (userCxt == null || userCxt.UserId < 1)
+            if (userCxt == null || userCxt.UserInfo == null || userCxt.UserInfo.UserId < 1)
             {
                 rightCode = StatusCode.LoginFailed;
                 return false;
