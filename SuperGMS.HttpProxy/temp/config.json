@@ -5,9 +5,10 @@
 			"Ip": "192.168.7.*",
 			"Port": 0,
 			"PortList": {
-				"HttpProxy": 5001,
-				"TestPocService": 20002,
-				"TestPocRpcClient":20003,
+				"HttpProxy": 20001,
+				"TravelingSmoothlyDriverService": 20002,
+				"TestPocRpcClient": 30001,
+				"TestPocService": 30002
 			},
 			"ServerType": 2,
 			"AssemblyPath": null,
@@ -22,21 +23,21 @@
 	},
 	"DataBase": {
 		"RefFile": "true",
-		"DbFile": "database.config",
-		"SqlFile": "sqlmap.config"
+		"DbFile": "DataBase.config",
+		"SqlFile": "MySql.config"
 	},
-	 "NLog": {
-    "autoReload": false,
-    "throwConfigExceptions": true,
-    "internalLogLevel": "info",
-    "internalLogFile": "${basedir}/txtLog/internal-nlog.txt",
-    "extensions": [
-      { "assembly": "NLog.Extensions.Logging" }
-    ],
-    "default-wrapper": {
-      "type": "AsyncWrapper",
-      "overflowAction": "Block"
-    },
+	"NLog": {
+		"autoReload": false,
+		"throwConfigExceptions": true,
+		"internalLogLevel": "info",
+		"internalLogFile": "${basedir}/txtLog/internal-nlog.txt",
+		"extensions": [{
+			"assembly": "NLog.Extensions.Logging"
+		}],
+		"default-wrapper": {
+			"type": "AsyncWrapper",
+			"overflowAction": "Block"
+		},
 		"targets": {
 			"all-file": {
 				"type": "File",
@@ -55,8 +56,7 @@
 				"target": {
 					"type": "ColoredConsole",
 					"layout": "${longdate}\r${event-properties:item=EventId_Id:whenEmpty=}\r\n${uppercase:${level}}\r\n${logger}\r\n${message}\r\n${exception:format=tostring}${callsite}\r\n-------------------------------------------------------------------\r\n",
-					"rowHighlightingRules": [
-						{
+					"rowHighlightingRules": [{
 							"condition": "level == LogLevel.Error",
 							"foregroundColor": "Red"
 						},
@@ -69,14 +69,12 @@
 				}
 			}
 		},
-    "rules": [
-			{
-				"logger": "*",
-				"minLevel": "Debug",
-				"writeTo": "all-file,own-console"
-			}
-    ]
-  },
+		"rules": [{
+			"logger": "*",
+			"minLevel": "Debug",
+			"writeTo": "all-file,own-console"
+		}]
+	},
 	"ConstKeyValue": {
 		"Items": [{
 				"Key": "MaxHttpBody",
@@ -89,41 +87,40 @@
 		]
 	},
 	"RabbitMQ": {
-		"Host": [
-			{
-				"Name": "Default",
-				"Ip": "192.168.100.201",
-				"Port": 5672,
-				"UserName": "xxxxx",
-				"PassWord": "xxxxxxxx",
-				"NoAckMsgCount": 5
-			}
-		]
+		"Host": [{
+			"Name": "Default",
+			"Ip": "172.19.247.78",
+			"Port": 5672,
+			"UserName": "tttttt",
+			"PassWord": "xxxxx",
+			"NoAckMsgCount": 5
+		}]
 	},
 	"RedisConfig": {
 		"Nodes": [{
 			"NodeName": "resource",
 			"IsMasterSlave": false,
-			"Items": [
-				{
-					"Pool": 1,
-					"IsMaster": false,
-					"Server": "192.168.100.201",
-					"Port": 6379,
-					"AllowAdmin": true,
-					"ConnectTimeout": 4000,
-					"Ssl": true,
-					"Pwd": "xxxxxx"
-				}
-			]
+			"Items": [{
+				"Pool": 1,
+				"IsMaster": false,
+				"Server": "192.168.100.200",
+				"Port": 6379,
+				"AllowAdmin": true,
+				"ConnectTimeout": 4000,
+				"Ssl": true,
+				"Pwd": "xxxxx"
+			}]
 		}]
 	},
 	"HttpProxy": {
 		"Items": [{
-				"Name": "TestPocService"
+				"Name": "TravelingSmoothlyDriverService"
 			},
 			{
 				"Name": "TestPocRpcClient"
+			},
+			{
+				"Name": "TestPocService"
 			}
 		]
 	},
@@ -132,36 +129,38 @@
 	},
 	"RpcClients": {
 		"Clients": [{
-			"ServerName": "TestPocService",
-			"RouterType": 2,
-			"Items": [{
+				"ServerName": "TravelingSmoothlyDriverService",
+				"RouterType": 2,
+				"Items": [{
 					"Pool": 1,
-					"Ip": "192.168.7.223",
+					"Ip": "192.168.7.207",
 					"Port": 20002,
 					"ServerType": 2,
 					"Enable": true
-				},
-				{
+				}]
+			},
+			{
+				"ServerName": "TestPocRpcClient",
+				"RouterType": 2,
+				"Items": [{
 					"Pool": 1,
-					"Ip": "192.168.7.223",
-					"Port": 20002,
+					"Ip": "192.168.7.207",
+					"Port": 30001,
 					"ServerType": 2,
 					"Enable": true
-				}
-			]
-		},
-{
-			"ServerName": "TestPocRpcClient",
-			"RouterType": 2,
-			"Items": [{
+				}]
+			},
+			{
+				"ServerName": "TestPocService",
+				"RouterType": 2,
+				"Items": [{
 					"Pool": 1,
-					"Ip": "192.168.7.223",
-					"Port": 20003,
+					"Ip": "192.168.7.207",
+					"Port": 30002,
 					"ServerType": 2,
 					"Enable": true
-				}
-			]
-		}
-]
+				}]
+			}
+		]
 	}
 }

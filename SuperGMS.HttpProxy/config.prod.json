@@ -1,0 +1,8 @@
+﻿{
+  "ServerConfig": {
+    "ConfigCenter": {
+      "ConfigType": 3,
+      "Ip": "https://xxx.com/config/config.prod.json"
+    }
+  }
+}

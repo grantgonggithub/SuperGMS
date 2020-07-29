@@ -558,34 +558,34 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
         #endregion
 
         #region 查询命令执行
-        public DataSet QueryDataSetBySqlKey(string sqlKey)
+        public DataSet QueryDataSetBySqlKey(string sqlKey, CommandType commandType = CommandType.Text)
         {
             string sql = ServerSetting.GetSql(DbInfo.DbContextName, sqlKey);
-            return QueryDataSetBySql(sql);
+            return QueryDataSetBySql(sql, commandType);
         }
-        public List<dynamic> QuerySqlKey(string sqlKey, string[] paramsList, object[] valuesList)
+        public List<dynamic> QuerySqlKey(string sqlKey, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text)
         {
             string sql = ServerSetting.GetSql(DbInfo.DbContextName, sqlKey);
-            return QuerySql(sql, paramsList, valuesList);
+            return QuerySql(sql, paramsList, valuesList, commandType);
         }
-        public List<dynamic> QuerySqlKey(IDbTransaction trans, string sqlKey, string[] paramsList, object[] valuesList)
+        public List<dynamic> QuerySqlKey(IDbTransaction trans, string sqlKey, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text)
         {
             string sql = ServerSetting.GetSql(DbInfo.DbContextName, sqlKey);
-            return QuerySql(trans, sql, paramsList, valuesList);
-        }
-
-        public List<T> QuerySqlKey<T>(string sqlKey, string[] paramsList, object[] valuesList)
-        {
-            string sql = ServerSetting.GetSql(DbInfo.DbContextName, sqlKey);
-            return QuerySql<T>(sql, paramsList, valuesList);
-        }
-        public List<T> QuerySqlKey<T>(IDbTransaction trans, string sqlKey, string[] paramsList, object[] valuesList)
-        {
-            string sql = ServerSetting.GetSql(DbInfo.DbContextName, sqlKey);
-            return QuerySql<T>(trans, sql, paramsList, valuesList);
+            return QuerySql(trans, sql, paramsList, valuesList, commandType);
         }
 
-        public DataSet QueryDataSetBySql(string sql)
+        public List<T> QuerySqlKey<T>(string sqlKey, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text)
+        {
+            string sql = ServerSetting.GetSql(DbInfo.DbContextName, sqlKey);
+            return QuerySql<T>(sql, paramsList, valuesList,commandType);
+        }
+        public List<T> QuerySqlKey<T>(IDbTransaction trans, string sqlKey, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text)
+        {
+            string sql = ServerSetting.GetSql(DbInfo.DbContextName, sqlKey);
+            return QuerySql<T>(trans, sql, paramsList, valuesList, commandType);
+        }
+
+        public DataSet QueryDataSetBySql(string sql,CommandType commandType=CommandType.Text)
         {
             DataSet ds = new DataSet();
             try
@@ -603,7 +603,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                         using (DbCommand cmd = connection.Connection.CreateCommand())
                         {
                             cmd.CommandText = tmpSql;
-                            cmd.CommandType = CommandType.Text;
+                            cmd.CommandType = commandType;
                             cmd.CommandTimeout = DbInfo.CommandTimeout;
                             using (var dr = cmd.ExecuteReader())
                             {
@@ -622,14 +622,14 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                 throw ex;
             }
         }
-        public List<dynamic> QuerySql(string sql, string[] paramsList, object[] valuesList)
+        public List<dynamic> QuerySql(string sql, string[] paramsList, object[] valuesList,CommandType commandType=CommandType.Text)
         {
             try
             {
                 using (var connection = GetConnection())
                 {
                     DynamicParameters ps = PrepareCommand(paramsList, valuesList);
-                    return connection.Connection.Query(sql, ps, null, false, DbInfo.CommandTimeout, CommandType.Text).AsList();
+                    return connection.Connection.Query(sql, ps, null, false, DbInfo.CommandTimeout, commandType).AsList();
                 }
             }
             catch (Exception ex)
@@ -637,11 +637,11 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                 throw ex;
             }
         }
-        public List<dynamic> QuerySql(IDbTransaction trans, string sql, string[] paramsList, object[] valuesList)
+        public List<dynamic> QuerySql(IDbTransaction trans, string sql, string[] paramsList, object[] valuesList,CommandType commandType = CommandType.Text)
         {
             DynamicParameters ps = PrepareCommand(paramsList, valuesList);
             PrintSql(sql, ps);
-            return trans.Connection.Query(sql, ps, trans, false, DbInfo.CommandTimeout, CommandType.Text).AsList();
+            return trans.Connection.Query(sql, ps, trans, false, DbInfo.CommandTimeout, commandType).AsList();
         }
         public List<T> QuerySql<T>(string sql, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text)
         {
@@ -667,41 +667,41 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
         #endregion
 
         #region 标量命令执行
-        public T ExecuteScalarSqlKey<T>(string sqlKey, string[] paramsList, object[] valuesList)
+        public T ExecuteScalarSqlKey<T>(string sqlKey, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text)
         {
             string sql = ServerSetting.GetSql(DbInfo.DbContextName, sqlKey);
-            return ExecuteScalarSql<T>(sql, paramsList, valuesList);
+            return ExecuteScalarSql<T>(sql, paramsList, valuesList,commandType);
         }
-        public T ExecuteScalarSqlKey<T>(IDbTransaction trans, string sqlKey, string[] paramsList, object[] valuesList)
+        public T ExecuteScalarSqlKey<T>(IDbTransaction trans, string sqlKey, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text)
         {
             string sql = ServerSetting.GetSql(DbInfo.DbContextName, sqlKey);
-            return ExecuteScalarSql<T>(trans, sql, paramsList, valuesList);
+            return ExecuteScalarSql<T>(trans, sql, paramsList, valuesList, commandType);
         }
-        public dynamic ExecuteScalarSqlKey(string sqlKey, string[] paramsList, object[] valuesList)
+        public dynamic ExecuteScalarSqlKey(string sqlKey, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text)
         {
             string sql = ServerSetting.GetSql(DbInfo.DbContextName, sqlKey);
-            return ExecuteScalarSql(sql, paramsList, valuesList);
+            return ExecuteScalarSql(sql, paramsList, valuesList, commandType);
         }
-        public dynamic ExecuteScalarSqlKey(IDbTransaction trans, string sqlKey, string[] paramsList, object[] valuesList)
+        public dynamic ExecuteScalarSqlKey(IDbTransaction trans, string sqlKey, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text)
         {
             string sql = ServerSetting.GetSql(DbInfo.DbContextName, sqlKey);
-            return ExecuteScalarSql(trans, sql, paramsList, valuesList);
+            return ExecuteScalarSql(trans, sql, paramsList, valuesList, commandType);
         }
-        public T ExecuteScalarSql<T>(string sql, string[] paramsList, object[] valuesList)
+        public T ExecuteScalarSql<T>(string sql, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text)
         {
-            return ExecuteScalarCommand<T>(sql, CommandType.Text, paramsList, valuesList);
+            return ExecuteScalarCommand<T>(sql, commandType, paramsList, valuesList);
         }
-        public T ExecuteScalarSql<T>(IDbTransaction trans, string sql, string[] paramsList, object[] valuesList)
+        public T ExecuteScalarSql<T>(IDbTransaction trans, string sql, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text)
         {
-            return ExecuteScalarCommand<T>(trans, sql, CommandType.Text, paramsList, valuesList);
+            return ExecuteScalarCommand<T>(trans, sql, commandType, paramsList, valuesList);
         }
-        public dynamic ExecuteScalarSql(string sql, string[] paramsList, object[] valuesList)
+        public dynamic ExecuteScalarSql(string sql, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text)
         {
-            return ExecuteScalarCommand(sql, CommandType.Text, paramsList, valuesList);
+            return ExecuteScalarCommand(sql, commandType, paramsList, valuesList);
         }
-        public dynamic ExecuteScalarSql(IDbTransaction trans, string sql, string[] paramsList, object[] valuesList)
+        public dynamic ExecuteScalarSql(IDbTransaction trans, string sql, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text)
         {
-            return ExecuteScalarCommand(trans, sql, CommandType.Text, paramsList, valuesList);
+            return ExecuteScalarCommand(trans, sql, commandType, paramsList, valuesList);
         }
 
         protected dynamic ExecuteScalarCommand(string sql, CommandType commandType, string[] paramsList, object[] valuesList)

@@ -37,6 +37,10 @@ namespace SuperGMS.Protocol.RpcProtocol
         /// 这个主要记录内部请求客户端的ip
         /// </summary>
         public const string INNERIP = "inner_ip";
+        /// <summary>
+        /// 客户端设备信息
+        /// </summary>
+        public const string USERAGENT= "user_agent";
 
         public HeaderValue(string serverName, string key, object value)
         {
