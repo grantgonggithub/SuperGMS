@@ -265,14 +265,13 @@ namespace SuperGMS.HttpProxy
             {
                 ipValue = "unknown";
             }
+            var userAgent = ctx.Request.Headers["User-Agent"];
 
             Dictionary<string, HeaderValue> dic = new Dictionary<string, HeaderValue>();
-            dic.Add(
-               HeaderValue.REMOTEIP, // 一个请求只会经过一次接入层
-               new HeaderValue(
-                    $"{HttpProxyName}_{ServiceEnvironment.ComputerAddress}_{ServiceEnvironment.ComputerName}",
-                    HeaderValue.REMOTEIP,
-                    ipValue));
+            var serverName = $"{HttpProxyName}_{ServiceEnvironment.ComputerAddress}_{ServiceEnvironment.ComputerName}";
+            dic.Add(HeaderValue.REMOTEIP, // 一个请求只会经过一次接入层
+               new HeaderValue(serverName,HeaderValue.REMOTEIP,ipValue));
+            dic.Add(HeaderValue.USERAGENT, new HeaderValue(serverName, HeaderValue.USERAGENT, userAgent));
             return dic;
         }
     }

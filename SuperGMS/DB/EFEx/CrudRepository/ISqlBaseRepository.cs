@@ -27,8 +27,9 @@ namespace SuperGMS.DB.EFEx.CrudRepository
         /// 根据Sql查询返回DataSet
         /// </summary>
         /// <param name="sql"></param>
+        /// <param name="commandType"></param>
         /// <returns></returns>
-        DataSet QueryDataSetBySql(string sql);
+        DataSet QueryDataSetBySql(string sql, CommandType commandType = CommandType.Text);
 
         /// <summary>
         /// Query
@@ -65,7 +66,7 @@ namespace SuperGMS.DB.EFEx.CrudRepository
         /// <param name="valuesList">valuesList</param>
         /// <param name="commandType">commandType</param>
         /// <returns>list</returns>
-        List<T> QuerySql<T>(string sql, string[] paramsList, object[] valuesList, CommandType commandType);
+        List<T> QuerySql<T>(string sql, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text);
         /// <summary>
         /// Query
         /// </summary>
@@ -76,7 +77,7 @@ namespace SuperGMS.DB.EFEx.CrudRepository
         /// <param name="valuesList">valuesList</param>
         /// <param name="commandType">commandType</param>
         /// <returns>list</returns>
-        List<T> QuerySql<T>(IDbTransaction trans, string sql, string[] paramsList, object[] valuesList, CommandType commandType);
+        List<T> QuerySql<T>(IDbTransaction trans, string sql, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text);
 
         /// <summary>
         /// Query
@@ -84,8 +85,9 @@ namespace SuperGMS.DB.EFEx.CrudRepository
         /// <param name="sql">sql</param>
         /// <param name="paramsList">paramsList</param>
         /// <param name="valuesList">valuesList</param>
+        /// <param name="commandType"></param>
         /// <returns>list</returns>
-        List<dynamic> QuerySql(string sql, string[] paramsList, object[] valuesList);
+        List<dynamic> QuerySql(string sql, string[] paramsList, object[] valuesList,CommandType commandType = CommandType.Text);
         /// <summary>
         /// Query
         /// </summary>
@@ -93,8 +95,9 @@ namespace SuperGMS.DB.EFEx.CrudRepository
         /// <param name="sql">sql</param>
         /// <param name="paramsList">paramsList</param>
         /// <param name="valuesList">valuesList</param>
+        /// <param name="commandType"></param>
         /// <returns>list</returns>
-        List<dynamic> QuerySql(IDbTransaction trans, string sql, string[] paramsList, object[] valuesList);
+        List<dynamic> QuerySql(IDbTransaction trans, string sql, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text);
 
         /// <summary>
         /// ExecuteScalar
@@ -103,8 +106,9 @@ namespace SuperGMS.DB.EFEx.CrudRepository
         /// <param name="sql">sql</param>
         /// <param name="paramsList">paramsList</param>
         /// <param name="valuesList">valuesList</param>
+        /// <param name="commandType"></param>
         /// <returns>TValue</returns>
-        T ExecuteScalarSql<T>(string sql, string[] paramsList, object[] valuesList);
+        T ExecuteScalarSql<T>(string sql, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text);
 
         /// <summary>
         /// ExecuteScalar
@@ -114,8 +118,9 @@ namespace SuperGMS.DB.EFEx.CrudRepository
         /// <param name="sql">sql</param>
         /// <param name="paramsList">paramsList</param>
         /// <param name="valuesList">valuesList</param>
+        /// <param name="commandType"></param>
         /// <returns>Tvalue</returns>
-        T ExecuteScalarSql<T>(IDbTransaction trans, string sql, string[] paramsList, object[] valuesList);
+        T ExecuteScalarSql<T>(IDbTransaction trans, string sql, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text);
 
         /// <summary>
         /// ExecuteScalar
@@ -123,8 +128,9 @@ namespace SuperGMS.DB.EFEx.CrudRepository
         /// <param name="sql">sql</param>
         /// <param name="paramsList">paramsList</param>
         /// <param name="valuesList">valuesList</param>
+        /// <param name="commandType"></param>
         /// <returns>dynamic</returns>
-        dynamic ExecuteScalarSql(string sql, string[] paramsList, object[] valuesList);
+        dynamic ExecuteScalarSql(string sql, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text);
 
         /// <summary>
         /// ExecuteScalar
@@ -133,8 +139,9 @@ namespace SuperGMS.DB.EFEx.CrudRepository
         /// <param name="sql">sql</param>
         /// <param name="paramsList">paramsList</param>
         /// <param name="valuesList">valuesList</param>
+        /// <param name="commandType"></param>
         /// <returns>dynamic</returns>
-        dynamic ExecuteScalarSql(IDbTransaction trans, string sql, string[] paramsList, object[] valuesList);
+        dynamic ExecuteScalarSql(IDbTransaction trans, string sql, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text);
 
         /// <summary>
         /// ExecuteNoQuery

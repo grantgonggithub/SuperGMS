@@ -30,6 +30,20 @@ namespace SuperGMS.UserSession
         private readonly object rootLock = new object();
 
         private readonly static ILogger logger = LogFactory.CreateLogger<UserContext>();
+
+        internal object UserObject { get; set; }
+
+        /// <summary>
+        /// 获取用户自定义上下文
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetUserObject<T>() where T:class,new()
+        {
+            if (UserObject == null) return default(T);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(UserObject.ToString());
+        }
+
         /// <summary>
         /// 登录用户信息
         /// </summary>
@@ -145,7 +159,7 @@ namespace SuperGMS.UserSession
                     {
                         try
                         {
-                            UserInfo.FunctionInfos = CacheManager.Get<List<FunctionInfo>>(GetRoleMenuKey(Token));
+                            UserInfo.Menus = CacheManager.Get<List<Menu>>(GetRoleMenuKey(Token));
                         }
                         catch (Exception ex)
                         {
