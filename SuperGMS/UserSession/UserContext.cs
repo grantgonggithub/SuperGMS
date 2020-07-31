@@ -31,7 +31,10 @@ namespace SuperGMS.UserSession
 
         private readonly static ILogger logger = LogFactory.CreateLogger<UserContext>();
 
-        internal object UserObject { get; set; }
+        /// <summary>
+        /// 用户自定义的上下文信息
+        /// </summary>
+        public object UserObject { get; set; }
 
         /// <summary>
         /// 获取用户自定义上下文
