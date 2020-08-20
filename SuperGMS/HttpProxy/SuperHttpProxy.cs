@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SuperGMS.Config;
 using SuperGMS.Log;
+using SuperGMS.Protocol.ApiProtocol;
 using SuperGMS.Protocol.RpcProtocol;
 using SuperGMS.Rpc;
 using SuperGMS.Rpc.Client;
@@ -70,11 +71,26 @@ namespace SuperGMS.HttpProxy
             var mainLog = new LogStat() { BusinessType = "http.Proxy" };
             mainLog.SetInfo(context);
             var content = string.Empty;
-            
+            Args<object> a = null;
             try
             {
                 content = GetRequestValue(context.Request);
-                Args<object> a = JsonConvert.DeserializeObject<Args<object>>(content, jSetting);
+                var isUdf = IsController(context);
+                if (isUdf)
+                {
+                    ApiArgs apiArgs = new ApiArgs { Headers = new Dictionary<string, string>(), Params = new Dictionary<string, string>() };
+                    foreach (var h in context.Request.Headers)
+                        apiArgs.Headers.Add(h.Key, h.Value);
+                    foreach (var p in context.Request.Query)
+                        apiArgs.Params[p.Key] = p.Value;
+                    apiArgs.Body = content;
+                    a = new Args<object> { v = apiArgs, ct = ClientType.ThirdPart.ToString() };
+                }
+                else
+                {
+                    a = JsonConvert.DeserializeObject<Args<object>>(content, jSetting);
+                }
+
                 a.Headers = GetRequestIp(context);
                 if (string.IsNullOrEmpty(a.rid))
                 {
@@ -83,10 +99,24 @@ namespace SuperGMS.HttpProxy
                 }
 
                 var rtn = RpcClientManager.Send(a, context.Request.Path);
-
+                string body = rtn.c;
+                if (isUdf)
+                {
+                    if (rtn.r.v != null&&!string.IsNullOrEmpty(rtn.r.v.ToString()))
+                    {
+                        var apiRst =JsonConvert.DeserializeObject<ApiResult>(rtn.r.v.ToString());
+                        if (apiRst != null)
+                        {
+                            body = apiRst.Body;
+                            context.Response.StatusCode =(int)apiRst.Code;
+                            if (context.Response.StatusCode < 1) context.Response.StatusCode = 200;
+                            if (!string.IsNullOrEmpty(apiRst.ContentType)) context.Response.ContentType = apiRst.ContentType;
+                        }
+                    }
+                }
                 using (var strStream = new StreamWriter(context.Response.Body))
                 {
-                    strStream.Write(rtn.c);
+                    strStream.Write(body);
                     strStream.Flush();
                     strStream.Close();
                 }
@@ -107,7 +137,7 @@ namespace SuperGMS.HttpProxy
                 {
                     try
                     {
-                        Args<object> a = JsonConvert.DeserializeObject<Args<object>>(content);
+                        a = JsonConvert.DeserializeObject<Args<object>>(content);
                         if (!string.IsNullOrEmpty(a.rid))
                         {
                             rr.rid = a.rid;
@@ -139,6 +169,17 @@ namespace SuperGMS.HttpProxy
                 logger.LogInformation(new EventId(0, rr.rid), mainLog.ToString());
                 return rr;
             }
+        }
+
+        /// <summary>
+        /// 是否以Controller结尾，的自定义Api
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        private static bool IsController(HttpContext context)
+        {
+            var path = context.Request.Path.HasValue ? context.Request.Path.ToString().ToLower() : string.Empty;
+            return path.EndsWith("controller");
         }
 
         /// <summary>
@@ -237,7 +278,7 @@ namespace SuperGMS.HttpProxy
                 args = args?.Replace("\"lang\":\"\"", $"\"lang\":\"{lang}\"");
                 args = args?.Replace("\"lang\":null", $"\"lang\":\"{lang}\"");
             }
-            return args;
+            return args.Replace("{}","");
         }
 
         private static Dictionary<string, HeaderValue> GetRequestIp(HttpContext ctx)
