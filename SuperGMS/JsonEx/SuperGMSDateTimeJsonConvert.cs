@@ -29,7 +29,7 @@ namespace SuperGMS.JsonEx
     /// <summary>
     /// GrantDateTimeJsonConvert
     /// </summary>
-    public class GrantDateTimeJsonConvert : DateTimeConverterBase
+    public class SuperGMSDateTimeJsonConvert : DateTimeConverterBase
     {
         public const string DefaultDateTimeValueString = "1900-1-1";
         public static readonly DateTime DefaultDateTimeValue = DateTime.Parse(DefaultDateTimeValueString);

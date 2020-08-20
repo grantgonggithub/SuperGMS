@@ -424,9 +424,9 @@ namespace SuperGMS.Extend.Extensions
             {
                 return string.Empty;
             }
-            DateTime dateValue = GrantDateTimeJsonConvert.DefaultDateTimeValue;
+            DateTime dateValue = SuperGMSDateTimeJsonConvert.DefaultDateTimeValue;
             DateTime.TryParse(date.ToString(),out dateValue);
-            if (dateValue <= GrantDateTimeJsonConvert.DefaultDateTimeValue) // 小于等于默认值就返回空
+            if (dateValue <= SuperGMSDateTimeJsonConvert.DefaultDateTimeValue) // 小于等于默认值就返回空
             {
                 return string.Empty;
             }
@@ -481,7 +481,7 @@ namespace SuperGMS.Extend.Extensions
 
         private static bool IsNullDateTime(object date)
         {
-            DateTime dateTimeValue = GrantDateTimeJsonConvert.DefaultDateTimeValue;
+            DateTime dateTimeValue = SuperGMSDateTimeJsonConvert.DefaultDateTimeValue;
             if (date == null || date == DBNull.Value) return true;
             var dt = (DateTime)date;
             return dt <= dateTimeValue;
@@ -497,19 +497,19 @@ namespace SuperGMS.Extend.Extensions
         {
             if (value == null || value == DBNull.Value|| value.ToString()==string.Empty) // 如果是空就要转为默认值
             {
-                dateTime = GrantDateTimeJsonConvert.DefaultDateTimeValue;
+                dateTime = SuperGMSDateTimeJsonConvert.DefaultDateTimeValue;
                 return true;
             }
 
             if (DateTime.TryParse(value.ToString(), out dateTime))
             {
-                if (dateTime < GrantDateTimeJsonConvert.DefaultDateTimeValue)
-                    dateTime = GrantDateTimeJsonConvert.DefaultDateTimeValue; // 防止用户输入000-00-00
+                if (dateTime < SuperGMSDateTimeJsonConvert.DefaultDateTimeValue)
+                    dateTime = SuperGMSDateTimeJsonConvert.DefaultDateTimeValue; // 防止用户输入000-00-00
                 return true;
             }
             else
             {
-                dateTime = GrantDateTimeJsonConvert.DefaultDateTimeValue;
+                dateTime = SuperGMSDateTimeJsonConvert.DefaultDateTimeValue;
                 return false;
             }
         }
