@@ -24,6 +24,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="config\database.prod.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="config\database.test.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Update="config\database.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
