@@ -42,6 +42,11 @@ namespace SuperGMS.Protocol.RpcProtocol
         /// </summary>
         public const string USERAGENT= "user_agent";
 
+        /// <summary>
+        /// 请求的域名
+        /// </summary>
+        public const string HOST = "host";
+
         public HeaderValue(string serverName, string key, object value)
         {
             this.serverName = serverName;
