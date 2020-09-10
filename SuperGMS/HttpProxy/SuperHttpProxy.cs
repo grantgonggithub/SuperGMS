@@ -307,12 +307,13 @@ namespace SuperGMS.HttpProxy
                 ipValue = "unknown";
             }
             var userAgent = ctx.Request.Headers["User-Agent"];
-
+            var host = ctx.Request.Host.Value;
             Dictionary<string, HeaderValue> dic = new Dictionary<string, HeaderValue>();
             var serverName = $"{HttpProxyName}_{ServiceEnvironment.ComputerAddress}_{ServiceEnvironment.ComputerName}";
             dic.Add(HeaderValue.REMOTEIP, // 一个请求只会经过一次接入层
                new HeaderValue(serverName,HeaderValue.REMOTEIP,ipValue));
             dic.Add(HeaderValue.USERAGENT, new HeaderValue(serverName, HeaderValue.USERAGENT, userAgent));
+            dic.Add(HeaderValue.HOST, new HeaderValue(serverName, HeaderValue.HOST, host));
             return dic;
         }
     }
