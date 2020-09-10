@@ -25,7 +25,7 @@ namespace SuperGMS.UserSession
         /// <summary>
         ///  Gets or sets   租户ID
         /// </summary>
-        public string TTID { get; set; }
+        public int TTID { get; set; }
 
         /// <summary>
         /// 租户名称
