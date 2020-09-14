@@ -38,12 +38,12 @@ namespace Grant.HttpProxy.Middleware
                 return this.SendStringRespond(context);
             }
 
-            if (context.Request.ContentType == null || context.Request.ContentType.IndexOf("application/json") < 0)
-            {
-                context.Response.StatusCode = 403;
-                context.Response.ContentType += "application/json;charset=utf-8;";
-                return context.Response.WriteAsync("Please set ContentType=application/json");
-            }
+            //if (context.Request.ContentType == null || context.Request.ContentType.IndexOf("application/json") < 0)
+            //{
+            //    context.Response.StatusCode = 403;
+            //    context.Response.ContentType += "application/json;charset=utf-8;";
+            //    return context.Response.WriteAsync("Please set ContentType=application/json");
+            //}
 
             return this.SendStringRespond(context);
         }
