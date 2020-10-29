@@ -31,6 +31,10 @@ namespace SuperGMS.UserSession
         /// </summary>
         public string SysName { get; set; }
         /// <summary>
+        /// 菜单显示在那种类型的终端上
+        /// </summary>
+        public string ShowSysType { get; set; }
+        /// <summary>
         /// 排序
         /// </summary>
         public int SortNo { get; set; }

@@ -251,7 +251,7 @@ namespace SuperGMS.HttpProxy
             string args = request.Query["args"]; // get,post不区分了
             if (string.IsNullOrEmpty(args) && request.Method.ToUpper() == "GET")
             {
-                args = "{}";
+                args = "#{#}#";
             }
 
             // 如果没有接到，就用流接
@@ -278,7 +278,7 @@ namespace SuperGMS.HttpProxy
                 args = args?.Replace("\"lang\":\"\"", $"\"lang\":\"{lang}\"");
                 args = args?.Replace("\"lang\":null", $"\"lang\":\"{lang}\"");
             }
-            return args.Replace("{}","");
+            return args.Replace("#{#}#","");
         }
 
         private static Dictionary<string, HeaderValue> GetRequestIp(HttpContext ctx)
