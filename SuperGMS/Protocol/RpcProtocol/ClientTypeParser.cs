@@ -16,7 +16,7 @@ namespace SuperGMS.Protocol.RpcProtocol
         /// <returns>枚举</returns>
         public static ClientType Parser(string clientType)
         {
-            if (!Enum.TryParse<ClientType>(clientType, out var ct))
+            if (!Enum.TryParse<ClientType>(clientType,true, out var ct))
             {
                 ct = ClientType.Unkunwn;
             }
