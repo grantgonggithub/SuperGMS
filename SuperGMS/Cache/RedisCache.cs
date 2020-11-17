@@ -143,7 +143,8 @@ namespace SuperGMS.Cache
         /// <returns>bool</returns>
         public bool RemoveHashKey(string key, string filed)
         {
-            return RedisProxy.RemoveKey(_redisName, _redisName, key);
+            RedisProxy.RemoveHashKey(_redisName, _redisName, key, filed);
+            return true;
         }
 
         /// <summary>
