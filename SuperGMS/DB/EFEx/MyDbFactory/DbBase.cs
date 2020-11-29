@@ -146,6 +146,10 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             searchParameters.BuildEmptySearch();
             // 复制一个,避免修改的时候影响外部数据
             var copyCondition = JsonEx.JsonConvert.CopyObject(searchParameters.QueryModel.Items);
+            copyCondition.Sort((a, b) =>
+            {
+                return a.Field.CompareTo(b.Field);
+            });
             var sb = new StringBuilder();
             List<string> groups = new List<string>();
 

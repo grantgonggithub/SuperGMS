@@ -120,6 +120,7 @@ namespace SuperGMS.DB.EFEx.DynamicSearch
         {
             var sb = new StringBuilder();
             List<string> groups = new List<string>();
+            QueryModel.Items.Sort((a, b) => { return a.Field.CompareTo(b.Field); });
             foreach (var conditionItem in QueryModel.Items)
             {
                 string sqlWhere = string.Empty;
@@ -161,6 +162,10 @@ namespace SuperGMS.DB.EFEx.DynamicSearch
         public Dictionary<string, object> GetParameters()
         {
             var paraDic = new Dictionary<string, object>();
+            QueryModel.Items.Sort((a, b) =>
+            {
+                return a.Field.CompareTo(b.Field);
+            });
             for (int i = 0; i < QueryModel.Items.Count; i++)
             {
                 var item = QueryModel.Items[i];
@@ -261,6 +266,7 @@ namespace SuperGMS.DB.EFEx.DynamicSearch
         /// </summary>
         public void BuildEmptySearch()
         {
+            QueryModel.Items.Sort((a, b) => { return a.Field.CompareTo(b.Field); });
             if (this.QueryModel != null && this.QueryModel.Items != null && this.QueryModel.Items.Count > 0)
             {
                 foreach (var item in this.QueryModel.Items.ToArray())
