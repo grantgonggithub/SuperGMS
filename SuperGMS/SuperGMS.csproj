@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <LangVersion>7.1</LangVersion>
     <PackageReleaseNotes>2019-03-29</PackageReleaseNotes>
-    <Version>5.0.5</Version>
+    <Version>5.1.2</Version>
     <Authors>SuperGMS</Authors>
     <Company>SuperGMS</Company>
     <Description>SuperGMS</Description>

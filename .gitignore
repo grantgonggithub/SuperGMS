@@ -261,3 +261,4 @@ __pycache__/
 /.vscode
 /Package
 Grant.HttpProxy/Downloads/
+SuperGMS.HttpProxy/Properties/launchSettings.json
