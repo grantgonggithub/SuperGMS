@@ -677,21 +677,22 @@ namespace SuperGMS.Config
             else
             {
                 env = env.ToLower().Trim();
-                switch (env)
-                {
-                    case "dev":
-                        configFile = string.Format(configFile, ".dev");
-                        break;
-                    case "test":
-                        configFile = string.Format(configFile, ".test");
-                        break;
-                    case "prod":
-                        configFile = string.Format(configFile, ".prod");
-                        break;
-                    default:
-                        configFile = string.Format(configFile, "");
-                        break;
-                }
+                //switch (env)
+                //{
+                //    case "dev":
+                //        configFile = string.Format(configFile, ".dev");
+                //        break;
+                //    case "test":
+                //        configFile = string.Format(configFile, ".test");
+                //        break;
+                //    case "prod":
+                //        configFile = string.Format(configFile, ".prod");
+                //        break;
+                //    default:
+                //        configFile = string.Format(configFile, "");
+                //        break;
+                //}
+                configFile = string.Format(configFile, "."+env);
             }
             var configJson = Path.Combine(AppContext.BaseDirectory, configFile);
             // 在NLog配置没有初始化之前，只能靠Console输出日志
