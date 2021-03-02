@@ -28,6 +28,7 @@ using SuperGMS.DB.EFEx.DynamicSearch;
 using SuperGMS.DB.EFEx.GrantDbContext;
 using SuperGMS.Tools;
 using Z.EntityFramework.Plus;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace SuperGMS.DB.EFEx
 {
@@ -47,6 +48,11 @@ namespace SuperGMS.DB.EFEx
         {
             _dbContext = context;
             _dbInfo = dbInfo;
+        }
+
+        internal ChangeTracker GetChangeTracker()
+        {
+            return _dbContext.ChangeTracker;
         }
 
         /// <summary>
