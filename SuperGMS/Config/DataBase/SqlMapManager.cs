@@ -100,10 +100,10 @@ namespace SuperGMS.Config
                         continue;
                     };
                     if (string.IsNullOrEmpty(file.Value)) continue;
-                    var filePath = $"{AppContext.BaseDirectory}Config{Path.DirectorySeparatorChar}{item.Name}{Path.DirectorySeparatorChar}{file.Value}";
+                    var filePath = $"{AppContext.BaseDirectory}config{Path.DirectorySeparatorChar}{item.Name}{Path.DirectorySeparatorChar}{file.Value}";
                     if (!File.Exists(filePath))
                     {
-                        filePath = $"{AppContext.BaseDirectory}Config{Path.DirectorySeparatorChar}{item.Name}{Path.DirectorySeparatorChar}{file.Value}";
+                        filePath = $"{AppContext.BaseDirectory}config{Path.DirectorySeparatorChar}{item.Name}{Path.DirectorySeparatorChar}{file.Value}";
                         if(!File.Exists(filePath))
                            throw new Exception($"未找到路径{filePath}中的SQL配置文件");
                     }
