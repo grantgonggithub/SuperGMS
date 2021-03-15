@@ -46,8 +46,6 @@ namespace SuperGMS.ApiHelper
                     var list = helper.GetAllInterfaceClass(this.args.lg, true);
                     return list;
                 }
-
-                
             }
             catch (Exception ex)
             {
