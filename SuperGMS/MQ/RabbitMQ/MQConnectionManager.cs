@@ -148,7 +148,7 @@ namespace SuperGMS.MQ.RabbitMQ
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    LogTextWriter.Write(e);
                 }
 
             }
