@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using SuperGMS.ApiHelper.Xml;
 using SuperGMS.AttributeEx;
+using SuperGMS.Log;
 using SuperGMS.Rpc.Server;
 using SuperGMS.Tools;
 
@@ -132,7 +133,7 @@ namespace SuperGMS.ApiHelper
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"{x.FullName}:{ex.Message}");
+                        LogTextWriter.Write($"{x.FullName}:{ex.Message}");
                         var infoArgs = new ClassInfo(this.assembly.FullName);
                         infoArgs.Name = x.Name;
                         infoArgs.FullName = x.FullName;
@@ -224,7 +225,7 @@ namespace SuperGMS.ApiHelper
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"{x.FullName}:{ex.Message}");
+                        LogTextWriter.Write($"{x.FullName}:{ex.Message}");
                         var infoArgs = new ClassInfo(this.assembly.FullName);
                         infoArgs.Name = x.Name;
                         infoArgs.FullName = x.FullName;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using SuperGMS.ExceptionEx;
+using SuperGMS.Log;
 using SuperGMS.Protocol.RpcProtocol;
 
 namespace SuperGMS.AttributeEx
@@ -25,7 +26,7 @@ namespace SuperGMS.AttributeEx
             var code = (int)(object)enumValue;
             if (cd == null)
             {
-                Console.WriteLine($"枚举值{enumValue} 没有定义属性[CodeDescAttribute]");
+                LogTextWriter.Write($"枚举值{enumValue} 没有定义属性[CodeDescAttribute]");
 
                 // return StatusCode.ErrorCodeUndefined;
                 return new StatusCode(code, StatusCode.ErrorCodeUndefined.ToString());
