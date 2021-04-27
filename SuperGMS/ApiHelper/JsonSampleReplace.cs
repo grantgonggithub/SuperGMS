@@ -143,6 +143,8 @@ namespace SuperGMS.ApiHelper
             {
                 SetJProperty(jp);
             }
+            else
+                SetJProperty(jp);
         }
 
         private void SetJProperty(JProperty jp)
