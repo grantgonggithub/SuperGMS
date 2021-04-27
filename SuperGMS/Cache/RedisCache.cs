@@ -34,6 +34,18 @@ namespace SuperGMS.Cache
         }
 
         /// <summary>
+        /// 设置redis的key过期时间
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <param name="expiry">过期TimeSpan</param>
+        /// <returns></returns>
+        public bool KeyExpire(string key, TimeSpan? expiry = null)
+        {
+            expiry = expiry == null ? new TimeSpan(24, 0, 0) : expiry;
+            return RedisProxy.KeyExpire(_redisName, _redisName, key, expiry);
+        }
+
+        /// <summary>
         /// 放缓存
         /// </summary>
         /// <param name="key">key</param>
