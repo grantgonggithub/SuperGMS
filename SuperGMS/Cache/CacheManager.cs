@@ -239,5 +239,16 @@ namespace SuperGMS.Cache
         {
             return instance.PopAllQueue(key);
         }
+
+        /// <summary>
+        /// 设置指定key的过期时间
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <param name="expiry">过期时间</param>
+        /// <returns></returns>
+        public bool KeyExpire(string key, TimeSpan? expiry = null)
+        {
+            return instance.KeyExpire(key, expiry);
+        }
     }
 }
