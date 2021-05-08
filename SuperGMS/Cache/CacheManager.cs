@@ -246,7 +246,7 @@ namespace SuperGMS.Cache
         /// <param name="key">key</param>
         /// <param name="expiry">过期时间</param>
         /// <returns></returns>
-        public bool KeyExpire(string key, TimeSpan? expiry = null)
+        public static bool KeyExpire(string key, TimeSpan? expiry = null)
         {
             return instance.KeyExpire(key, expiry);
         }
