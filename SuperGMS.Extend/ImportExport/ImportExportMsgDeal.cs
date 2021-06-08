@@ -10,11 +10,83 @@ using SuperGMS.Protocol.RpcProtocol;
 namespace SuperGMS.Extend.ImportExport
 {
     /// <summary>
-    /// 导入导出消息处理类
+    /// 消息处理类
     /// </summary>
-    public class ImportExportMsgDeal
+    public class SuperMessageHelper
     {
-        private readonly static ILogger logger = LogFactory.CreateLogger<ImportExportMsgDeal>();
+        private readonly static ILogger logger = LogFactory.CreateLogger<SuperMessageHelper>();
+
+        public static void Initlize(params string[] bussinessTypes)
+        {
+            BackGroundMessageMgr messageMgr = new BackGroundMessageMgr(bussinessTypes);
+            messageMgr.OnBackGroundMessageReceive += MessageMgr_OnBackGroundMessageReceive;
+        }
+
+        /// <summary>
+        /// 处理导入导出消息
+        /// </summary>
+        /// <param name="m">消息</param>
+        /// <param name="ex">异常</param>
+        /// <returns>处理结果，决定是否删除消息</returns>
+        private static bool MessageMgr_OnBackGroundMessageReceive(Protocol.MQProtocol.MQProtocol<SetBackGroudMessageArgs> m, System.Exception ex)
+        {
+            try
+            {
+                logger.LogDebug($"开始处理消息[{m?.Msg?.Args?.rid}]: {m?.ToString()}");
+                var code = new StatusCode(805, "消息分发时发生异常");
+                if (ex != null || m?.Msg?.Args == null)
+                {
+                    logger.LogError($"处理消息[{m?.Msg?.Args?.rid}] 异常 : 消息分发时发生异常");
+                }
+
+                if (m?.Msg != null)
+                {
+                    SetBackGroudMessageArgs args = m.Msg;
+                    try
+                    {
+                        var ctxArgs = args.Args.Copy();
+                        ctxArgs.ct = "Import & Export function inner use.";
+                        var data = JsonConvert.DeserializeObject<object>(args.Data, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Populate });
+                        ctxArgs.v = data;
+                        MicroServiceAssembly.Run(args.BussinessType, ctxArgs, out code);
+
+                        if (code.code != StatusCode.OK.code)
+                        {
+                            logger.LogError($"消息[{m.Msg.Args?.rid}] Initialization.MessageMgr_OnBackGroundMessageReceive.Error.args={m.ToString()}，code:{code.code},msg:{code.msg}");
+                            //return false;
+                        }
+
+                        // 消息兜底异步处理
+                        var rst = BackGroundMessageMgr.GetProcessStatus(m.Msg.Args?.rid);
+                        if (rst == null || (rst.Code.IsSuccess && (rst.ProcessNum != rst.TotalNum || rst.ProcessNum == -1)))
+                        {
+                            logger.LogWarning($"消息[{m.Msg.Args?.rid}] 处理返回成功，但是没有设置进度100%,{m.ToString()}，code:{code.code},msg:{code.msg}");
+                        }
+
+                    }
+                    catch (Exception e)
+                    {
+                        StatusCode c = new StatusCode(500, "SuperMessageHelper.MessageMgr_OnBackGroundMessageReceive.Error=" + e.Message);
+                        logger.LogError(e, $"消息[{m.Msg.Args?.rid}] Initialization.MessageMgr_OnBackGroundMessageReceive.Error.args={m.ToString()}");
+                        //return false;
+                    }
+
+                    logger.LogDebug($"结束处理消息[{m.Msg.Args?.rid}] .");
+                }
+            }
+            catch (Exception ex1)
+            {
+                logger.LogError(ex1, $"处理消息[{m?.Msg?.Args?.rid}] .异常...");
+            }
+            return true;
+            //这里最大的问题是如果MQ在连续3个消息都没有收到ACK就不在给这个客户端发送消息，直到收到为止
+            // 全部返回ACK  因为消息到这里来，就说明已经收到消息了，
+        }
+    }
+
+    public class SuperImportMessageHelper
+    {
+        private readonly static ILogger logger = LogFactory.CreateLogger<SuperMessageHelper>();
 
         public static void Initlize(params string[] bussinessTypes)
         {

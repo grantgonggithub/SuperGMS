@@ -38,50 +38,19 @@ namespace SuperGMS.MQ
             this.publisher = new Publisher(mq, m);
         }
 
-        ///// <summary>
-        ///// 消息发布者（默认配置）
-        ///// </summary>
-        ///// <param name="msg">消息</param>
-        ///// <param name="autoDelete">是否自动删除</param>
-        // public GrantPublisher(M msg, bool autoDelete)
-        //    : this(msg,RouterKeyConst.DefaultRouterKey,autoDelete)
-        // {
-
-        // }
-
-        ///// <summary>
-        ///// 消息发布者(默认配置，指定特定routerKey)
-        ///// </summary>
-        ///// <param name="msg">消息</param>
-        ///// <param name="routerKey">关注的特定key的队列</param>
-        ///// <param name="autoDelete">是否自动删除</param>
-        // public GrantPublisher(M msg, string routerKey, bool autoDelete)
-        //    : this(msg,routerKey,MQueueConst.DefaultGrantMQ,autoDelete)
-        // {
-        // }
-        ///// <summary>
-        ///// 消息发布者（默认配置，指定了特定的routeKey和queueName）
-        ///// </summary>
-        ///// <param name="msg">消息</param>
-        ///// <param name="routeKey">关注指定队列queueName的特定routeKey</param>
-        ///// <param name="queueName">队列名称</param>
-        ///// <param name="autoDelete">是否自动删除</param>
-        // public GrantPublisher(M msg, string routeKey, string queueName, bool autoDelete)
-        //    : this(msg, ExchangeConst.DefaultExchange, routeKey, queueName, autoDelete)
-        // {
-
-        // }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GrantPublisher{M}"/> class.
         /// 消息发布者  非默认，一个自定义的消息交换机、队列、路由key
         /// </summary>
         /// <param name="msg">消息</param>
-        /// <param name="exchange">交换机</param>
+        /// <param name="exchangeName">交换机名称</param>
         /// <param name="routeKey">路由key</param>
         /// <param name="queueName">队列</param>
         /// <param name="autoDelete">是否自动删除</param>
-        public Publisher(M msg, string exchange, string routeKey, string queueName, bool autoDelete, VirtualHost host)
+        /// <param name="host"></param>
+        /// <param name="exchangeType">交换机类型</param>
+        public Publisher(M msg, string exchangeName, string routeKey, string queueName, bool autoDelete, VirtualHost host, string exchangeType = ExchangeType.Direct)
             : this(
                 new MQueue()
         {
@@ -93,8 +62,8 @@ namespace SuperGMS.MQ
                     AutoDeclare = false,
                     AutoDelete = false,
                     Durable = true,
-                    ExchangeType = ExchangeType.Direct,
-                    ExchangeName = exchange,
+                    ExchangeType = exchangeType,
+                    ExchangeName = exchangeName,
                 },
             Exclusive = false,
             RouteKey = routeKey,
