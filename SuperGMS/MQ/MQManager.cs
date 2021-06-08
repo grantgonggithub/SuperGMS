@@ -28,19 +28,7 @@ namespace SuperGMS.MQ
     {
         private static List<IDisposable> consumers = new List<IDisposable>();
 
-
-        /// <summary>
-        /// 发布一条默认配置的消息
-        /// </summary>
-        /// <typeparam name="M"></typeparam>
-        /// <param name="msg">msg</param>
-        /// <returns>bool</returns>
-        // public static bool Publish(MQProtocol<M> msg)
-        // {
-        //    // GrantDefaultPublisher<MQProtocol<M>> p = new GrantDefaultPublisher<MQProtocol<M>>(msg,false);
-        //    // return p.Publish();
-        //    return Publish(msg, RouterKeyConst.DefaultRouterKey);
-        // }
+        #region 点对点消息 Direct 
 
         /// <summary>
         ///  发布一条指定了特定routerKey的消息
@@ -59,39 +47,6 @@ namespace SuperGMS.MQ
         }
 
         /// <summary>
-        /// 指定虚拟机发送默认消息
-        /// </summary>
-        /// <param name="msg">msg</param>
-        /// <param name="host">host</param>
-        /// <returns>bool</returns>
-        // public static bool Publish(MQProtocol<M> msg, VirtualHost host)
-        // {
-        //   return Publish(msg, RouterKeyConst.DefaultRouterKey, host);
-        // }
-
-        /// <summary>
-        /// 注册一个默认配置的消费者，等待消息的到来
-        /// </summary>
-        /// <typeparam name="M">返回消息的实体类型</typeparam>
-        /// <param name="autoDelete">是否自动删除,true为自动删除，false不会自动删除，需要业务自己删除</param>
-        /// <param name="fn">
-        /// 处理返回消息的回调，注意如果autoDelete指定为false说明调用方需要自己确定
-        /// 消息什么时候删除，这里就需要fn返回是否删除，autoDelete指定为true时，fn这个返回值将不起作用
-        /// </param>
-        /// <returns></returns>
-        // public static void ConsumeRegister(bool autoDelete,Func<MQProtocol<M>, Exception, bool> fn)
-        // {
-        //    // GrantDefaultConsumer<MQProtocol<M>> c = new GrantDefaultConsumer<MQProtocol<M>>(autoDelete);
-        //    // c.OnGrantMsgReceive += (MQProtocol<M> m, Exception ex) =>
-        //    // {
-        //    //   return fn(m, ex);
-        //    // };
-        //    // consumers.Add(c);
-        //    // c.Register();
-        //    ConsumeRegister(RouterKeyConst.DefaultRouterKey, autoDelete, fn);
-        // }
-
-        /// <summary>
         /// 指定虚拟机，发送特定routerKey的消息
         /// </summary>
         /// <param name="msg">msg</param>
@@ -102,12 +57,13 @@ namespace SuperGMS.MQ
         {
             msg.ExChange = ExchangeConst.DefaultExchange;
             msg.RouterKey = routerKey;
-            using (Publisher<MQProtocol<M>> p = new Publisher<MQProtocol<M>>(msg, ExchangeConst.DefaultExchange, routerKey, MQueueConst.DefaultGrantMQ, false, host))
+            using (DefaultPublisher<MQProtocol<M>> p = new DefaultPublisher<MQProtocol<M>>(msg, ExchangeConst.DefaultExchange, routerKey, MQueueConst.DefaultGrantMQ, false, host))
             {
                 // consumers.Add(p);
                 return p.Publish();
             }                
         }
+
 
         /// <summary>
         /// 注册一个指定了routerKey的消费者
@@ -147,6 +103,83 @@ namespace SuperGMS.MQ
             c.Register();
         }
 
+        #endregion
+
+        #region 广播消息 Fanout
+
+        /// <summary>
+        /// 发布一条广播的消息的消息
+        /// </summary>
+        /// <param name="msg">消息</param>
+        /// <param name="exChangeName">交换机名称</param>
+        /// <param name="queueName">队列名称</param>
+        /// <returns></returns>
+        public static bool PublishFanout(MQProtocol<M> msg, string exChangeName, string queueName = MQueueConst.DefaultGrantMQ)
+        {
+            msg.ExChange = exChangeName;
+            using (FanoutPublisher<MQProtocol<M>> p = new FanoutPublisher<MQProtocol<M>>(msg, exChangeName, queueName, false))
+            {
+                return p.Publish();
+            }
+        }
+
+        /// <summary>
+        /// 指定虚拟机，发送特定routerKey的消息
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="exChangeName"></param>
+        /// <param name="host"></param>
+        /// <param name="queueName"></param>
+        /// <returns></returns>
+        public static bool PublishFanout(MQProtocol<M> msg, string exChangeName, VirtualHost host, string queueName = MQueueConst.DefaultGrantMQ)
+        {
+            msg.ExChange = exChangeName;
+            using (FanoutPublisher<MQProtocol<M>> p = new FanoutPublisher<MQProtocol<M>>(msg, exChangeName, "", queueName, false, host))
+            {
+                return p.Publish();
+            }
+        }
+
+
+        /// <summary>
+        /// 注册一个接受广播消费者
+        /// </summary>
+        /// <param name="exChangeName">交换机名称</param>
+        /// <param name="queueName">队列名称</param>
+        /// <param name="autoDelete">是否自动删除</param>
+        /// <param name="fn">接收到消息后的回调函数</param>
+        public static void FanoutConsumeRegister(string exChangeName,string queueName, bool autoDelete, Func<MQProtocol<M>, Exception, bool> fn)
+        {
+            FanoutConsumer<MQProtocol<M>> c = new FanoutConsumer<MQProtocol<M>>(exChangeName, queueName, autoDelete);
+            c.OnGrantMsgReceive += (MQProtocol<M> m, Exception ex) =>
+            {
+                return fn(m, ex);
+            };
+            consumers.Add(c);
+            c.Register();
+        }
+
+        /// <summary>
+        /// 注册一个接受广播消费者
+        /// </summary>
+        /// <param name="exChangeName">交换机名称</param>
+        /// <param name="queueName">队列名称</param>
+        /// <param name="host"></param>
+        /// <param name="autoDelete"></param>
+        /// <param name="fn"></param>
+        public static void FanoutConsumeRegister(string exChangeName, string queueName, VirtualHost host, bool autoDelete, Func<MQProtocol<M>, Exception, bool> fn)
+        {
+            FanoutConsumer<MQProtocol<M>> c = new FanoutConsumer<MQProtocol<M>>(exChangeName, queueName, autoDelete, host);
+            c.OnGrantMsgReceive += (MQProtocol<M> m, Exception ex) =>
+            {
+                return fn(m, ex);
+            };
+            consumers.Add(c);
+            c.Register();
+        }
+
+        #endregion
+
         /// <summary>
         /// 注册一个指定了Host的特定routerKey的拉消费者
         /// </summary>
@@ -162,17 +195,6 @@ namespace SuperGMS.MQ
             c.Register();
             return c;
         }
-
-        /// <summary>
-        /// 注册一个指定了Host的消费者
-        /// </summary>
-        /// <param name="host">host</param>
-        /// <param name="autoDelete">autoDelete</param>
-        /// <param name="fn">fn</param>
-        // public static void ConsumeRegister(VirtualHost host, bool autoDelete, Func<MQProtocol<M>, Exception, bool> fn)
-        // {
-        //    ConsumeRegister(RouterKeyConst.DefaultRouterKey, host, autoDelete, fn);
-        // }
 
         /// <summary>
         /// 凡是注册过消费者(ConsumeRegister)的，一定要在程序退出时调用此方法

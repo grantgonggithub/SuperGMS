@@ -22,17 +22,6 @@ namespace SuperGMS.MQ
        where M : class
    {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultPublisher{M}"/> class.
-        /// 消息发布者（默认配置）注释掉了，不能有这样的重载，要不乱套了，都发到一个上面了
-        /// </summary>
-        /// <param name="msg">消息</param>
-        /// <param name="autoDelete">是否自动删除</param>
-        // public GrantDefaultPublisher(M msg, bool autoDelete)
-        //    : this(msg, RouterKeyConst.DefaultRouterKey, autoDelete)
-        // {
-        // }
-
-        /// <summary>
         /// 消息发布者(默认配置，指定特定routerKey)
         /// </summary>
         /// <param name="msg">消息</param>
@@ -74,6 +63,21 @@ namespace SuperGMS.MQ
                }, msg)
        {
        }
+        
+        /// <summary>
+        /// 添加发布者消息
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="exchangeName"></param>
+        /// <param name="routeKey"></param>
+        /// <param name="queueName"></param>
+        /// <param name="autoDelete"></param>
+        /// <param name="host"></param>
+        /// <param name="exchangeType"></param>
+        public DefaultPublisher(M msg, string exchangeName, string routeKey, string queueName, bool autoDelete, VirtualHost host, string exchangeType = ExchangeType.Direct)
+            : base(msg, exchangeName, routeKey, queueName, autoDelete, host)
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultPublisher{M}"/> class.

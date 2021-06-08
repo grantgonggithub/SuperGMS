@@ -70,39 +70,6 @@ namespace SuperGMS.MQ
             }
         }
 
-        ///// <summary>
-        ///// 订阅系统全部默认的消息
-        ///// </summary>
-        ///// <param name="autoDelete"></param>
-        // public GrantConsumer(bool autoDelete)
-        //    :this(RouterKeyConst.DefaultRouterKey,autoDelete)
-        // {
-
-        // }
-
-        ///// <summary>
-        ///// 消费者，一个指定了特定routerKey的消费订阅，其他系统默认
-        ///// </summary>
-        ///// <param name="routerKey"></param>
-        ///// <param name="autoDelete"></param>
-        // public GrantConsumer(string routerKey, bool autoDelete)
-        //    : this(routerKey, MQueueConst.DefaultGrantMQ, autoDelete)
-        // {
-
-        // }
-
-        ///// <summary>
-        ///// 消费者，一个指定了特定queueName上特定routeKey的消费，其他系统默认
-        ///// </summary>
-        ///// <param name="routeKey">路由key</param>
-        ///// <param name="queueName">队列</param>
-        ///// <param name="autoDelete"></param>
-        // public GrantConsumer(string routeKey, string queueName, bool autoDelete)
-        //    : this(ExchangeConst.DefaultExchange, routeKey, queueName, autoDelete)
-        // {
-
-        // }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="GrantConsumer{M}"/> class.
         /// 消费者，一个完全自定义的消费者
@@ -112,7 +79,7 @@ namespace SuperGMS.MQ
         /// <param name="queueName">queueName</param>
         /// <param name="autoDelete">autoDelete</param>
         /// <param name="host">虚拟主机(可以用HostConfigManager.GetHost获取)</param>
-        public Consumer(string exchange, string routeKey, string queueName, bool autoDelete, VirtualHost host)
+        public Consumer(string exchange, string routeKey, string queueName, bool autoDelete, VirtualHost host,string exChangeType=ExchangeType.Direct)
             : this(new MQueue()
             {
                 AutoDeclare = false,
@@ -123,7 +90,7 @@ namespace SuperGMS.MQ
                     AutoDeclare = false,
                     AutoDelete = false,
                     Durable = true,
-                    ExchangeType = ExchangeType.Direct,
+                    ExchangeType = exChangeType,
                     ExchangeName = exchange,
                 },
                 Exclusive = false,

@@ -22,30 +22,6 @@ namespace SuperGMS.MQ
        where TM : class
    {
         /// <summary>
-        /// Initializes a new instance of the <see cref="FanoutPublisher{TM}"/> class.
-        /// 消息发布者（默认配置）
-        /// </summary>
-        /// <param name="msg">消息</param>
-        /// <param name="autoDelete">是否自动删除</param>
-        public FanoutPublisher(TM msg, bool autoDelete)
-            : this(msg, ExchangeConst.DefaultFanoutExchange, MQueueConst.DefaultGrantMQ, autoDelete)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FanoutPublisher{TM}"/> class.
-        /// 消息发布者（默认配置，指定了特定的routeKey和queueName）
-        /// </summary>
-        /// <param name="msg">消息</param>
-        /// <param name="queueName">队列名称</param>
-        /// <param name="autoDelete">是否自动删除</param>
-        public FanoutPublisher(TM msg, string queueName, bool autoDelete)
-            : this(msg, ExchangeConst.DefaultFanoutExchange, queueName, autoDelete)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FanoutPublisher{TM}"/> class.
         /// 消息发布者  非默认，一个自定义的消息交换机、队列、路由key
         /// </summary>
         /// <param name="msg">消息</param>
@@ -74,5 +50,18 @@ namespace SuperGMS.MQ
         {
 
         }
-   }
+
+        /// <summary>
+        /// 添加发布者广播消息
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="exchangeName"></param>
+        /// <param name="routeKey"></param>
+        /// <param name="queueName"></param>
+        /// <param name="autoDelete"></param>
+        /// <param name="host"></param>
+        public FanoutPublisher(TM msg, string exchangeName, string routeKey, string queueName, bool autoDelete, VirtualHost host)
+            : base(msg, exchangeName, routeKey, queueName, autoDelete, host,ExchangeType.Fanout)
+        { }
+    }
 }

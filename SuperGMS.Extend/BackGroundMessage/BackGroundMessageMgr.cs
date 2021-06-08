@@ -98,16 +98,17 @@ namespace SuperGMS.Extend.BackGroundMessage
 
             logger.LogInformation($"BackGroundMessageMgr.SetMessage.MQ.Success.rid = {valueArgs.Args.rid}");
 
-            var processMsg = new BackGroundMessageProcessResult() // 初始化一个未开始状态，所有值都为-1，表示还在队列中，未开始
-            {
-                ProcessNum = -1,
-                SuccessNum = -1,
-                TotalNum = -1,
-                Data = string.Empty,
-                Rid = valueArgs.Args.rid,
-            };
+            //var processMsg = new BackGroundMessageProcessResult() // 初始化一个未开始状态，所有值都为-1，表示还在队列中，未开始
+            //{
+            //    ProcessNum = -1,
+            //    SuccessNum = -1,
+            //    TotalNum = -1,
+            //    Data = string.Empty,
+            //    Rid = valueArgs.Args.rid,
+            //};
 
-            return SetProcessStatus(processMsg);
+            //return SetProcessStatus(processMsg);
+            return true;
         }
 
         /// <summary>
