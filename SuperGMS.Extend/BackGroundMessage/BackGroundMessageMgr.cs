@@ -16,11 +16,13 @@ using System.Threading.Tasks;
 namespace SuperGMS.Extend.BackGroundMessage
 {
     using System;
+    using System.Linq;
+
     using Microsoft.Extensions.Logging;
-    using SuperGMS.Cache;
     using SuperGMS.Log;
     using SuperGMS.MQ;
     using SuperGMS.Protocol.MQProtocol;
+    using SuperGMS.Tools;
 
     /// <summary>
     /// 接到消息的时间
@@ -28,48 +30,51 @@ namespace SuperGMS.Extend.BackGroundMessage
     /// <param name="m">m</param>
     /// <param name="ex">ex</param>
     /// <returns>返回成功或者失败</returns>
-    public delegate bool BackGroundMessageReceive(MQProtocol<SetBackGroudMessageArgs> m, Exception ex);
+    public delegate bool BackGroundMessageReceive(MQProtocol<SetBackGroudMessageArgs> m, Exception ex,object objCtx);
 
-    /// <summary>
-    /// BackGroundMessageMgr
-    /// </summary>
-    public class BackGroundMessageMgr
-    {
-        private readonly static ILogger logger = LogFactory.CreateLogger<BackGroundMessageMgr>();
+    public class MessageRouterMap { 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BackGroundMessageMgr"/> class.
+        /// 处理业务的接口名称
+        /// </summary>
+        public string BussinessApiName { get; set; }
+
+        /// <summary>
+        /// MQ的消息路由名，如果是点对点的消息，这个值是消息发布者定义Router,如果是扇波消息这个值是消息发布者定义的ExChangeName
+        /// </summary>
+        public string MQRouterName { get; set; }
+    }
+    /// <summary>
+    /// 点对点消息
+    /// </summary>
+    public class BackGroundDirectMessage
+    {
+        private readonly static ILogger logger = LogFactory.CreateLogger<BackGroundDirectMessage>();
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BackGroundDirectMessage"/> class.
         /// 创建接受消息实例
         /// </summary>
         /// <param name="bussinessTypes">接受消息的所有bussinessTypes</param>
-        public BackGroundMessageMgr(params string[] bussinessTypes)
+        public BackGroundDirectMessage(params MessageRouterMap[] messageRouterMap)
         {
+            if (messageRouterMap?.Any(x => string.IsNullOrEmpty(x.BussinessApiName) || string.IsNullOrEmpty(x.MQRouterName)) ?? true)
+                throw new Exception("BackGroundDirectMessage构造函数的参数不合法");
             Task.Run(() =>
             {
                 // 订阅所有的routerKey
-                foreach (var item in bussinessTypes)
+                foreach (var item in messageRouterMap)
                 {
                     MQManager<SetBackGroudMessageArgs>.ConsumeRegister(
-                        GetRouter(item),
-                        GetQueue(item),
+                        GetRouter(item.MQRouterName), //点对点的消息，必须安装消息发布者的router和队列
+                        GetQueue(item.MQRouterName), //同上
                         false,
-                        (MQProtocol<SetBackGroudMessageArgs> m, Exception ex) =>
+                        (MQProtocol<SetBackGroudMessageArgs> m, Exception ex,object objCtx) =>
                         {
-                            // if (ex != null)
-                            // {
-                            //    if (m != null)
-                            //    {
-                            // string msg = m.ToString();
-                            // Console.WriteLine(msg);
-                            // return true;
                             if (this.OnBackGroundMessageReceive != null)
                             {
-                                return this.OnBackGroundMessageReceive(m, ex);
+                                return this.OnBackGroundMessageReceive(m, ex,objCtx);
                             }
-
-                            // }
-                            // }
                             return false; // 如果没有回调，不能随意删除消息
-                        });
+                        },item.BussinessApiName);
                 }
             });
         }
@@ -79,71 +84,84 @@ namespace SuperGMS.Extend.BackGroundMessage
         /// </summary>
         public event BackGroundMessageReceive OnBackGroundMessageReceive;
 
-        /// <summary>
-        /// 保存异步消息，并设置初始处理状态
-        /// </summary>
-        /// <param name="valueArgs">参数</param>
-        /// <returns>是否成功</returns>
-        public static bool SetMessage(SetBackGroudMessageArgs valueArgs)
-        {
-            var msg = new MQProtocol<SetBackGroudMessageArgs>("SetBackGroudMessage", valueArgs, valueArgs.Args.rid);
-            var routeKey = GetRouter(valueArgs.BussinessType);
-            var mq = MQManager<SetBackGroudMessageArgs>.Publish(msg, routeKey);
-
-            if (!mq)
-            {
-                logger.LogError($"BackGroundMessageMgr.SetMessage.MQ.Error.rid = {valueArgs.Args.rid}");
-                return false;
-            }
-
-            logger.LogInformation($"BackGroundMessageMgr.SetMessage.MQ.Success.rid = {valueArgs.Args.rid}");
-
-            //var processMsg = new BackGroundMessageProcessResult() // 初始化一个未开始状态，所有值都为-1，表示还在队列中，未开始
-            //{
-            //    ProcessNum = -1,
-            //    SuccessNum = -1,
-            //    TotalNum = -1,
-            //    Data = string.Empty,
-            //    Rid = valueArgs.Args.rid,
-            //};
-
-            //return SetProcessStatus(processMsg);
-            return true;
-        }
-
-        /// <summary>
-        /// 设置进度
-        /// </summary>
-        /// <param name="processMsg">信息</param>
-        /// <returns>是否成功</returns>
-        public static bool SetProcessStatus(BackGroundMessageProcessResult processMsg)
-        {
-           return ResourceCache.Instance.Set(processMsg.Rid, processMsg);
-        }
-
-        /// <summary>
-        /// 获取处理进度信息
-        /// </summary>
-        /// <param name="taskGuid">taskGuid</param>
-        /// <returns>BackGroundMessageProcessResult</returns>
-        public static BackGroundMessageProcessResult GetProcessStatus(string taskGuid)
-        {
-            return ResourceCache.Instance.Get<BackGroundMessageProcessResult>(taskGuid);
-        }
 
         /// <summary>
         /// 获取router
         /// </summary>
         /// <param name="bussinessType">业务类型</param>
         /// <returns>routerkey</returns>
-        private static string GetRouter(string bussinessType)
+        public static string GetRouter(string mqRouterName)
         {
-            return $"route-BackGroundMessageMgr-{bussinessType.Trim().ToLower()}";
+            return $"route-BackGroundMessageMgr-{mqRouterName.Trim().ToLower()}";
         }
 
-        private static string GetQueue(string bussinessType)
+        public static string GetQueue(string mqRouterName)
         {
-            return $"queue-BackGroundMessageMgr-{bussinessType.Trim().ToLower()}";
+            return $"queue-BackGroundMessageMgr-{mqRouterName.Trim().ToLower()}";
+        }
+    }
+
+
+    /// <summary>
+    /// 扇波消息
+    /// </summary>
+    public class BackGroundFanoutMessage
+    {
+        private readonly static ILogger logger = LogFactory.CreateLogger<BackGroundFanoutMessage>();
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BackGroundFanoutMessage"/> class.
+        /// 创建和初始化扇波的订阅方
+        /// </summary>
+        /// <param name="bussinessTypes">接受消息的所有bussinessTypes</param>
+        public BackGroundFanoutMessage(params MessageRouterMap[] messageRouterMap)
+        {
+            if (messageRouterMap?.Any(x => string.IsNullOrEmpty(x.BussinessApiName) || string.IsNullOrEmpty(x.MQRouterName)) ?? true)
+                throw new Exception("BackGroundFanoutMessage构造函数的参数不合法");
+            Task.Run(() =>
+            {
+                // 订阅所有的routerKey
+                foreach (var item in messageRouterMap)
+                {
+                    MQManager<SetBackGroudMessageArgs>.FanoutConsumeRegister(
+                        GetExchange(item.MQRouterName),
+                        GetQueue(item.BussinessApiName),// 这里特殊，因为是扇波消息，所以这个队列是自己定义的特有的，所以用ApiName
+                        false,
+                        (MQProtocol<SetBackGroudMessageArgs> m, Exception ex,object objCtx) =>
+                        {
+                            if (this.OnBackGroundMessageReceive != null)
+                            {
+                                return this.OnBackGroundMessageReceive(m, ex, objCtx);
+                            }
+                            return false; // 如果没有回调，不能随意删除消息
+                        },item.BussinessApiName);
+                }
+            });
+        }
+
+        /// <summary>
+        /// 回调事件,注意返回值是true将会删除消息，false不删除
+        /// </summary>
+        public event BackGroundMessageReceive OnBackGroundMessageReceive;
+
+
+        /// <summary>
+        /// 获取扇波的交换机
+        /// </summary>
+        /// <param name="bussinessType">业务类型</param>
+        /// <returns>routerkey</returns>
+        public static string GetExchange(string mqRouterName)
+        {
+            return $"exchange-BackGroundFanoutMessage-{mqRouterName.Trim().ToLower()}";
+        }
+
+        /// <summary>
+        /// 获取扇波的队列,这个队列是每个消费者自己定义的，由交互机投递到这个队列的
+        /// </summary>
+        /// <param name="bussinessType"></param>
+        /// <returns></returns>
+        public static string GetQueue(string mqRouterName)
+        {
+            return $"queue-BackGroundFanoutMessage-{mqRouterName.Trim().ToLower()}-{ServiceEnvironment.ComputerAddress.Replace(".","_")}";
         }
     }
 }

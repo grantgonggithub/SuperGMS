@@ -69,16 +69,18 @@ namespace SuperGMS.MQ
         /// 注册一个指定了routerKey的消费者
         /// </summary>
         /// <param name="routerKey">特定的routerKey这个用户特定标识特殊消息</param>
+        /// <param name="queueName"></param>
         /// <param name="autoDelete">是否自动删除,true为自动删除，false不会自动删除，需要业务自己删除</param>
         /// <param name="fn">/// 处理返回消息的回调，注意如果autoDelete指定为false说明调用方需要自己确定
         /// 消息什么时候删除，这里就需要fn返回是否删除，autoDelete指定为true时，fn这个返回值将不起作用
         /// </param>
-        public static void ConsumeRegister(string routerKey, string queueName, bool autoDelete, Func<MQProtocol<M>, Exception, bool> fn)
+        /// <param name="_objCtx"></param>
+        public static void ConsumeRegister(string routerKey, string queueName, bool autoDelete, Func<MQProtocol<M>, Exception, object, bool> fn,object _objCtx=null)
         {
-            DefaultConsumer<MQProtocol<M>> c = new DefaultConsumer<MQProtocol<M>>(routerKey, queueName, autoDelete);
-            c.OnGrantMsgReceive += (MQProtocol<M> m, Exception ex) =>
+            DefaultConsumer<MQProtocol<M>> c = new DefaultConsumer<MQProtocol<M>>(routerKey, queueName, autoDelete,_objCtx);
+            c.OnGrantMsgReceive += (MQProtocol<M> m, Exception ex,object objCtx) =>
             {
-                return fn(m, ex);
+                return fn(m, ex,_objCtx);
             };
             consumers.Add(c);
             c.Register();
@@ -92,12 +94,13 @@ namespace SuperGMS.MQ
         /// <param name="host">特定的host服务器</param>
         /// <param name="autoDelete">是否自动删除autoDelete，一般不要在注册的时候设置为true,在处理完消息的回调中删除消息</param>
         /// <param name="fn">回调fn</param>
-        public static void ConsumeRegister(string routerKey, string queueName, VirtualHost host, bool autoDelete, Func<MQProtocol<M>, Exception, bool> fn)
+        /// <param name="_objCtx"></param>
+        public static void ConsumeRegister(string routerKey, string queueName, VirtualHost host, bool autoDelete, Func<MQProtocol<M>, Exception,object, bool> fn, object _objCtx = null)
         {
-            Consumer<MQProtocol<M>> c = new Consumer<MQProtocol<M>>(ExchangeConst.DefaultExchange, routerKey, queueName, autoDelete, host);
-            c.OnGrantMsgReceive += (MQProtocol<M> m, Exception ex) =>
+            Consumer<MQProtocol<M>> c = new Consumer<MQProtocol<M>>(ExchangeConst.DefaultExchange, routerKey, queueName, autoDelete, host,_objCtx);
+            c.OnGrantMsgReceive += (MQProtocol<M> m, Exception ex,object objCtx) =>
             {
-                return fn(m, ex);
+                return fn(m, ex, objCtx);
             };
             consumers.Add(c);
             c.Register();
@@ -148,12 +151,13 @@ namespace SuperGMS.MQ
         /// <param name="queueName">队列名称</param>
         /// <param name="autoDelete">是否自动删除</param>
         /// <param name="fn">接收到消息后的回调函数</param>
-        public static void FanoutConsumeRegister(string exChangeName,string queueName, bool autoDelete, Func<MQProtocol<M>, Exception, bool> fn)
+        /// <param name="_objCtx"></param>
+        public static void FanoutConsumeRegister(string exChangeName,string queueName, bool autoDelete, Func<MQProtocol<M>, Exception,object, bool> fn,object _objCtx)
         {
-            FanoutConsumer<MQProtocol<M>> c = new FanoutConsumer<MQProtocol<M>>(exChangeName, queueName, autoDelete);
-            c.OnGrantMsgReceive += (MQProtocol<M> m, Exception ex) =>
+            FanoutConsumer<MQProtocol<M>> c = new FanoutConsumer<MQProtocol<M>>(exChangeName, queueName, autoDelete,_objCtx);
+            c.OnGrantMsgReceive += (MQProtocol<M> m, Exception ex,object objCtx) =>
             {
-                return fn(m, ex);
+                return fn(m, ex, objCtx);
             };
             consumers.Add(c);
             c.Register();
@@ -167,12 +171,13 @@ namespace SuperGMS.MQ
         /// <param name="host"></param>
         /// <param name="autoDelete"></param>
         /// <param name="fn"></param>
-        public static void FanoutConsumeRegister(string exChangeName, string queueName, VirtualHost host, bool autoDelete, Func<MQProtocol<M>, Exception, bool> fn)
+        /// <param name="_objCtx"></param>
+        public static void FanoutConsumeRegister(string exChangeName, string queueName, VirtualHost host, bool autoDelete, Func<MQProtocol<M>, Exception,object, bool> fn,object _objCtx)
         {
-            FanoutConsumer<MQProtocol<M>> c = new FanoutConsumer<MQProtocol<M>>(exChangeName, queueName, autoDelete, host);
-            c.OnGrantMsgReceive += (MQProtocol<M> m, Exception ex) =>
+            FanoutConsumer<MQProtocol<M>> c = new FanoutConsumer<MQProtocol<M>>(exChangeName, queueName, autoDelete, host,_objCtx);
+            c.OnGrantMsgReceive += (MQProtocol<M> m, Exception ex,object objCtx) =>
             {
-                return fn(m, ex);
+                return fn(m, ex, objCtx);
             };
             consumers.Add(c);
             c.Register();
