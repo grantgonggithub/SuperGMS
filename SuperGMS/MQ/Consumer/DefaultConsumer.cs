@@ -33,8 +33,9 @@ namespace SuperGMS.MQ
         /// 真正决定消息的路由是routeKey,Queue是接收的容器，理论上不同的routeKey要定义不同的Queue,否则不同的key投送到同一个Queue上就乱了</param>
         /// <param name="routeKey">路由key</param>
         /// <param name="autoDelete">是否自动删除</param>
-        public DefaultConsumer(string routeKey, string queueName, bool autoDelete)
-            : this(ExchangeConst.DefaultExchange, routeKey, queueName, autoDelete)
+        /// <param name="_objCtx"></param>
+        public DefaultConsumer(string routeKey, string queueName, bool autoDelete, object _objCtx = null)
+            : this(ExchangeConst.DefaultExchange, routeKey, queueName, autoDelete,_objCtx)
         {
         }
 
@@ -46,7 +47,8 @@ namespace SuperGMS.MQ
         /// <param name="routeKey">routeKey</param>
         /// <param name="queueName">queueName</param>
         /// <param name="autoDelete">autoDelete</param>
-        public DefaultConsumer(string exchange, string routeKey, string queueName, bool autoDelete)
+        /// <param name="_objCtx"></param>
+        public DefaultConsumer(string exchange, string routeKey, string queueName, bool autoDelete, object _objCtx = null)
             : base(new MQueue()
             {
                 AutoDeclare = false,
@@ -64,7 +66,7 @@ namespace SuperGMS.MQ
                 QueueName = queueName,
                 RouteKey = routeKey,
                 Host = MQHostConfigManager.GetDefaultHost(),
-            })
+            },_objCtx)
         {
         }
     }

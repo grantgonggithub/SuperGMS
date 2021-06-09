@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using SuperGMS.ExceptionEx;
+using SuperGMS.Extend.ImportExport;
 using SuperGMS.Log;
 using SuperGMS.Protocol.RpcProtocol;
 
@@ -36,7 +37,7 @@ namespace SuperGMS.Extend.BackGroundMessage
         /// <param name="data">数据</param>
         public static void SetProgress(string rid, StatusCode code, int totalNum, int processNum, int successNum,  string data = "")
         {
-            var rtn = BackGroundMessageMgr.SetProcessStatus(new BackGroundMessageProcessResult()
+            var rtn = SuperImportExprotMessageHelper.SetProcessStatus(new BackGroundMessageProcessResult()
             {
                 Rid = rid,
                 Code = code,
