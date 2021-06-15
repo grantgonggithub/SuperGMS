@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperGMS.HttpProxy", "Super
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{BEA5D961-2B47-4634-B188-698D5EEB0208}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperGMS.RpcProxyTools", "SuperGMS.RpcProxyTools\SuperGMS.RpcProxyTools.csproj", "{6D075BFB-95C3-41A8-A131-656C006007AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperGMS.RpcProxyTools", "SuperGMS.RpcProxyTools\SuperGMS.RpcProxyTools.csproj", "{6D075BFB-95C3-41A8-A131-656C006007AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
