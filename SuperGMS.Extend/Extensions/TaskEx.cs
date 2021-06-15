@@ -144,7 +144,7 @@ namespace SuperGMS.Extend.Extensions
                         backGround.SuccessNum = success;
                         backGround.ProcessNum = current;
 
-                        SuperImportExprotMessageHelper.SetProcessStatus(backGround);
+                        MQ.SuperImportExprotMessageHelper.SetProcessStatus(backGround);
                     }
                 });
                 tsk.Start();
