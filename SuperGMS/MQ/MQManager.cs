@@ -137,7 +137,7 @@ namespace SuperGMS.MQ
         public static bool PublishFanout(MQProtocol<M> msg, string exChangeName, VirtualHost host, string queueName = MQueueConst.DefaultGrantMQ)
         {
             msg.ExChange = exChangeName;
-            using (FanoutPublisher<MQProtocol<M>> p = new FanoutPublisher<MQProtocol<M>>(msg, exChangeName, "", queueName, false, host))
+            using (FanoutPublisher<MQProtocol<M>> p = new FanoutPublisher<MQProtocol<M>>(msg, exChangeName, queueName, queueName, false, host))
             {
                 return p.Publish();
             }

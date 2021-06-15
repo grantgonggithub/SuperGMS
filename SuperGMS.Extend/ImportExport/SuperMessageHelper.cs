@@ -11,7 +11,7 @@ using SuperGMS.MQ;
 using SuperGMS.Protocol.MQProtocol;
 using SuperGMS.Protocol.RpcProtocol;
 
-namespace SuperGMS.Extend.ImportExport
+namespace SuperGMS.Extend.MQ
 {
     /// <summary>
     /// 点对点消息处理类
@@ -94,7 +94,7 @@ namespace SuperGMS.Extend.ImportExport
         /// </summary>
         /// <param name="valueArgs">参数</param>
         /// <returns>是否成功</returns>
-        public static bool SetDirectMessage(SetBackGroudMessageArgs valueArgs, bool isImport)
+        public static bool SetDirectMessage(SetBackGroudMessageArgs valueArgs)
         {
             var msg = new MQProtocol<SetBackGroudMessageArgs>("SetDirectMessage", valueArgs, valueArgs.Args.rid);
             var routeKey = BackGroundDirectMessage.GetRouter(valueArgs.MQRouterName);
@@ -250,7 +250,7 @@ namespace SuperGMS.Extend.ImportExport
         /// <returns></returns>
         public static bool SendImportMessage(SetBackGroudMessageArgs msg)
         {
-            if (SuperDirectMessageHelper.SetDirectMessage(msg, true))
+            if (SuperDirectMessageHelper.SetDirectMessage(msg))
             {
                     var processMsg = new BackGroundMessageProcessResult() // 初始化一个未开始状态，所有值都为-1，表示还在队列中，未开始
                     {

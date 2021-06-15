@@ -37,7 +37,7 @@ namespace SuperGMS.Extend.BackGroundMessage
         /// <param name="data">数据</param>
         public static void SetProgress(string rid, StatusCode code, int totalNum, int processNum, int successNum,  string data = "")
         {
-            var rtn = SuperImportExprotMessageHelper.SetProcessStatus(new BackGroundMessageProcessResult()
+            var rtn = MQ.SuperImportExprotMessageHelper.SetProcessStatus(new BackGroundMessageProcessResult()
             {
                 Rid = rid,
                 Code = code,
