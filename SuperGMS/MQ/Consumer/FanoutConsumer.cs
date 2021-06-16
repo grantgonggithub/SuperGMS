@@ -29,7 +29,8 @@ namespace SuperGMS.MQ
         /// <param name="exchange">exchange</param>
         /// <param name="queueName">queueName</param>
         /// <param name="autoDelete">autoDelete</param>
-        public FanoutConsumer(string exchange, string queueName, bool autoDelete)
+        /// <param name="_objCtx"></param>
+        public FanoutConsumer(string exchange, string queueName, bool autoDelete, object _objCtx = null)
             : base(new MQueue()
             {
                 AutoDeclare = false,
@@ -47,7 +48,7 @@ namespace SuperGMS.MQ
                 QueueName = queueName,
                 RouteKey ="",
                 Host = MQHostConfigManager.GetDefaultHost(),
-            })
+            },_objCtx)
         {
         }
 
@@ -58,7 +59,8 @@ namespace SuperGMS.MQ
         /// <param name="queueName"></param>
         /// <param name="autoDelete"></param>
         /// <param name="host"></param>
-        public FanoutConsumer(string exchange, string queueName, bool autoDelete, VirtualHost host)
+        /// <param name="_objCtx"></param>
+        public FanoutConsumer(string exchange, string queueName, bool autoDelete, VirtualHost host,object _objCtx=null)
             : base(new MQueue()
             {
                 AutoDeclare = false,
@@ -76,7 +78,7 @@ namespace SuperGMS.MQ
                 QueueName = queueName,
                 RouteKey = "",
                 Host = host,
-            })
+            }, _objCtx)
         {
         }
     }

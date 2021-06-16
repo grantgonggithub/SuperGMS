@@ -22,6 +22,7 @@ namespace SuperGMS.Extend.Extensions
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
     using SuperGMS.Extend.BackGroundMessage;
+    using SuperGMS.Extend.ImportExport;
     using SuperGMS.Protocol.RpcProtocol;
     using SuperGMS.Rpc.Server;
 
@@ -143,7 +144,7 @@ namespace SuperGMS.Extend.Extensions
                         backGround.SuccessNum = success;
                         backGround.ProcessNum = current;
 
-                        BackGroundMessageMgr.SetProcessStatus(backGround);
+                        MQ.SuperImportExprotMessageHelper.SetProcessStatus(backGround);
                     }
                 });
                 tsk.Start();
