@@ -40,6 +40,10 @@ namespace SuperGMS.DB.EFEx
         //public event DbEFCommit OnDbCommit;
         private DbContext _dbContext;
         private DbInfo _dbInfo;
+        /// <summary>
+        /// 当前数据库信息
+        /// </summary>
+        public DbInfo DbInfo { get { return _dbInfo; } }
 
         private readonly object _rootObj = new object();
         private Dictionary<string, object> _repositories = new Dictionary<string, object>();
