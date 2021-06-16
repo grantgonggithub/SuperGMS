@@ -24,7 +24,10 @@ namespace SuperGMS.Extend.BackGroundMessage
     {
         public string Data { get; set; }
 
-        public string BussinessType { get; set; }
+        /// <summary>
+        /// 如果这个是点对点消息，此值为Router 如果是扇波消息则为ExChangeName
+        /// </summary>
+        public string MQRouterName { get; set; }
 
         public string TtId { get; set; }
 
