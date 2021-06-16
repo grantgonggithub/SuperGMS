@@ -32,6 +32,11 @@ namespace SuperGMS.DB.EFEx
 
         private DbInfo dbInfo;
 
+        /// <summary>
+        /// 当前数据库信息
+        /// </summary>
+        public DbInfo DbInfo { get { return dbInfo; } }
+
         public DapperDBContext(DbInfo info)
         {
             dbInfo = info;
