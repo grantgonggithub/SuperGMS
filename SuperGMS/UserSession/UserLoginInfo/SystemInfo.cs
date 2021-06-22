@@ -33,7 +33,7 @@ namespace SuperGMS.UserSession
         /// <summary>
         /// 菜单显示在那种类型的终端上
         /// </summary>
-        public string ShowSysType { get; set; }
+        public string PlatFormType { get; set; }
         /// <summary>
         /// 排序
         /// </summary>
