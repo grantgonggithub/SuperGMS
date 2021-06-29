@@ -36,7 +36,7 @@ namespace SuperGMS.Extend.BackGroundMessage
         /// <summary>
         /// 处理业务的接口名称
         /// </summary>
-        public string BussinessApiName { get; set; }
+        public Type BussinessApi { get; set; }
 
         /// <summary>
         /// MQ的消息路由名，如果是点对点的消息，这个值是消息发布者定义Router,如果是扇波消息这个值是消息发布者定义的ExChangeName
@@ -56,7 +56,7 @@ namespace SuperGMS.Extend.BackGroundMessage
         /// <param name="bussinessTypes">接受消息的所有bussinessTypes</param>
         public BackGroundDirectMessage(params MessageRouterMap[] messageRouterMap)
         {
-            if (messageRouterMap?.Any(x => string.IsNullOrEmpty(x.BussinessApiName) || string.IsNullOrEmpty(x.MQRouterName)) ?? true)
+            if (messageRouterMap?.Any(x => x.BussinessApi==null || string.IsNullOrEmpty(x.MQRouterName)) ?? true)
                 throw new Exception("BackGroundDirectMessage构造函数的参数不合法");
             Task.Run(() =>
             {
@@ -74,7 +74,7 @@ namespace SuperGMS.Extend.BackGroundMessage
                                 return this.OnBackGroundMessageReceive(m, ex,objCtx);
                             }
                             return false; // 如果没有回调，不能随意删除消息
-                        },item.BussinessApiName);
+                        },item.BussinessApi.Name);
                 }
             });
         }
@@ -115,7 +115,7 @@ namespace SuperGMS.Extend.BackGroundMessage
         /// <param name="bussinessTypes">接受消息的所有bussinessTypes</param>
         public BackGroundFanoutMessage(params MessageRouterMap[] messageRouterMap)
         {
-            if (messageRouterMap?.Any(x => string.IsNullOrEmpty(x.BussinessApiName) || string.IsNullOrEmpty(x.MQRouterName)) ?? true)
+            if (messageRouterMap?.Any(x =>x.BussinessApi==null || string.IsNullOrEmpty(x.MQRouterName)) ?? true)
                 throw new Exception("BackGroundFanoutMessage构造函数的参数不合法");
             Task.Run(() =>
             {
@@ -124,7 +124,7 @@ namespace SuperGMS.Extend.BackGroundMessage
                 {
                     MQManager<SetBackGroudMessageArgs>.FanoutConsumeRegister(
                         GetExchange(item.MQRouterName),
-                        GetQueue(item.BussinessApiName),// 这里特殊，因为是扇波消息，所以这个队列是自己定义的特有的，所以用ApiName
+                        GetQueue(item.MQRouterName,item.BussinessApi.FullName),// 这里特殊，因为是扇波消息，所以这个队列是自己定义的特有的，所以用MQRouterName+ApiName 相当于是按MQRouterName+ApiName进行分组的，相同分组多节点，只有一个节点收到
                         false,
                         (MQProtocol<SetBackGroudMessageArgs> m, Exception ex,object objCtx) =>
                         {
@@ -133,7 +133,7 @@ namespace SuperGMS.Extend.BackGroundMessage
                                 return this.OnBackGroundMessageReceive(m, ex, objCtx);
                             }
                             return false; // 如果没有回调，不能随意删除消息
-                        },item.BussinessApiName);
+                        },item.BussinessApi.Name);
                 }
             });
         }
@@ -159,9 +159,9 @@ namespace SuperGMS.Extend.BackGroundMessage
         /// </summary>
         /// <param name="bussinessType"></param>
         /// <returns></returns>
-        public static string GetQueue(string mqRouterName)
+        public static string GetQueue(string mqRouterName,string bussinessApiName)
         {
-            return $"queue-BackGroundFanoutMessage-{mqRouterName.Trim().ToLower()}-{ServiceEnvironment.ComputerAddress.Replace(".","_")}";
+            return $"queue-BackGroundFanoutMessage-{mqRouterName.Trim().ToLower()}-{bussinessApiName.Trim().ToLower().Replace(".","_")}";
         }
     }
 }
