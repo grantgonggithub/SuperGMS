@@ -92,12 +92,12 @@ namespace SuperGMS.Extend.BackGroundMessage
         /// <returns>routerkey</returns>
         public static string GetRouter(string mqRouterName)
         {
-            return $"route-BackGroundMessageMgr-{mqRouterName.Trim().ToLower()}";
+            return $"route-direct-{mqRouterName.Trim().ToLower()}";
         }
 
         public static string GetQueue(string mqRouterName)
         {
-            return $"queue-BackGroundMessageMgr-{mqRouterName.Trim().ToLower()}";
+            return $"queue-direct-{mqRouterName.Trim().ToLower()}";
         }
     }
 
@@ -151,7 +151,7 @@ namespace SuperGMS.Extend.BackGroundMessage
         /// <returns>routerkey</returns>
         public static string GetExchange(string mqRouterName)
         {
-            return $"exchange-{mqRouterName.Trim().ToLower()}";
+            return $"exchange-fanout-{mqRouterName.Trim().ToLower()}";
         }
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace SuperGMS.Extend.BackGroundMessage
         /// <returns></returns>
         public static string GetQueue(string mqRouterName,string bussinessApiName)
         {
-            return $"queue-{mqRouterName.Trim().ToLower()}-{bussinessApiName.Trim().ToLower().Replace(".","_")}";
+            return $"queue-fanout-{mqRouterName.Trim().ToLower()}-{bussinessApiName.Trim().ToLower().Replace(".","_")}";
         }
     }
 }
