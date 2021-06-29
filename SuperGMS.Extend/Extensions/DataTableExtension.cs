@@ -24,6 +24,11 @@ namespace SuperGMS.Extend.Extensions
     using SuperGMS.Rpc.Server;
     using System.Text;
     using SuperGMS.ExceptionEx;
+    using SuperGMS.Config;
+    using SuperGMS.Tools;
+    using SuperGMS.Protocol.RpcProtocol;
+    using Microsoft.Extensions.Logging;
+    using SuperGMS.Log;
 
     /// <summary>
     /// DataTableExtension
@@ -531,5 +536,59 @@ namespace SuperGMS.Extend.Extensions
         /// </summary>
         public string ExcelRowIndex { get; set; }
 
+    }
+
+    /// <summary>
+    /// CallHttpProxyHelper
+    /// </summary>
+    public static class CallHttpProxyHelper
+    {
+        public static TR CallService<TA, TR>(this RpcContext rpcContext, string relatedUrl, TA model, int timeout)
+        {
+            if (relatedUrl.StartsWith("/"))
+            {
+                relatedUrl = relatedUrl.Substring(1);
+            }
+            var httpProxyHost = ServerSetting.GetConstValue("HttpProxy")?.Value;
+            if (string.IsNullOrEmpty(httpProxyHost)) httpProxyHost = ServerSetting.Config.ServerConfig.RpcService.Ip;
+            try
+            {
+                using (var wc = new WebClientEx { Encoding = Encoding.UTF8, TimeOut = timeout })
+                {
+                    wc.Headers.Add("Content-Type", "application/json;charset=utf-8");
+                    var args = Newtonsoft.Json.JsonConvert.SerializeObject(
+                        new Args<TA>()
+                        {
+                            tk = rpcContext.Args.tk,
+                            v = model,
+                        },
+                        new Newtonsoft.Json.JsonSerializerSettings()
+                        {
+                            NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore,
+                            DateFormatString = "yyyy-MM-dd HH:mm:ss",
+                            Formatting = Newtonsoft.Json.Formatting.Indented
+                        });
+                    var postData = Encoding.UTF8.GetBytes(args);
+                    byte[] responseData = wc.UploadData($"{httpProxyHost}/{relatedUrl}", "POST", postData);
+                    var result = Encoding.UTF8.GetString(responseData);
+                    Result<TR> apiResult = null;
+
+                    apiResult = Newtonsoft.Json.JsonConvert.DeserializeObject<Result<TR>>(result);
+
+                    if (apiResult.c == StatusCode.OK.code)
+                    {
+                        return apiResult.v;
+                    }
+                    else
+                    {
+                        throw new Exception($"rid:{apiResult.rid};状态码:{apiResult.c};说明:{apiResult.msg}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("url:" + httpProxyHost + "/" + relatedUrl + ",token:" + rpcContext.Args.tk + ",状态码:" + ex.Message);
+            }
+        }
     }
 }
