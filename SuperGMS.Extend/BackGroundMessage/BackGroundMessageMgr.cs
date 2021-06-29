@@ -151,7 +151,7 @@ namespace SuperGMS.Extend.BackGroundMessage
         /// <returns>routerkey</returns>
         public static string GetExchange(string mqRouterName)
         {
-            return $"exchange-BackGroundFanoutMessage-{mqRouterName.Trim().ToLower()}";
+            return $"exchange-{mqRouterName.Trim().ToLower()}";
         }
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace SuperGMS.Extend.BackGroundMessage
         /// <returns></returns>
         public static string GetQueue(string mqRouterName,string bussinessApiName)
         {
-            return $"queue-BackGroundFanoutMessage-{mqRouterName.Trim().ToLower()}-{bussinessApiName.Trim().ToLower().Replace(".","_")}";
+            return $"queue-{mqRouterName.Trim().ToLower()}-{bussinessApiName.Trim().ToLower().Replace(".","_")}";
         }
     }
 }
