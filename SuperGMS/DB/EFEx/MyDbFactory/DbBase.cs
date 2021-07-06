@@ -155,7 +155,8 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
 
             // 如果是Dapper 则把Condition 的 Field 和 Value 替换掉
 
-            var mapDic = DbColumnMaps.GetDbContextFiledMaps();
+            var mapDic = DbColumnMaps.GetDbContextFiledMaps(_dbInfo.DbContextName);
+            if (mapDic == null) throw new NotImplementedException($"请在项目的AppStart中初始化{_dbInfo.DbContextName}");
             for (int i = 0; i < copyCondition.Count; i++)
             {
                 var item = copyCondition[i];
@@ -517,7 +518,8 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                     char[] delimiters = { ',' };
                     string[] sorts =
                         searchParameters.PageInfo.SortField.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
-                    var mapDic = DbColumnMaps.GetDbContextFiledMaps();
+                    var mapDic = DbColumnMaps.GetDbContextFiledMaps(_dbInfo.DbContextName);
+                    if (mapDic == null) throw new NotImplementedException($"请在项目的AppStart中初始化{_dbInfo.DbContextName}");
                     for (int i = 0; i < sorts.Length; i++)
                     {
                         string[] values = sorts[i].Trim().Split(' ');
@@ -540,7 +542,8 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             }
             else
             {
-                var mapDic = DbColumnMaps.GetDbContextFiledMaps();
+                var mapDic = DbColumnMaps.GetDbContextFiledMaps(_dbInfo.DbContextName);
+                if (mapDic == null) throw new NotImplementedException($"请在项目的AppStart中初始化{_dbInfo.DbContextName}");
                 var sortName = searchParameters.PageInfo.SortField;
                 if (mapDic.ContainsKey(sortName))
                 {
