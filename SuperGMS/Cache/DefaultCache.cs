@@ -1,24 +1,25 @@
 ﻿/*----------------------------------------------------------------
- Copyright (C) 2018 SuperGMS (Grant 巩建春)  本软件的所有源码都可以免费的进行学习交流,切勿用于商业用途
+Copyright (C) 2021 顺兴文旅版权所有
 
- 项目名称：SuperGMS.Cache
- 文件名：  DefaultCache
- 创建者：  grant(巩建春)
- CLR版本： 4.0.30319.42000
- 时间：    2018/1/23 17:32:53
+项目名称：SuperGMS.Cache
+文件名：  DefaultCache
+创建者：  grant(巩建春)
+CLR版本： 4.0.30319.42000
+时间：    2021/8/5 星期四 13:45:50
 
- 功能描述：
-
+功能描述：
 ----------------------------------------------------------------*/
 
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace SuperGMS.Cache
 {
     /// <summary>
-    /// 资源文件
+    /// DefaultCache
     /// </summary>
-    //[InitlizeMethod]
-    public class ResourceCache
+    public class DefaultCache
     {
         private static ICache _instance;
 
@@ -33,7 +34,7 @@ namespace SuperGMS.Cache
         //[InitlizeMethod]
         internal static void Initlize()
         {
-            _instance = new RedisCache("resource");
+            _instance = new RedisCache();
         }
 
         /// <summary>
