@@ -316,7 +316,7 @@ namespace SuperGMS.Rpc.Client
         /// 代理层使用
         /// </summary>
         /// <param name="args">参数</param>
-        /// <param name="url">前端要求将M值体现在路径上，接入层自己来做个转换处理</param>
+        /// <param name="url">前端要求将M值体现在路径上，接入层自己来做个转换处理,如果是websocket则url=null，M在args上</param>
         /// <returns>string,参数</returns>
         internal static (string c, Result<object> r) Send(Args<object> args, string url)
         {
@@ -338,8 +338,8 @@ namespace SuperGMS.Rpc.Client
                     case ClientType.ThirdPart:
                         break;
                 }
-
-                string[] motheds = url.Split("/".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                url = string.IsNullOrEmpty(url) ? args.m : url;
+                string[] motheds = url?.Split("/".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                 if (motheds == null || motheds.Length < 2)
                 {
                     rr.msg = "HttpProxy.Error:Request args Error,Server name Could not found rid=" + args.rid;

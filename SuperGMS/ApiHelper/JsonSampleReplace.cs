@@ -155,7 +155,7 @@ namespace SuperGMS.ApiHelper
                 {
                     var keyPair = propList.First(x => x.Key == jp.Name);
                     jp.Value = keyPair.Value;
-                    propList.Remove(keyPair);
+                    //propList.Remove(keyPair);
                 }
             }
         }
