@@ -89,7 +89,6 @@ namespace SuperGMS.ApiHelper
                 else if (item is JProperty)
                 {
                     JProperty jProperty = (JProperty)item;
-                    SetValue(jProperty);
                     if (jProperty.Value.GetType() == typeof(JObject))
                     {
                         SetJsonTimeOrDecmail((JObject)jProperty.Value);
@@ -116,6 +115,8 @@ namespace SuperGMS.ApiHelper
                             }
                         }
                     }
+                    else
+                        SetValue(jProperty);
                 }
             }
         }
