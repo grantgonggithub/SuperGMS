@@ -8,9 +8,9 @@
  时间：    2018/1/16 13:34:51
 
  功能描述：
-
-        [DefaultValue(typeof(DateTime), GrantDateTimeJsonConvert.DefaultDateTimeValueString)] // 设置默认值为1900-1-1,用于反序列化赋值
-        [JsonConverter(typeof(GrantDateTimeJsonConvert))] // 用于序列化时将1900-1-1设置为空字符串
+        注意：命名空间是Newtonsoft.Json.JsonConverter
+        [DefaultValue(typeof(DateTime), SuperGMSDateTimeJsonConvert.DefaultDateTimeValueString)] // 设置默认值为1900-1-1,用于反序列化赋值
+        [Newtonsoft.Json.JsonConverter.JsonConverter(typeof(SuperGMSDateTimeJsonConvert))] // 用于序列化时将1900-1-1设置为空字符串
         public DateTime Date
         {
             get;

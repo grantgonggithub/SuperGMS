@@ -6,6 +6,7 @@ using SuperGMS.Config;
 using SuperGMS.HttpProxy;
 using SuperGMS.Rpc;
 using Grant.HttpProxy.Middleware;
+using System;
 
 namespace SuperGMS.HttpProxy
 {
@@ -47,6 +48,12 @@ namespace SuperGMS.HttpProxy
                 SuperGMS.HttpProxy.SuperHttpProxy.Register();
             }
             app.UseCors("AllowAll");
+            //WebSocketOptions socketOptions = new WebSocketOptions
+            //{
+            //    KeepAliveInterval = TimeSpan.FromSeconds(120),
+            //    ReceiveBufferSize=4*1024,
+            //};
+            //app.UseWebSockets(socketOptions);
             app.UseMiddleware<ProxyMiddleware>();
 
             // app.UseMvc();
