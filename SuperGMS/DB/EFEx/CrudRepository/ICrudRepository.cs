@@ -17,6 +17,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using SuperGMS.DB.EFEx.CrudRepository;
 using SuperGMS.DB.EFEx.DynamicSearch;
+using SuperGMS.DB.EFEx.DynamicSearch.Model;
 
 namespace SuperGMS.DB.EFEx
 {
@@ -108,6 +109,14 @@ namespace SuperGMS.DB.EFEx
         /// <param name="isTrackEntity">是否跟踪实体(默认跟踪)</param>
         /// <returns>一个待查询的结果集</returns>
         IQueryable<T> GetQueryableByQuery(Expression<Func<T, bool>> exp, bool isTrackEntity = true);
+
+        /// <summary>
+        /// 根据QueryModel获取一个泛型对象集合，未连接数据库，需要使用ToList方法查询数据库转换成实体对象集合
+        /// </summary>
+        /// <param name="queryModel">SearchParameters.QueryModel查询表达式</param>
+        /// <param name="isTrackEntity">是否跟踪实体(默认跟踪)</param>
+        /// <returns>一个待查询的结果集</returns>
+        IQueryable<T> GetQueryableByQuery(QueryModel queryModel, bool isTrackEntity = true);
 
         /// <summary>
         ///     插入一个对象
