@@ -424,7 +424,27 @@ namespace SuperGMS.ApiHelper
         private string GetXmlComment(Type type, PropertyInfo property)
         {
             var processXmlNode = $"P:{type.FullName}.{property.Name}";
-            return XmlCommencts?.FindMember(processXmlNode)?.InnerXml ?? string.Empty;
+            var desc = XmlCommencts?.FindMember(processXmlNode)?.InnerXml ?? string.Empty;
+            if (!string.IsNullOrEmpty(desc))
+                return desc;
+            else
+            {
+                var cBase = type.BaseType;
+                for (int i = 0; i < 5; i++) // 只支持最大5层继承，在xml中基类的属性是用的基类的命名空间存储的
+                {
+                    if (cBase != null)
+                    {
+                        processXmlNode = $"P:{cBase.FullName}.{property.Name}";
+                        desc = XmlCommencts?.FindMember(processXmlNode)?.InnerXml ?? string.Empty;
+                        if (!string.IsNullOrEmpty(desc))
+                            return desc;
+                        cBase = cBase.BaseType;
+                    }
+                    else
+                        return desc;
+                }
+            }
+            return desc;
         }
 
         private string GetDescription(Type type, PropertyInfo property)
