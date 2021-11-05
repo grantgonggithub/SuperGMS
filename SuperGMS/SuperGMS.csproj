@@ -3,9 +3,9 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <LangVersion>7.1</LangVersion>
-    <PackageReleaseNotes>2021-10-29</PackageReleaseNotes>
-    <Version>5.3.2</Version>
-    <Authors>SuperGMS</Authors>
+    <PackageReleaseNotes>grantgongjianchun(nnn987@126.com)</PackageReleaseNotes>
+    <Version>5.3.3</Version>
+    <Authors>grantgongjianchun</Authors>
     <Company>SuperGMS</Company>
     <Description>SuperGMS</Description>
     <PackageIconUrl />
