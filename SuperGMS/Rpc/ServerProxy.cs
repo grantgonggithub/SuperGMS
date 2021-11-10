@@ -24,8 +24,20 @@ namespace SuperGMS.Rpc
     public class ServerProxy
     {
         private readonly static ILogger logger = LogFactory.CreateLogger<ServerProxy>();
+
+        /// <summary>
+        /// 一般在Program里面注册
+        /// 如果是NetCore3.1用TypeOf(Program).Namespace
+        /// 如果是Net5,Net6用TypeOf(Program).Module.Name
+        /// 如果你觉得麻烦，请直接用另外一个构造吧
+        /// 注意这一句是Program最后一句代码，任何放到这句后的代码都不会被执行
+        /// </summary>
+        /// <param name="programNamespace"></param>
+        [Obsolete("建议用更简单的构造：Register(Type typeOfClass)")]
         public static void Register(string programNamespace)
         {
+            if (string.IsNullOrEmpty(programNamespace))
+                throw new Exception("argument programNamespace is Null");
             ServicePointManager.SetTcpKeepAlive(true, 5*60*1000, 5*60*1000); // 设置系统socket如果5分钟没有交互，需要发送心跳包，进行保活
 
             //初始化线程池最小大小 为 1000
@@ -56,8 +68,22 @@ namespace SuperGMS.Rpc
                 Register(s);
             }
             logger.LogInformation($"ThreadPool.GetMinThreads: worker-{Math.Max(wt, 1000)}; io-{Math.Max(ct, 1000)}");
+
+            // 阻止主线程，防止退出
+            Thread.Sleep(int.MaxValue);
         }
 
+        /// <summary>
+        /// 一般在Program里面注册时用TypeOf(Program)
+        /// 注意这一句是Program最后一句代码，任何放到这句后的代码都不会被执行
+        /// </summary>
+        /// <param name="typeOfClass">TypeOf(Program)</param>
+        public static void Register(Type typeOfClass)
+        {
+            if (typeOfClass == null)
+                throw new Exception("argument typeOfClass is Null");
+            Register(typeOfClass.Module.Name);
+        }
         private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
         {
             server.QtDispose();
@@ -65,7 +91,11 @@ namespace SuperGMS.Rpc
 
         private static SuperGMSBaseServer server = null;
 
-        public static void Register(SuperGMSServerConfig config)
+        /// <summary>
+        /// 通过配置直接注册使用
+        /// </summary>
+        /// <param name="config">配置文件</param>
+        internal static void Register(SuperGMSServerConfig config)
         {
             switch (config.ServerType)
             {
