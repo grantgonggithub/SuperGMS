@@ -244,11 +244,11 @@ namespace SuperGMS.DB.EFEx
         {
             if (isTrackEntity)
             {
-                return _dbSet.Where(x=>x!=null).Where(queryModel);
+                return _dbSet.Where(queryModel);
             }
             else
             {
-                return _dbSet.AsNoTracking().Where(x => x != null).Where(queryModel) ;
+                return _dbSet.AsNoTracking().Where(queryModel) ;
             }
         }
 
