@@ -12,8 +12,12 @@
 ----------------------------------------------------------------*/
 
 using Dapper;
+
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
-using MySql.Data.MySqlClient;
+
+using MySqlConnector;
+
 using Npgsql;
 using Oracle.ManagedDataAccess.Client;
 using SuperGMS.Config;
@@ -26,7 +30,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <ServerGarbageCollection>false</ServerGarbageCollection>
     <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Authors>SuperGMS</Authors>
     <Product>SuperGMS</Product>
   </PropertyGroup>
