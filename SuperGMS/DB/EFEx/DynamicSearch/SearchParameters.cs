@@ -135,13 +135,21 @@ namespace SuperGMS.DB.EFEx.DynamicSearch
                             {
                                 if (sbChild.Length > 0)
                                 {
-                                    sbChild.Append(" or ");
+                                    if (conditionItem.OrGroup.IndexOf(",") > -1)
+                                        sbChild.Append(" and ");
+                                    else
+                                        sbChild.Append(" or ");
                                 }
                                 sbChild.Append((string.IsNullOrEmpty(senItem.Prefix) ? "" : (senItem.Prefix + ".")) + senItem.Field + " " + ConvertMethodToSql(senItem.Method, senItem.Value));
                             }
                         }
                         if (sb.Length > 0)
-                            sb.Append(" and ");
+                        {
+                            if (conditionItem.OrGroup.IndexOf(",") > -1)
+                                sb.Append(" or ");
+                            else
+                                sb.Append(" and ");
+                        }
                         sb.Append("(" + sbChild.ToString() + ")");
                         groups.Add(conditionItem.OrGroup);
                     }
