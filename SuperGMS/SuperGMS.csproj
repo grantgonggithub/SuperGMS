@@ -5,7 +5,7 @@
     <LangVersion>7.1</LangVersion>
     <PackageReleaseNotes>为升级.Net6.0做兼容准备
 grantgongjianchun(nnn987@126.com)</PackageReleaseNotes>
-    <Version>5.3.4</Version>
+    <Version>5.3.6</Version>
     <Authors>grantgongjianchun</Authors>
     <Company>SuperGMS</Company>
     <Description>SuperGMS</Description>
