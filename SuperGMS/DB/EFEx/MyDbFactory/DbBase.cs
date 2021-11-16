@@ -175,7 +175,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                     item.Field = mapDic[item.Field];
                 }
             }
-
+            StringBuilder noOrGroup = new StringBuilder();
             foreach (var conditionItem in copyCondition)
             {
                 if (!string.IsNullOrEmpty(conditionItem.OrGroup))
@@ -192,7 +192,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                                     if (conditionItem.OrGroup.IndexOf(",") > -1)
                                         sbChild.Append(" and ");
                                     else
-                                      sbChild.Append(" or ");
+                                        sbChild.Append(" or ");
                                 }
                                 sbChild.Append(GetQueryCloumn(senItem) + " " + ConvertMethodToSql(senItem.Method, senItem.Value));
                             }
@@ -202,7 +202,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                             if (conditionItem.OrGroup.IndexOf(",") > -1)
                                 sb.Append(" or ");
                             else
-                               sb.Append(" and ");
+                                sb.Append(" and ");
                         }
                         sb.Append("(" + sbChild.ToString() + ")");
                         groups.Add(conditionItem.OrGroup);
@@ -210,11 +210,17 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                 }
                 else
                 {
-                    if (sb.Length > 0)
-                        sb.Append(" and ");
-                    sb.Append((string.IsNullOrEmpty(conditionItem.Prefix) ? "" : (conditionItem.Prefix + ".")) + conditionItem.Field + " " + ConvertMethodToSql(conditionItem.Method, conditionItem.Value));
+                    if (noOrGroup.Length > 0)
+                        noOrGroup.Append(" and ");
+                    noOrGroup.Append((string.IsNullOrEmpty(conditionItem.Prefix) ? "" : (conditionItem.Prefix + ".")) + conditionItem.Field + " " + ConvertMethodToSql(conditionItem.Method, conditionItem.Value));
                 }
             }
+            if (sb.Length > 0)
+            {
+                if (noOrGroup.Length > 0) sb.Append(" and ").Append(noOrGroup); // 没有orgroup的拼到最后，这样都是and
+            }
+            else
+                sb.Append(noOrGroup);
             return sb.ToString();
         }
         /// <summary>
