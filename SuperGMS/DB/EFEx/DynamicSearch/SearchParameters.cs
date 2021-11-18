@@ -226,12 +226,33 @@ namespace SuperGMS.DB.EFEx.DynamicSearch
         }
 
         /// <summary>
+        /// ConditionItem获取sql
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public string GetConditionItemSql(ConditionItem item)
+        {
+
+            return $"{GetQueryCloumn(item)} {ConvertMethodToSql(item.Method,item.Value)}";
+        }
+
+        /// <summary>
+        /// 转换列
+        /// </summary>
+        /// <param name="senItem">查询条件</param>
+        /// <returns>查询列名</returns>
+        public string GetQueryCloumn(ConditionItem senItem)
+        {
+            return (string.IsNullOrEmpty(senItem.Prefix) ? "" : (senItem.Prefix + ".")) + senItem.Field;
+        }
+
+        /// <summary>
         /// 将Method转换成sql语法的查询语句
         /// </summary>
         /// <param name="method"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        private string ConvertMethodToSql(QueryMethod method, object value)
+        public string ConvertMethodToSql(QueryMethod method, object value)
         {
             switch (method)
             {
