@@ -57,7 +57,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
         public DbBase(DbInfo dbInfo)
         {
             _dbInfo = dbInfo;
-            if (_dbInfo.CommandTimeout < 1) _dbInfo.CommandTimeout = 10 * 60 * 1000; // 默认10分钟 ，这是OMS统计W库存时,时间过长，nick要求修改的  2019-2-19 by grant
+            if (_dbInfo.CommandTimeout < 1) _dbInfo.CommandTimeout = 10 * 60 * 1000; // 默认10分钟
         }
 
         public IDbTransaction GetTransaction()

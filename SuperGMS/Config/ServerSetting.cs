@@ -47,6 +47,8 @@ namespace SuperGMS.Config
 
         private static string _appName;
 
+        private static string _environmentVariable;
+
         private static int _pool;
 
         private static Action<string, Configuration> updateConfigurationAction;
@@ -56,6 +58,12 @@ namespace SuperGMS.Config
         public readonly string ServerInfo = ServiceEnvironment.EnvironmentInfo;
 
         private static ILogger logger = NullLogger.Instance;
+
+        /// <summary>
+        /// 取当前的环境变量
+        /// </summary>
+        public static string EnvironmentVariable => _environmentVariable;
+
         /// <summary>
         /// Gets appName
         /// </summary>
@@ -694,6 +702,7 @@ namespace SuperGMS.Config
                 //}
                 configFile = string.Format(configFile, "."+env);
             }
+            _environmentVariable = env;
             var configJson = Path.Combine(AppContext.BaseDirectory, configFile);
             // 在NLog配置没有初始化之前，只能靠Console输出日志
             LogTextWriter.Write($"当前的环境变量是:{env},加载的指向配置文件是:{configJson}\r\n");
