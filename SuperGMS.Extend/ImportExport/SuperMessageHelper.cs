@@ -58,7 +58,6 @@ namespace SuperGMS.Extend.MQ
                     try
                     {
                         var ctxArgs = args.Args.Copy();
-                        ctxArgs.ct = "Import & Export function inner use.";
                         var data = JsonConvert.DeserializeObject<object>(args.Data, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Populate });
                         ctxArgs.v = data;
                         MicroServiceAssembly.Run(objCtx.ToString(), ctxArgs, out code);
@@ -178,7 +177,6 @@ namespace SuperGMS.Extend.MQ
                     try
                     {
                         var ctxArgs = args.Args.Copy();
-                        ctxArgs.ct = "Import & Export function inner use.";
                         var data = JsonConvert.DeserializeObject<object>(args.Data, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Populate });
                         ctxArgs.v = data;
                         MicroServiceAssembly.Run(objCtx.ToString(), ctxArgs, out code);
@@ -299,7 +297,6 @@ namespace SuperGMS.Extend.MQ
                     try
                     {
                         var ctxArgs = args.Args.Copy();
-                        ctxArgs.ct = "Import & Export function inner use.";
                         var data = JsonConvert.DeserializeObject<object>(args.Data, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Populate });
                         ctxArgs.v = data;
                         MicroServiceAssembly.Run(objCtx.ToString(), ctxArgs, out code);

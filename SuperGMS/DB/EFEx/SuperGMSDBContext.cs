@@ -119,6 +119,7 @@ namespace SuperGMS.DB.EFEx
             if (ServerSetting.GetConstValue("TrackSql")?.Value.ToLower() == "true")
             {
                 options.UseLoggerFactory(LogFactory.LoggerFactory);
+                options.EnableSensitiveDataLogging();
             }
             var dbContext = (TContext)Activator.CreateInstance(typeof(TContext), options.Options);
             return new EFDbContext(dbContext, info);

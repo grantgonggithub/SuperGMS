@@ -51,6 +51,7 @@ namespace SuperGMS.DB.EFEx
             if (ServerSetting.GetConstValue("TrackSql")?.Value.ToLower() == "true")
             {
                 options.UseLoggerFactory(LogFactory.LoggerFactory);
+                options.EnableSensitiveDataLogging();
             }
 
             options.UseMySql(sqlConnectionString,ServerVersion.AutoDetect(sqlConnectionString));
