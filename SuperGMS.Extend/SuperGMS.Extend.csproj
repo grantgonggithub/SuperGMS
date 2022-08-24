@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Version>4.1.9</Version>
-    <Authors>SuperGMS</Authors>
+    <Version>6.0.0</Version>
+    <Authors>gongjianchun</Authors>
     <Product>SuperGMS</Product>
-    <Description>SuperGMS</Description>
+    <Description>SuperGMS,从此版本开始直接升级到Net6,所以版本号直接升级到6.0.0，以前的版本（仅支持3.1）不在维护升级</Description>
     <PackageIconUrl />
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Company>SuperGMS</Company>
