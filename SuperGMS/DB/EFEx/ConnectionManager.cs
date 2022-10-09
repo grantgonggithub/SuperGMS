@@ -54,7 +54,7 @@ namespace SuperGMS.DB.EFEx
                 options.EnableSensitiveDataLogging();
             }
 
-            options.UseMySql(sqlConnectionString);
+            options.UseMySql(sqlConnectionString,ServerVersion.AutoDetect(sqlConnectionString));
             return options.Options;
         }
 
@@ -72,7 +72,7 @@ namespace SuperGMS.DB.EFEx
             {
                 default:
                 case DbType.MySql:
-                    dbConection = new MySql.Data.MySqlClient.MySqlConnection(conectionString);
+                    dbConection = new MySqlConnector.MySqlConnection(conectionString);
                     break;
 
                 case DbType.SqlServer:
@@ -112,7 +112,7 @@ namespace SuperGMS.DB.EFEx
             {
                 default:
                 case "MYSQL":
-                    dbConection = new MySql.Data.MySqlClient.MySqlConnection(string.Format("server={0};user id={1};password={2};persistsecurityinfo=True;database={3};Character Set=utf8;Allow Zero Datetime=true;Convert Zero Datetime=true;pooling=true;MaximumPoolsize=100;", server, uid, pwd, database));
+                    dbConection = new MySqlConnector.MySqlConnection(string.Format("server={0};user id={1};password={2};persistsecurityinfo=True;database={3};Character Set=utf8;Allow Zero Datetime=true;Convert Zero Datetime=true;pooling=true;MaximumPoolsize=100;", server, uid, pwd, database));
                     break;
                 case "SQLSERVER":
                     throw new NotImplementedException();
