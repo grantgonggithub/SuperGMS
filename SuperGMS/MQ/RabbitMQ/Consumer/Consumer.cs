@@ -180,13 +180,13 @@ namespace SuperGMS.MQ.RabbitMQ
                 {
                     var body = e.Body;
                     string msg;
-                    if (body == null || body.Length < 1)
+                    if (body.Length < 1)
                     {
                         msg = null;
                     }
                     else
                     {
-                        msg = Encoding.UTF8.GetString(body);
+                        msg = Encoding.UTF8.GetString(body.ToArray());
                     }
 
                     logger.LogDebug($"Consumer.Consumer_Received 收到消息推送：{msg}");
