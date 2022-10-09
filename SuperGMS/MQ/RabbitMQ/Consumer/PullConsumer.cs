@@ -132,13 +132,13 @@ namespace SuperGMS.MQ.RabbitMQ
                     {
                         var body = result.Body;
                         string msg;
-                        if (body == null || body.Length < 1)
+                        if (body.Length < 1)
                         {
                             msg = null;
                         }
                         else
                         {
-                            msg = Encoding.UTF8.GetString(body);
+                            msg = Encoding.UTF8.GetString(body.ToArray());
                         }
 
                         return new PullMsg()
