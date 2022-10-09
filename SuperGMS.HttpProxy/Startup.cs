@@ -41,7 +41,7 @@ namespace SuperGMS.HttpProxy
             var server = ServerSetting.GetRpcServer(SuperGMS.HttpProxy.SuperHttpProxy.HttpProxyName);
             if (server.ServerType == ServerType.HttpWebApi)
             {
-                ServerProxy.Register(server.AssemblyPath);
+                ServerProxy.Register(typeof(Program));
             }
             else
             {

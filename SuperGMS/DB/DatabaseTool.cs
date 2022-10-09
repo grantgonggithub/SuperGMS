@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.EntityFrameworkCore.Infrastructure;
+﻿using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
-using MySql.Data.MySqlClient;
 
 namespace SuperGMS.DB
 {
@@ -86,7 +82,7 @@ namespace SuperGMS.DB
         /// <returns></returns>
         public static bool IsMySqlDb(DbConnection conn)
         {
-            if (conn.ConnectionString.Contains("3306") || conn is MySqlConnection)
+            if (conn.ConnectionString.Contains("3306") || conn is MySqlConnector.MySqlConnection)
             {
                 return true;
             }

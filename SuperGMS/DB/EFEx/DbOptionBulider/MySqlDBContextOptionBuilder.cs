@@ -42,7 +42,7 @@ namespace SuperGMS.DB.EFEx
             where T : DbContext
         {
             DbContextOptionsBuilder<T> options = new DbContextOptionsBuilder<T>();
-            options.UseMySql<T>(connectionString);
+            options.UseMySql<T>(connectionString,ServerVersion.AutoDetect(connectionString));
             return options;
         }
 
