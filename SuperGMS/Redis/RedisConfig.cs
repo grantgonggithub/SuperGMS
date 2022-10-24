@@ -167,7 +167,7 @@ namespace SuperGMS.Redis
             catch (Exception ex)
             {
                 logger.LogError(ex, "SuperGMS.Redis.redisConfig.Initlize error");
-                throw ex;
+                throw;
             }
             finally
             {
