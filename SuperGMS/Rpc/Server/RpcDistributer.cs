@@ -223,22 +223,22 @@ namespace SuperGMS.Rpc.Server
                                                     }
                                                 }
 
-                                                throw RTLEx;
+                                                throw;
                                             }
                                             catch (TypeLoadException TLEx)
                                             {
                                                 logger.LogCritical(TLEx, $"无法加载程序集:{args2.Name}");
-                                                throw TLEx;
+                                                throw;
                                             }
                                             catch (FileNotFoundException FNtEx)
                                             {
                                                 logger.LogCritical(FNtEx, $"无法加载程序集:{args2.Name}");
-                                                throw FNtEx;
+                                                throw;
                                             }
                                             catch (Exception ex)
                                             {
                                                 logger.LogCritical(ex, $"加载程序集{args2.FullName}失败");
-                                                throw ex;
+                                                throw;
                                             }
                                         };
                                     asLoad = AssemblyLoadContext.Default.LoadFromAssemblyPath(path);
@@ -279,7 +279,7 @@ namespace SuperGMS.Rpc.Server
                                 }
                                 catch (Exception ex)
                                 {
-                                    throw ex;
+                                    throw;
                                 }
 
                                 List<Type> types = new List<Type>();
@@ -377,7 +377,7 @@ namespace SuperGMS.Rpc.Server
             catch (Exception ex)
             {
                 logger.LogCritical(ex, string.Format("初始化assAssemblyPath={0}出现错误！", config.AssemblyPath));
-                throw ex; // 初始化失败，严重错误，直接抛到顶层去，不让程序启动。
+                throw; // 初始化失败，严重错误，直接抛到顶层去，不让程序启动。
             }
         }
 

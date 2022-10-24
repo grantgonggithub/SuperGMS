@@ -127,7 +127,7 @@ namespace SuperGMS.DB.EFEx
                             {
                                 // 防止回滚的异常将提交异常冲掉
                             }
-                            throw ex;
+                            throw;
                         }
                     }
                 }
