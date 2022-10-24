@@ -184,7 +184,7 @@ namespace SuperGMS.Rpc.AssemblyTools
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
 
