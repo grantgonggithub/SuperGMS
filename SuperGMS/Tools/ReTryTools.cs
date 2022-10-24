@@ -54,7 +54,7 @@ namespace SuperGMS.Tools
                     SleepWhile();
                     goto gotoLable;
                 }
-                throw ex;
+                throw;
             }
         }
 
@@ -75,7 +75,7 @@ namespace SuperGMS.Tools
                     SleepWhile();
                     goto gotoLable;
                 }
-                throw ex;
+                throw;
             }
         }
 
@@ -96,7 +96,7 @@ namespace SuperGMS.Tools
                     SleepWhile();
                     goto gotoLable;
                 }
-                throw ex;
+                throw;
             }
         }
 
@@ -117,7 +117,7 @@ namespace SuperGMS.Tools
                     SleepWhile();
                     goto gotoLable;
                 }
-                throw ex;
+                throw;
             }
         }
 
@@ -144,7 +144,7 @@ namespace SuperGMS.Tools
                     SleepWhile();
                     goto gotoLable;
                 }
-                throw ex;
+                throw;
             }
         }
 
@@ -164,7 +164,7 @@ namespace SuperGMS.Tools
                     SleepWhile();
                     goto gotoLable;
                 }
-                throw ex;
+                throw;
             }
         }
 
@@ -184,7 +184,7 @@ namespace SuperGMS.Tools
                     SleepWhile();
                     goto gotoLable;
                 }
-                throw ex;
+                throw;
             }
         }
 
@@ -204,7 +204,7 @@ namespace SuperGMS.Tools
                     SleepWhile();
                     goto gotoLable;
                 }
-                throw ex;
+                throw;
             }
         }
     }

@@ -386,7 +386,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -422,7 +422,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -441,7 +441,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
         private int GetTotalCountBySearchParameter(string sql, SearchParameters searchParameters)
@@ -471,7 +471,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                 }
                 catch (Exception ex)
                 {
-                    throw ex;
+                    throw;
                 }
             }
 
@@ -509,7 +509,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                 }
                 catch (Exception ex)
                 {
-                    throw ex;
+                    throw;
                 }
             }
 
@@ -648,7 +648,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
         public List<dynamic> QuerySql(string sql, string[] paramsList, object[] valuesList,CommandType commandType=CommandType.Text)
@@ -664,7 +664,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
         public List<dynamic> QuerySql(IDbTransaction trans, string sql, string[] paramsList, object[] valuesList,CommandType commandType = CommandType.Text)
@@ -686,7 +686,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
         public List<T> QuerySql<T>(IDbTransaction trans, string sql, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text)
@@ -755,14 +755,14 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                         catch (Exception e)
                         {
                             tran.Rollback();
-                            throw e;
+                            throw;
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
         protected dynamic ExecuteScalarCommand(IDbTransaction trans, string sql, CommandType commandType, string[] paramsList, object[] valuesList)
@@ -791,14 +791,14 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                         catch (Exception e)
                         {
                             tran.Rollback();
-                            throw e;
+                            throw;
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
         protected T ExecuteScalarCommand<T>(IDbTransaction trans, string sql, CommandType commandType, string[] paramsList, object[] valuesList)
@@ -878,14 +878,14 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                         catch (Exception e)
                         {
                             tran.Rollback();
-                            throw e;
+                            throw;
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
         protected int ExecuteNoQueryCommand(IDbTransaction trans, string sql, object param, CommandType commandType)
