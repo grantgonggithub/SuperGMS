@@ -99,7 +99,7 @@ namespace SuperGMS.Zookeeper
             catch (Exception e)
             {
                 logger.LogCritical(e, $"ZK连接:{connectionString}初始化异常");
-                throw e;
+                throw;
             }
         }
 
@@ -510,7 +510,7 @@ namespace SuperGMS.Zookeeper
                 }
                 else
                 {
-                    throw e; // 设置数据的地方一定要抛异常 
+                    throw; // 设置数据的地方一定要抛异常 
                 }
             }
         }
@@ -557,7 +557,7 @@ namespace SuperGMS.Zookeeper
                 }
                 else
                 {
-                    throw e; // 设置数据的地方一定要抛异常
+                    throw; // 设置数据的地方一定要抛异常
                 }
             }
         }
@@ -621,7 +621,7 @@ namespace SuperGMS.Zookeeper
                 }
                 else
                 {
-                    throw e; // 设置数据的地方一定要抛异常 
+                    throw; // 设置数据的地方一定要抛异常 
                 }
             }
         }

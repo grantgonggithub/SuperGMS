@@ -419,7 +419,7 @@ namespace SuperGMS.Config
             catch (Exception ex)
             {
                 logger.LogCritical(ex, "ServerSetting.Initlize.Error");
-                throw ex;
+                throw;
             }
         }
 
@@ -537,7 +537,7 @@ namespace SuperGMS.Config
             catch (Exception ex)
             {
                 logger.LogError(ex, $"ServerSetting.UpdateLocal.Error");
-                throw ex;
+                throw;
             }
         }
 
