@@ -17,6 +17,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Dockerfile" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Dockerfile">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
 
