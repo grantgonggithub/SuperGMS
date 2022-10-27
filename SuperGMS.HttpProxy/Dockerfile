@@ -1,5 +1,5 @@
-FROM registry.cn-hangzhou.aliyuncs.com/img/dotnet:v3.1-dotnet-runtime
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 
-WORKDIR /publish
-COPY  ./Publish/ /publish/
+WORKDIR /publish_dir
+COPY  . /publish_dir/
 ENTRYPOINT ["dotnet", "SuperGMS.HttpProxy.dll"]
