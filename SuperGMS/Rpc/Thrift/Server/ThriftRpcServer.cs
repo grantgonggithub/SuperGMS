@@ -49,12 +49,12 @@ namespace SuperGMS.Rpc.Thrift.Server
             catch (TTransportException tex)
             {
                 logger.LogError(tex, "ThriftServer.ServerRegister.TTransportException.Error");
-                throw tex;
+                throw;
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "ThriftServer.ServerRegister.Exception.Error");
-                throw ex;
+                throw;
             }
         }
     }

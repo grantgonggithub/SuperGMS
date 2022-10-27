@@ -162,7 +162,7 @@ namespace SuperGMS.Config
             catch (Exception e)
             {
                 logger.LogError(e, "SqlMapManager.AddSqlMap.Error");
-                throw e;
+                throw;
             }
             finally
             {
