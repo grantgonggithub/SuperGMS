@@ -10,6 +10,8 @@
  功能描述：
 
 ----------------------------------------------------------------*/
+using Dapper;
+
 using SuperGMS.DB.EFEx.DynamicSearch;
 using System;
 using System.Collections.Generic;
@@ -169,7 +171,7 @@ namespace SuperGMS.DB.EFEx.CrudRepository
         /// <param name="param">params</param>
         /// <param name="commandType">commandType</param>
         /// <returns>int</returns>
-        int ExecuteNoQuerySql(string sql, object param, CommandType commandType);
+        int ExecuteNoQuerySql(string sql, DynamicParameters param, CommandType commandType);
         /// <summary>
         /// dapper底层函数
         /// </summary>
@@ -178,7 +180,7 @@ namespace SuperGMS.DB.EFEx.CrudRepository
         /// <param name="param">params</param>
         /// <param name="commandType">commandType</param>
         /// <returns>int</returns>
-        int ExecuteNoQuerySql(IDbTransaction trans, string sql, object param, CommandType commandType);
+        int ExecuteNoQuerySql(IDbTransaction trans, string sql, DynamicParameters param, CommandType commandType);
         /// <summary>
         /// Get Transaction
         /// </summary>
