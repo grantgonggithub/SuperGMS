@@ -810,12 +810,12 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
         #endregion
 
         #region 非查询命令执行
-        public int ExecuteNoQuerySqlKey(string sqlKey, object param, CommandType commandType = CommandType.Text)
+        public int ExecuteNoQuerySqlKey(string sqlKey, DynamicParameters param, CommandType commandType = CommandType.Text)
         {
             string sql = ServerSetting.GetSql(DbInfo.DbContextName, sqlKey);
             return ExecuteNoQueryCommand(sql, param, commandType);
         }
-        public int ExecuteNoQuerySqlKey(IDbTransaction trans, string sqlKey, object param, CommandType commandType = CommandType.Text)
+        public int ExecuteNoQuerySqlKey(IDbTransaction trans, string sqlKey, DynamicParameters param, CommandType commandType = CommandType.Text)
         {
             string sql = ServerSetting.GetSql(DbInfo.DbContextName, sqlKey);
             return ExecuteNoQueryCommand(trans, sql, param, commandType);
@@ -830,11 +830,11 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             string sql = ServerSetting.GetSql(DbInfo.DbContextName, sqlKey);
             return ExecuteNoQuerySql(trans, sql, paramsList, valuesList, commandType);
         }
-        public int ExecuteNoQuerySql(string sql, object param, CommandType commandType = CommandType.Text)
+        public int ExecuteNoQuerySql(string sql, DynamicParameters param, CommandType commandType = CommandType.Text)
         {
             return ExecuteNoQueryCommand(sql, param, commandType);
         }
-        public int ExecuteNoQuerySql(IDbTransaction trans, string sql, object param, CommandType commandType = CommandType.Text)
+        public int ExecuteNoQuerySql(IDbTransaction trans, string sql, DynamicParameters param, CommandType commandType = CommandType.Text)
         {
             return ExecuteNoQueryCommand(trans, sql, param, commandType);
         }
@@ -859,7 +859,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             DynamicParameters ps = PrepareCommand(paramsList, valuesList);
             return ExecuteNoQueryCommand(trans, sql, ps, commandType);
         }
-        protected int ExecuteNoQueryCommand(string sql, object param, CommandType commandType)
+        protected int ExecuteNoQueryCommand(string sql, DynamicParameters param, CommandType commandType)
         {
             try
             {
@@ -888,30 +888,30 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                 throw;
             }
         }
-        protected int ExecuteNoQueryCommand(IDbTransaction trans, string sql, object param, CommandType commandType)
+        protected int ExecuteNoQueryCommand(IDbTransaction trans, string sql, DynamicParameters param, CommandType commandType)
         {
             PrintSql(sql, param);
             return trans.Connection.Execute(sql, param, trans, DbInfo.CommandTimeout, commandType);
         }
         #endregion
 
-        private void PrintSql(string sql, object param)
-        {
-            try
-            {
-                if (ServerSetting.GetConstValue("TrackSql")?.Value.ToLower() == "true")
-                {
-                    StringBuilder sb = new StringBuilder();
-                    sb.AppendLine("TrackSql=" + sql);
-                    sb.AppendLine(JsonEx.JsonConvert.JsonSerializer(param));
-                    logger.LogInformation(sb.ToString());
-                }
-            }
-            catch (Exception ex)
-            {
-                //打印SQL异常时不影响业务
-            }
-        }
+        //private void PrintSql(string sql, object param)
+        //{
+        //    try
+        //    {
+        //        if (ServerSetting.GetConstValue("TrackSql")?.Value.ToLower() == "true")
+        //        {
+        //            StringBuilder sb = new StringBuilder();
+        //            sb.AppendLine("TrackSql=" + sql);
+        //            sb.AppendLine(JsonEx.JsonConvert.JsonSerializer(param));
+        //            logger.LogInformation(sb.ToString());
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        //打印SQL异常时不影响业务
+        //    }
+        //}
 
         private void PrintSql(string sql, DynamicParameters ps)
         {
