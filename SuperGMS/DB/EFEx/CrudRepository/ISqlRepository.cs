@@ -15,6 +15,9 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+
+using Dapper;
+
 using SuperGMS.DB.EFEx.DynamicSearch;
 
 namespace SuperGMS.DB.EFEx.CrudRepository
@@ -157,7 +160,7 @@ namespace SuperGMS.DB.EFEx.CrudRepository
         /// <param name="param">params</param>
         /// <param name="commandType">commandType</param>
         /// <returns>int</returns>
-        int ExecuteNoQuerySqlKey(string sqlKey, object param, CommandType commandType);
+        int ExecuteNoQuerySqlKey(string sqlKey, DynamicParameters param, CommandType commandType);
         /// <summary>
         /// dapper底层函数
         /// </summary>
@@ -166,7 +169,7 @@ namespace SuperGMS.DB.EFEx.CrudRepository
         /// <param name="param">params</param>
         /// <param name="commandType">commandType</param>
         /// <returns>int</returns>
-        int ExecuteNoQuerySqlKey(IDbTransaction trans, string sqlKey, object param, CommandType commandType);
+        int ExecuteNoQuerySqlKey(IDbTransaction trans, string sqlKey, DynamicParameters param, CommandType commandType);
         /// <summary>
         /// 获取配置的sql
         /// </summary>
