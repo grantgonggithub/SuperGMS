@@ -210,16 +210,18 @@ namespace SuperGMS.Rpc.Server
         /// <param name="lockKey">要锁定的key，这里可以是单据号，或者业务中不允许并行处理的业务key</param>
         /// <param name="timeOut">获取等待时间，如果锁被占用，等待释放的时间，默认不等待</param>
         /// <param name="autoReleaseTime">自动释放的时间，建议用默认值</param>
+        /// <param name="autoRelease">是否需要自动释放，默认是true,在一个rpc生命周期结束时自动释放，如果为false，需要外部记录key并手动释放，调用方法（ResourceCache.Instance.LockRelease）</param>
         /// <returns></returns>
         public DistributedLock TryGetLock(string lockKey, int timeOut = 0,
-            int autoReleaseTime = 60 * 1000)
+            int autoReleaseTime = 60 * 1000, bool autoRelease = true)
         {
-            var l= LockManager.TryGetLock(lockKey, timeOut, autoReleaseTime);
-            if (l==null)
+            var l = LockManager.TryGetLock(lockKey, timeOut, autoReleaseTime);
+            if (l == null)
             {
                 return null;
             }
-            locks.Add(l);
+            if (autoRelease)
+                locks.Add(l);
             return l;
         }
     }
