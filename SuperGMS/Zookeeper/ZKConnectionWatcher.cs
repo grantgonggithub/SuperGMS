@@ -32,7 +32,7 @@ namespace SuperGMS.Zookeeper
             switch (state)
             {
                 case Event.KeeperState.AuthFailed:
-               // case Event.KeeperState.Disconnected:
+                case Event.KeeperState.Disconnected:
                 case Event.KeeperState.Expired:
                 //case Event.KeeperState.SyncConnected:
                     var task = new Task(() => { Thread.Sleep(1000); this.CallBack(null); });
