@@ -124,7 +124,6 @@ namespace SuperGMS.DB.EFEx.DynamicSearch
             StringBuilder noOrGroup = new StringBuilder();
             foreach (var conditionItem in QueryModel.Items)
             {
-                string sqlWhere = string.Empty;
                 if (!string.IsNullOrEmpty(conditionItem.OrGroup))
                 {
                     if (!groups.Contains(conditionItem.OrGroup))
@@ -161,13 +160,14 @@ namespace SuperGMS.DB.EFEx.DynamicSearch
                         noOrGroup.Append(" and ");
                     noOrGroup.Append((string.IsNullOrEmpty(conditionItem.Prefix) ? "" : (conditionItem.Prefix + ".")) + conditionItem.Field + " " + ConvertMethodToSql(conditionItem.Method, conditionItem.Value));
                 }
-                if (sb.Length > 0)
-                {
-                    if (noOrGroup.Length > 0) sb.Append(" and ").Append(noOrGroup); // 没有orgroup的拼到最后，这样都是and
-                }
-                else
-                    sb.Append(noOrGroup);
             }
+            if (sb.Length > 0)
+            {
+                if (noOrGroup.Length > 0) sb.Append(" and ").Append(noOrGroup); // 没有orgroup的拼到最后，这样都是and
+            }
+            else
+                sb.Append(noOrGroup);
+
             return sb.ToString();
         }
         /// <summary>
