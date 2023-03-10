@@ -19,6 +19,7 @@ namespace SuperGMS.Extend.BackGroundMessage
     using System.Linq;
 
     using Microsoft.Extensions.Logging;
+
     using SuperGMS.Log;
     using SuperGMS.MQ;
     using SuperGMS.Protocol.MQProtocol;
@@ -42,6 +43,12 @@ namespace SuperGMS.Extend.BackGroundMessage
         /// MQ的消息路由名，如果是点对点的消息，这个值是消息发布者定义Router,如果是扇波消息这个值是消息发布者定义的ExChangeName
         /// </summary>
         public string MQRouterName { get; set; }
+
+        /// <summary>
+        /// 在fanout消息时，自己定义的queue可以自定义，如果不自定义框架会用BussinessApi.Name+ServiceEnvironment.ComputerAddress，保证每台机器的Queue不重复，
+        /// 如果自定义要考虑不重复的问题，重复了，最后定义的机器才能收到消息
+        /// </summary>
+        public string QueueName { get; set; } = null;
     }
     /// <summary>
     /// 点对点消息
@@ -124,7 +131,7 @@ namespace SuperGMS.Extend.BackGroundMessage
                 {
                     MQManager<SetBackGroudMessageArgs>.FanoutConsumeRegister(
                         GetExchange(item.MQRouterName),
-                        GetQueue(item.MQRouterName,item.BussinessApi.FullName),// 这里特殊，因为是扇波消息，所以这个队列是自己定义的特有的，所以用MQRouterName+ApiName 相当于是按MQRouterName+ApiName进行分组的，相同分组多节点，只有一个节点收到
+                        GetQueue(item.MQRouterName,item.BussinessApi.Name,item.QueueName),// 这里特殊，因为是扇波消息，所以这个队列是自己定义的特有的，所以用MQRouterName+ApiName 相当于是按MQRouterName+ApiName进行分组的，相同分组多节点，只有一个节点收到
                         false,
                         (MQProtocol<SetBackGroudMessageArgs> m, Exception ex,object objCtx) =>
                         {
@@ -155,13 +162,20 @@ namespace SuperGMS.Extend.BackGroundMessage
         }
 
         /// <summary>
-        /// 获取扇波的队列,这个队列是每个消费者自己定义的，由交互机投递到这个队列的
+        /// 获取扇波的队列,这个队列是每个消费者自己定义的，由交互机投递到这个队列的,多台机器要区分队列，要不变成一个Queue了
         /// </summary>
         /// <param name="bussinessType"></param>
         /// <returns></returns>
-        public static string GetQueue(string mqRouterName,string bussinessApiName)
+        public static string GetQueue(string mqRouterName,string bussinessApiName,string queueName)
         {
-            return $"queue-fanout-{mqRouterName.Trim().ToLower()}-{bussinessApiName.Trim().ToLower().Replace(".","_")}";
+            if (!string.IsNullOrEmpty(queueName))
+            {
+                return $"queue-fanout-{mqRouterName.Trim().ToLower()}-{queueName}";
+            }
+            else
+            {
+                return $"queue-fanout-{mqRouterName.Trim().ToLower()}-{bussinessApiName.Trim().ToLower().Replace(".", "_")}-{ServiceEnvironment.ComputerAddress}";
+            }
         }
     }
 }
