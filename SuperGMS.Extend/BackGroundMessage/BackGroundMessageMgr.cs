@@ -102,9 +102,14 @@ namespace SuperGMS.Extend.BackGroundMessage
             return $"route-direct-{mqRouterName.Trim().ToLower()}";
         }
 
+        /// <summary>
+        /// 点对的消息是所有机器共享一个队列，所有Queue是一个
+        /// </summary>
+        /// <param name="mqRouterName"></param>
+        /// <returns></returns>
         public static string GetQueue(string mqRouterName)
         {
-            return $"queue-direct-{mqRouterName.Trim().ToLower()}-{ServiceEnvironment.ComputerAddress}";
+            return $"queue-direct-{mqRouterName.Trim().ToLower()}";
         }
     }
 
@@ -162,7 +167,7 @@ namespace SuperGMS.Extend.BackGroundMessage
         }
 
         /// <summary>
-        /// 获取扇波的队列,这个队列是每个消费者自己定义的，由交互机投递到这个队列的,多台机器要区分队列，要不变成一个Queue了
+        /// 获取扇波的队列,这个队列是每个消费者自己定义的，由交互机投递到这个队列的,多台机器要区分队列，每台机器对应一个队列，区别点对点消息，要不变成一个Queue了
         /// </summary>
         /// <param name="bussinessType"></param>
         /// <returns></returns>
