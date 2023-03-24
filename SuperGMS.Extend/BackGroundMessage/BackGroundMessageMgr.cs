@@ -104,7 +104,7 @@ namespace SuperGMS.Extend.BackGroundMessage
 
         public static string GetQueue(string mqRouterName)
         {
-            return $"queue-direct-{mqRouterName.Trim().ToLower()}";
+            return $"queue-direct-{mqRouterName.Trim().ToLower()}-{ServiceEnvironment.ComputerAddress}";
         }
     }
 
