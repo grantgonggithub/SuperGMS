@@ -97,7 +97,7 @@ namespace SuperGMS.Redis
                 StringBuilder sb = new StringBuilder();
                 sb.AppendFormat("{0}:{1}", cfg.Server, cfg.Port);
                 sb.AppendFormat(",allowAdmin={0}", cfg.AllowAdmin);
-                sb.AppendFormat(",abortConnect=false,connectRetry=3,syncTimeout=3000");
+                sb.AppendFormat(",abortConnect=false,connectRetry=3,syncTimeout={0}",cfg.SyncTimeout<=3000?3000:cfg.SyncTimeout);
                 sb.AppendFormat(",connectTimeout={0}", cfg.ConnectTimeout>0?cfg.ConnectTimeout:5000);
                 sb.AppendFormat(",ssl={0},password={1}", cfg.Ssl2, cfg.Pwd);
 

@@ -125,6 +125,7 @@ namespace SuperGMS.Redis
                             IsMaster = sItem.IsMaster,
                             Pool = sItem.Pool,
                             ConnectTimeout = sItem.ConnectTimeout,
+                            SyncTimeout=sItem.SyncTimeout,
                             Server = sItem.Server,
                             Port = sItem.Port,
                             AllowAdmin = sItem.AllowAdmin,
