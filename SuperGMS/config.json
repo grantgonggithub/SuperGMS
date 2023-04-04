@@ -150,6 +150,7 @@
             "Port": 6379,
             "AllowAdmin": true,
             "ConnectTimeout": 4000,
+			"SyncTimeout":3000,
             "Ssl": true,
             "Pwd": "xxxxxx"
           },
@@ -160,6 +161,7 @@
             "Port": 6372,
             "AllowAdmin": true,
             "ConnectTimeout": 4000,
+			"SyncTimeout":3000,
             "Ssl": true,
             "Pwd": "xxxxxxxx"
           }

@@ -98,6 +98,7 @@ namespace SuperGMS.Config
                     {
                         AllowAdmin = o.AllowAdmin,
                         ConnectTimeout = o.ConnectTimeout,
+                        SyncTimeout = o.SyncTimeout,
                         IsMaster = o.IsMaster,
                         Pool = o.Pool,
                         Port = o.Port,
