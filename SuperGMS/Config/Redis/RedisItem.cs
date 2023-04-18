@@ -52,6 +52,11 @@ namespace SuperGMS.Config
         public int ConnectTimeout { get; set; }
 
         /// <summary>
+        /// 同步时间，这个会影响redis做get操作的是否会超时
+        /// </summary>
+        public int SyncTimeout { get; set; }
+
+        /// <summary>
         /// 
         /// </summary>
         public bool Ssl { get; set; }
