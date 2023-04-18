@@ -101,11 +101,12 @@ namespace SuperGMS.Config
                     };
                     if (string.IsNullOrEmpty(file.Value)) continue;
                     // 兼容sql文件配置指向文件时可以配置相对于config目录的文件，也可以配置默认路径的文件
-                    var partPath = file.Value.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries).Length > 1 ? "" : (Path.DirectorySeparatorChar.ToString() + item.Name);
-                    var filePath = $"{AppContext.BaseDirectory}config{partPath}{Path.DirectorySeparatorChar}{file.Value}";
+                    var p=file.Value.Split(new char[] { '\\','/'},StringSplitOptions.RemoveEmptyEntries);
+                    var partPath = p.Length > 1 ? string.Join(Path.DirectorySeparatorChar,p) :string.Join(Path.DirectorySeparatorChar,new string[] { item.Name.ToString(), file.Value });
+                    var filePath = $"{AppContext.BaseDirectory}config{Path.DirectorySeparatorChar}{partPath}";
                     if (!File.Exists(filePath))
                     {
-                        filePath = $"{AppContext.BaseDirectory}Config{partPath}{Path.DirectorySeparatorChar}{file.Value}";
+                        filePath = $"{AppContext.BaseDirectory}Config{Path.DirectorySeparatorChar}{partPath}";
                         if(!File.Exists(filePath))
                            throw new Exception($"未找到路径{filePath}中的SQL配置文件");
                     }
