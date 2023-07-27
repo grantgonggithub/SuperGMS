@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using SuperGMS.ExceptionEx;
 using SuperGMS.Log;
 using SuperGMS.Protocol.RpcProtocol;
+using SuperGMS.Tools;
 using System;
 
 namespace SuperGMS.Rpc.Server
@@ -188,7 +189,7 @@ namespace SuperGMS.Rpc.Server
         public R RunInner(A args, out StatusCode c, RpcContext rpcContext, object objValue = null)
         {
            var a = rpcContext.Args.Copy();
-           a.v = args;
+           a.v = args.GrantCopy();
            return Run(a, out c, objValue).v;
         }
 
