@@ -116,6 +116,7 @@ namespace SuperGMS.WebSocketEx
                 {
                     SuperWebSocketManager.OnClose(Token);
                     this._socket.CloseAsync(WebSocketCloseStatus.EndpointUnavailable, null, CancellationToken.None).Wait();
+                    this._socket = null;
                 }
             }
         }
