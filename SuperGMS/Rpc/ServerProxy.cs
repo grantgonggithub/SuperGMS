@@ -70,7 +70,7 @@ namespace SuperGMS.Rpc
             logger.LogInformation($"ThreadPool.GetMinThreads: worker-{Math.Max(wt, 1000)}; io-{Math.Max(ct, 1000)}");
 
             // 阻止主线程，防止退出
-            Thread.Sleep(int.MaxValue);
+           // Thread.Sleep(int.MaxValue);
         }
 
         /// <summary>

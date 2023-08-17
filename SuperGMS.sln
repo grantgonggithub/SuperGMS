@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29709.97
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33717.318
 MinimumVisualStudioVersion = 16.0.29709.97
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperGMS", "SuperGMS\SuperGMS.csproj", "{A926A511-DFEB-408F-81CD-7F0D7E3B1817}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{BEA5D961-2B47-4634-B188-698D5EEB0208}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperGMS.RpcProxyTools", "SuperGMS.RpcProxyTools\SuperGMS.RpcProxyTools.csproj", "{6D075BFB-95C3-41A8-A131-656C006007AA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperGMS.WebSocketService", "SuperGMS.WebSocketService\SuperGMS.WebSocketService.csproj", "{9099E6B0-3FA7-4002-B0A6-EB1516F9F0D3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +37,10 @@ Global
 		{6D075BFB-95C3-41A8-A131-656C006007AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D075BFB-95C3-41A8-A131-656C006007AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D075BFB-95C3-41A8-A131-656C006007AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9099E6B0-3FA7-4002-B0A6-EB1516F9F0D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9099E6B0-3FA7-4002-B0A6-EB1516F9F0D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9099E6B0-3FA7-4002-B0A6-EB1516F9F0D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9099E6B0-3FA7-4002-B0A6-EB1516F9F0D3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
