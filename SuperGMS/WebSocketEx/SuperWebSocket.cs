@@ -113,7 +113,10 @@ namespace SuperGMS.WebSocketEx
         {
             lock (_lock) {
                 if (DateTime.Now.Subtract(_lastActiveTime).TotalMinutes > SuperWebSocketManager.TimeOutSpan)
+                {
+                    SuperWebSocketManager.OnClose(Token);
                     this._socket.CloseAsync(WebSocketCloseStatus.EndpointUnavailable, null, CancellationToken.None).Wait();
+                }
             }
         }
 

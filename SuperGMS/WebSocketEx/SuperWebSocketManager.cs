@@ -59,7 +59,6 @@ namespace SuperGMS.WebSocketEx
                 try {
                     _sockets.Values.ToList().ForEach(s => {
                         s.Close();
-                        OnClose(s.Token);
                     });
                     Thread.Sleep(10 * 60 * 1000); // 每5分钟检查一次
                 }
