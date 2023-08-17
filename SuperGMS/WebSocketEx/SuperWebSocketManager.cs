@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using SuperGMS.Log;
 using Microsoft.Extensions.Logging;
+using SuperGMS.Tools;
 
 namespace SuperGMS.WebSocketEx
 {
@@ -34,9 +35,9 @@ namespace SuperGMS.WebSocketEx
         /// <summary>
         /// 超时时间，单位毫秒，（15秒）
         /// </summary>
-        public const int TimeOutSpan= 15 * 1000;
+        public const int TimeOutSpan= 15 * 60 * 1000;
         private static readonly ILogger _loger = LogFactory.CreateLogger<SuperWebSocketManager>();
-        private static ConcurrentDictionary<string, SuperWebSocket> _sockets = new ConcurrentDictionary<string, SuperWebSocket>();
+        private static ConcurrentDictionary<string,ComboxClass<UserType,SuperWebSocket>> _sockets = new ConcurrentDictionary<string, ComboxClass<UserType, SuperWebSocket>>();
 
         /// <summary>
         /// 初始化检查线程
@@ -58,7 +59,7 @@ namespace SuperGMS.WebSocketEx
             {
                 try {
                     _sockets.Values.ToList().ForEach(s => {
-                        s.Close();
+                        s.V2.Close();
                     });
                     Thread.Sleep(10 * 60 * 1000); // 每5分钟检查一次
                 }
@@ -69,12 +70,12 @@ namespace SuperGMS.WebSocketEx
             }
         }
 
-        public static void OnConnected(SuperWebSocket webSocket)
+        public static void OnConnected(ComboxClass<UserType, SuperWebSocket> webSocket)
         {
             //加入管理器
-            _sockets.TryAdd(webSocket.Token, webSocket);
+            _sockets.TryAdd(webSocket.V2.Token, webSocket);
             // 进入消息监听
-            webSocket.OnConnetcion();
+            webSocket.V2.OnConnetcion();
         }
 
         /// <summary>
@@ -95,11 +96,47 @@ namespace SuperGMS.WebSocketEx
         /// <param name="msg"></param>
         public static void SendMessage(EventMsg<string> msg)
         {
-            msg.To.ForEach(to => { 
-                if(_sockets.TryGetValue(to, out SuperWebSocket webSocket))
-                    webSocket.SendMessage(msg);
-            });
+            if (msg.Broadcast == Broadcast.None) // 非广播消息，以to为准
+            {
+                msg.To.ForEach(to =>
+                {
+                    if (_sockets.TryGetValue(to, out var webSocket))
+                        webSocket.V2.SendMessage(msg);
+                });
+            }
+            else
+            {
+                _sockets.Values.ToList().ForEach(sc => {
+                    if (msg.Broadcast == Broadcast.AllUser && sc.V1 == UserType.User)
+                    {
+                        sc.V2.SendMessage(msg);
+                    }
+                    else if (msg.Broadcast == Broadcast.AllEmployee && sc.V1 == UserType.Employee)
+                    {
+                        sc.V2.SendMessage(msg);
+                    }
+                    else
+                        sc.V2.SendMessage(msg);
+                    // 未指定类型将不发送
+                });
+            }
         }
 
+    }
+
+    /// <summary>
+    /// 用户类型
+    /// </summary>
+   public enum UserType
+    { 
+        /// <summary>
+        /// 用户
+        /// </summary>
+        User=1,
+
+        /// <summary>
+        /// 后台管理
+        /// </summary>
+        Employee=2,
     }
 }

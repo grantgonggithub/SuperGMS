@@ -2,6 +2,8 @@
 using SuperGMS.Protocol.MQProtocol;
 using SuperGMS.Protocol.RpcProtocol;
 using SuperGMS.Rpc.Server;
+using SuperGMS.Tools;
+using SuperGMS.UserSession;
 using SuperGMS.WebSocketEx;
 
 namespace WebSocketService
@@ -41,7 +43,7 @@ namespace WebSocketService
                             var websocket = httpContext.WebSockets.AcceptWebSocketAsync().Result;
                             a.Headers = SuperHttpProxy.GetRequestIp(httpContext);
                             var superSocket = new SuperWebSocket(websocket, a.tk, DateTime.Now, DateTime.Now, a);
-                            SuperWebSocketManager.OnConnected(superSocket);
+                            SuperWebSocketManager.OnConnected(new ComboxClass<UserType, SuperWebSocket> { V1 =(UserType)userCtx.UserInfo.UserType, V2 = superSocket });
                         }
                     }
                 }

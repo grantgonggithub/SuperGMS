@@ -29,13 +29,26 @@ namespace SuperGMS.Protocol.MQProtocol
         /// <param name="msg">消息实体</param>
         /// <param name="to">接受者，一个消息可以不标记接受者如广播消息</param>
         /// <param name="from">发送者，一个消息必须标记发送者即来源</param>
-        public EventMsg(string eventName, M msg, List<string> to, string from)
+        /// <param name="broadcast">消息广播类型</param>
+        public EventMsg(string eventName, M msg, List<string> to, string from,Broadcast broadcast=Broadcast.None)
         {
             this._eventName = eventName;
             this._msg = msg;
             this._to = to;
             this._from = from;
             this._msg_id = Guid.NewGuid().ToString("N");//消息生成时产生唯一编号
+            this._broadcast = broadcast;
+        }
+
+        private Broadcast _broadcast;
+
+        /// <summary>
+        /// 消息广播类型
+        /// </summary>
+        public Broadcast Broadcast
+        {
+            get { return _broadcast; }
+            set { _broadcast = value; }
         }
 
         private string _msg_id;
@@ -101,20 +114,29 @@ namespace SuperGMS.Protocol.MQProtocol
     }
 
     /// <summary>
-    /// 扩展的EventMsg
+    /// 广播类型
     /// </summary>
     [Serializable]
-    public class EventMsgEx : EventMsg<string>
-    {
+    public enum Broadcast
+    { 
         /// <summary>
-        /// 扩展消息
+        /// 指定目标对象，to参数有效
         /// </summary>
-        /// <param name="eventName"></param>
-        /// <param name="msg"></param>
-        /// <param name="to"></param>
-        /// <param name="from"></param>
-        public EventMsgEx(string eventName, string msg, List<string> to, string from) : base(eventName, msg, to, from)
-        {
-        }
+        None=0,
+        /// <summary>
+        /// 发送给全部在线用户
+        /// </summary>
+        AllUser=1,
+
+        /// <summary>
+        /// 发送给全部在线的后台员工
+        /// </summary>
+        AllEmployee=2,
+
+        /// <summary>
+        /// 发给系统所有在线人
+        /// </summary>
+        All=3,
+
     }
 }

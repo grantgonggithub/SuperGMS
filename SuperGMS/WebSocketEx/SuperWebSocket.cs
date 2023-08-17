@@ -189,7 +189,7 @@ namespace SuperGMS.WebSocketEx
                 var ms = Encoding.UTF8.GetBytes(msg);
                 lock (_lock)// 不能并发的发送，要不消息就乱了,必须依次发送
                 {
-                    _socket.SendAsync(new ArraySegment<byte>(ms, 0, ms.Length), WebSocketMessageType.Text, true, CancellationToken.None).Wait();
+                    _socket.SendAsync(new ArraySegment<byte>(ms, 0, ms.Length), WebSocketMessageType.Text, true, CancellationToken.None);
                 }
             }
             catch (Exception ex)
