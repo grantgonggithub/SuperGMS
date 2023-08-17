@@ -11,6 +11,7 @@
 
 ----------------------------------------------------------------*/
 using System;
+using System.Collections.Generic;
 
 namespace SuperGMS.Protocol.MQProtocol
 {
@@ -28,7 +29,7 @@ namespace SuperGMS.Protocol.MQProtocol
         /// <param name="msg">消息实体</param>
         /// <param name="to">接受者，一个消息可以不标记接受者如广播消息</param>
         /// <param name="from">发送者，一个消息必须标记发送者即来源</param>
-        public EventMsg(string eventName, M msg, string to, string from)
+        public EventMsg(string eventName, M msg, List<string> to, string from)
         {
             this._eventName = eventName;
             this._msg = msg;
@@ -68,11 +69,11 @@ namespace SuperGMS.Protocol.MQProtocol
             set { _msg = value; }
         }
 
-        private string _to;
+        private List<string> _to;
         /// <summary>
         /// 消息接收者
         /// </summary>
-        public string To
+        public List<string> To
         {
             get { return _to; }
             set { _to = value; }

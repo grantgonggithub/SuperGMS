@@ -1,0 +1,57 @@
+﻿using SuperGMS.HttpProxy;
+using SuperGMS.Protocol.MQProtocol;
+using SuperGMS.Protocol.RpcProtocol;
+using SuperGMS.Rpc.Server;
+using SuperGMS.WebSocketEx;
+
+namespace WebSocketService
+{
+    public class SuperWebSocketMiddleware
+    {
+        private readonly RequestDelegate _next;
+
+        public SuperWebSocketMiddleware(RequestDelegate next)
+        { 
+            this._next = next;
+        }
+
+        public Task Invoke(HttpContext httpContext)
+        {
+            var task = new Task(() => {
+                if (httpContext.Request.Path == "/superwebsocket" && httpContext.WebSockets.IsWebSocketRequest)
+                {
+                    var token = httpContext.Request.Query["tk"].FirstOrDefault();
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        httpContext.Response.StatusCode = 402; // 参数错误
+                    }
+                    else
+                    {
+                        var clientType = httpContext.Request.Query["ct"].FirstOrDefault();
+                        var a = new Args<object> { tk = token, ct = clientType };
+                        // 查找redis的token是否存在，构建字典
+                        RpcContext ctx = new RpcContext(null, a);
+                        var userCtx = ctx.GetUserContext();
+                        if (userCtx == null || userCtx.UserInfo == null)
+                        {
+                            httpContext.Response.StatusCode = 403; // tk错误或者用户未登录
+                        }
+                        else
+                        {
+                            var websocket = httpContext.WebSockets.AcceptWebSocketAsync().Result;
+                            a.Headers = SuperHttpProxy.GetRequestIp(httpContext);
+                            var superSocket = new SuperWebSocket(websocket, a.tk, DateTime.Now, DateTime.Now, a);
+                            SuperWebSocketManager.OnConnected(superSocket);
+                        }
+                    }
+                }
+                else
+                {
+                    httpContext.Response.StatusCode = 400;
+                }
+            });
+            task.Start();
+            return task;
+        }
+    }
+}
