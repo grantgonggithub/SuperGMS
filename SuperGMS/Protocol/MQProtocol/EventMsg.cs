@@ -99,4 +99,22 @@ namespace SuperGMS.Protocol.MQProtocol
             set { _ctx = value; }
         }
     }
+
+    /// <summary>
+    /// 扩展的EventMsg
+    /// </summary>
+    [Serializable]
+    public class EventMsgEx : EventMsg<string>
+    {
+        /// <summary>
+        /// 扩展消息
+        /// </summary>
+        /// <param name="eventName"></param>
+        /// <param name="msg"></param>
+        /// <param name="to"></param>
+        /// <param name="from"></param>
+        public EventMsgEx(string eventName, string msg, List<string> to, string from) : base(eventName, msg, to, from)
+        {
+        }
+    }
 }
