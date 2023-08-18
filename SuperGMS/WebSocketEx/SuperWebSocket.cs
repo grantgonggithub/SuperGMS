@@ -13,6 +13,10 @@
 
 using Microsoft.Extensions.Logging;
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+using SuperGMS.HttpProxy;
 using SuperGMS.Log;
 using SuperGMS.Protocol.MQProtocol;
 using SuperGMS.Protocol.RpcProtocol;
@@ -40,8 +44,6 @@ namespace SuperGMS.WebSocketEx
         private DateTime _loginDateTime;
 
         private DateTime _lastActiveTime;
-
-        private Dictionary<string, HeaderValue> _headers;
 
         private Args<object> _loginArgs;
 
@@ -92,14 +94,13 @@ namespace SuperGMS.WebSocketEx
         /// 构造WebSocket对象
         /// </summary>
         /// <param name="_socket"></param>
-        /// <param name="_token"></param>
         /// <param name="_loginDateTime"></param>
         /// <param name="_lastActiveTime"></param>
         /// <param name="_loginArgs"></param>
-        public SuperWebSocket(WebSocket _socket, string _token, DateTime _loginDateTime, DateTime _lastActiveTime, Args<object> _loginArgs)
+        public SuperWebSocket(WebSocket _socket, DateTime _loginDateTime, DateTime _lastActiveTime, Args<object> _loginArgs)
         {
             this._socket = _socket;
-            this._token = _token;
+            this._token = _loginArgs.tk;
             this._loginDateTime = _loginDateTime;
             this._lastActiveTime = _lastActiveTime;
             this._loginArgs = _loginArgs;
@@ -115,6 +116,7 @@ namespace SuperGMS.WebSocketEx
                 if (DateTime.Now.Subtract(_lastActiveTime).TotalMilliseconds > SuperWebSocketManager.TimeOutSpan)
                 {
                     SuperWebSocketManager.OnClose(Token);
+                    _loger.LogInformation($"客户端连接被清理端开：{JsonConvert.SerializeObject(_loginArgs, SuperHttpProxy.jsonSerializerSettings)}");
                     this._socket?.CloseAsync(WebSocketCloseStatus.EndpointUnavailable, null, CancellationToken.None);
                     this._socket = null;
                 }
@@ -139,7 +141,7 @@ namespace SuperGMS.WebSocketEx
         public Task OnConnetcion()
         {
             sendMessage("pong"); // 连接成功给客户端发个消息
-            _loger.LogInformation($"客户端连接成功：tk={Token}");
+            _loger.LogInformation($"客户端连接成功：{JsonConvert.SerializeObject(_loginArgs,SuperHttpProxy.jsonSerializerSettings)}");
             try
             {
                 var buffer = new byte[1024 * 4];
@@ -161,7 +163,7 @@ namespace SuperGMS.WebSocketEx
                         if (msg == null || msg.ToLower() == "ping")
                             respone = "pong";
                         else
-                            respone = SuperWebSocketProxy.Send(msg, _headers); // 发送到后端服务器
+                            respone = SuperWebSocketProxy.Send(msg, _loginArgs.Headers); // 发送到后端服务器
                         sendMessage(respone);
                     });
                     buffer = new byte[1024 * 4];
@@ -169,6 +171,7 @@ namespace SuperGMS.WebSocketEx
 
                 }
                 SuperWebSocketManager.OnClose(Token);
+                _loger.LogInformation($"客户端连接丢失断开：{JsonConvert.SerializeObject(_loginArgs, SuperHttpProxy.jsonSerializerSettings)}");
                 return this._socket?.CloseAsync(socketResult.CloseStatus.Value, null, CancellationToken.None);
             }
             catch (Exception e)

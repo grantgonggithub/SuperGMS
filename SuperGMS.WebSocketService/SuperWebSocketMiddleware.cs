@@ -42,7 +42,7 @@ namespace WebSocketService
                         {
                             var websocket = httpContext.WebSockets.AcceptWebSocketAsync().Result;
                             a.Headers = SuperHttpProxy.GetRequestIp(httpContext);
-                            var superSocket = new SuperWebSocket(websocket, a.tk, DateTime.Now, DateTime.Now, a);
+                            var superSocket = new SuperWebSocket(websocket, DateTime.Now, DateTime.Now, a);
                             SuperWebSocketManager.OnConnected(new ComboxClass<UserType, SuperWebSocket> { V1 =(UserType)userCtx.UserInfo.UserType, V2 = superSocket });
                         }
                     }
