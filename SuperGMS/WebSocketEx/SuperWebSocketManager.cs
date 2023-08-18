@@ -86,7 +86,6 @@ namespace SuperGMS.WebSocketEx
         /// <returns></returns>
         public static bool OnClose(string token)
         {
-            _loger.LogInformation($"客户端连接断开：tk={token}");
             if (string.IsNullOrEmpty(token)) return true;
             return _sockets.TryRemove(token, out _);
         }
