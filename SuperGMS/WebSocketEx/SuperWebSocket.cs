@@ -115,7 +115,7 @@ namespace SuperGMS.WebSocketEx
                 if (DateTime.Now.Subtract(_lastActiveTime).TotalMilliseconds > SuperWebSocketManager.TimeOutSpan)
                 {
                     SuperWebSocketManager.OnClose(Token);
-                    this._socket.CloseAsync(WebSocketCloseStatus.EndpointUnavailable, null, CancellationToken.None);
+                    this._socket?.CloseAsync(WebSocketCloseStatus.EndpointUnavailable, null, CancellationToken.None);
                     this._socket = null;
                 }
             }
@@ -169,7 +169,7 @@ namespace SuperGMS.WebSocketEx
 
                 }
                 SuperWebSocketManager.OnClose(Token);
-                return this._socket.CloseAsync(socketResult.CloseStatus.Value, null, CancellationToken.None);
+                return this._socket?.CloseAsync(socketResult.CloseStatus.Value, null, CancellationToken.None);
             }
             catch (Exception e)
             {
@@ -189,7 +189,7 @@ namespace SuperGMS.WebSocketEx
                 var ms = Encoding.UTF8.GetBytes(msg);
                 lock (_lock)// 不能并发的发送，要不消息就乱了,必须依次发送
                 {
-                    _socket.SendAsync(new ArraySegment<byte>(ms, 0, ms.Length), WebSocketMessageType.Text, true, CancellationToken.None);
+                    _socket?.SendAsync(new ArraySegment<byte>(ms, 0, ms.Length), WebSocketMessageType.Text, true, CancellationToken.None);
                 }
             }
             catch (Exception ex)
