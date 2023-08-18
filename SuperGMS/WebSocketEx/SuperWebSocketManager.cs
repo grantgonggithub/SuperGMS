@@ -33,7 +33,7 @@ namespace SuperGMS.WebSocketEx
     public class SuperWebSocketManager
     {
         /// <summary>
-        /// 超时时间，单位毫秒，（15秒）
+        /// 超时时间，单位毫秒，（15分钟）
         /// </summary>
         public const int TimeOutSpan= 15 * 60 * 1000;
         private static readonly ILogger _loger = LogFactory.CreateLogger<SuperWebSocketManager>();
@@ -57,6 +57,7 @@ namespace SuperGMS.WebSocketEx
         { 
             while (true)
             {
+                _loger.LogInformation($"开始执行清理线程{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}");
                 try {
                     _sockets.Values.ToList().ForEach(s => {
                         s.V2.Close();
