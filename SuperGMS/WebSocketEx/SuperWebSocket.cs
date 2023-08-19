@@ -90,6 +90,8 @@ namespace SuperGMS.WebSocketEx
           //set { _lastActiveTime = value; }
         }
 
+        private bool _isClear = false;
+
         /// <summary>
         /// 构造WebSocket对象
         /// </summary>
@@ -104,10 +106,11 @@ namespace SuperGMS.WebSocketEx
             this._loginDateTime = _loginDateTime;
             this._lastActiveTime = _lastActiveTime;
             this._loginArgs = _loginArgs;
+            _isClear = false;
         }
 
         /// <summary>
-        /// 是否心跳超时
+        /// 是否心跳超时,给外部调用
         /// </summary>
         /// <returns></returns>
         public void Close()
@@ -115,12 +118,26 @@ namespace SuperGMS.WebSocketEx
             lock (_lock) {
                 if (DateTime.Now.Subtract(_lastActiveTime).TotalMilliseconds > SuperWebSocketManager.TimeOutSpan)
                 {
-                    SuperWebSocketManager.OnClose(Token);
-                    _loger.LogInformation($"客户端连接被清理端开：{JsonConvert.SerializeObject(_loginArgs, SuperHttpProxy.jsonSerializerSettings)}");
-                    this._socket?.CloseAsync(WebSocketCloseStatus.EndpointUnavailable, null, CancellationToken.None);
-                    this._socket = null;
+                    close(WebSocketCloseStatus.EndpointUnavailable, "客户端连接被清理断开");
+                    _isClear = true;
                 }
             }
+        }
+
+        /// <summary>
+        /// 关闭并清理
+        /// </summary>
+        /// <param name="webSocketCloseStatus"></param>
+        /// <param name="msgPrifx"></param>
+        private Task close(WebSocketCloseStatus webSocketCloseStatus,string msgPrifx)
+        {
+            if(!_isClear)
+            {
+                SuperWebSocketManager.OnClose(Token);
+                _loger.LogInformation($"{msgPrifx}：{JsonConvert.SerializeObject(_loginArgs, SuperHttpProxy.jsonSerializerSettings)}");
+                return this._socket?.CloseAsync(webSocketCloseStatus, null, CancellationToken.None);
+            }
+            return Task.CompletedTask;
         }
 
 
@@ -170,15 +187,20 @@ namespace SuperGMS.WebSocketEx
                     socketResult = this._socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None).Result;
 
                 }
-                SuperWebSocketManager.OnClose(Token);
-                _loger.LogInformation($"客户端连接丢失断开：{JsonConvert.SerializeObject(_loginArgs, SuperHttpProxy.jsonSerializerSettings)}");
-                return this._socket?.CloseAsync(socketResult.CloseStatus.Value, null, CancellationToken.None);
+                // 如果是主动被清理线程关闭的，已经执行过了此操作，不重复操作
+                //if(!_isClear)
+                //{
+                //    SuperWebSocketManager.OnClose(Token);
+                //    _loger.LogInformation($"：{JsonConvert.SerializeObject(_loginArgs, SuperHttpProxy.jsonSerializerSettings)}");
+                //     this._socket?.CloseAsync(socketResult.CloseStatus.Value, null, CancellationToken.None);
+                //}
+               return close(socketResult.CloseStatus.Value, "客户端连接丢失断开");
             }
             catch (Exception e)
             {
                 _loger.LogError(e, "SuperWebSocket.OnConnetcion.Error");
-                return Task.CompletedTask;
             }
+            return Task.CompletedTask;
         }
 
         /// <summary>

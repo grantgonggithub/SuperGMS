@@ -62,27 +62,14 @@ namespace SuperGMS.WebSocketEx
         {
             // 构造一个统计日志
             var mainLog = new LogStat() { BusinessType = "websocket.Proxy" };
-            // mainLog.SetInfo(context);
+            //mainLog.SetInfo(context);
             // var content = string.Empty;
             Args<object> a = null;
             string rst = null;
             try
             {
-                //content = GetRequestValue(context.Request);
-                //var isUdf = IsController(context);
-                //if (isUdf)
-                //{
-                //    ApiArgs apiArgs = new ApiArgs { Headers = new Dictionary<string, string>(), Params = new Dictionary<string, string>() };
-                //    foreach (var h in context.Request.Headers)
-                //        apiArgs.Headers.Add(h.Key, h.Value);
-                //    foreach (var p in context.Request.Query)
-                //        apiArgs.Params[p.Key] = p.Value;
-                //    apiArgs.Body = content;
-                //    a = new Args<object> { v = apiArgs, ct = ClientType.ThirdPart.ToString() };
-                //}
-                //else
-                //{
                 a = JsonConvert.DeserializeObject<Args<object>>(content, SuperHttpProxy.jsonSerializerSettings);
+                a.Headers = headers;
                 //}
 
                 if (string.IsNullOrEmpty(a.rid))
@@ -91,31 +78,9 @@ namespace SuperGMS.WebSocketEx
                     a.rid = Guid.NewGuid().ToString("N");
                 }
 
-                (var rtn, _) = RpcClientManager.Send(a, a.m);
+                (var rtn,var rt) = RpcClientManager.Send(a, a.m);
                 rst = rtn;
-                //string body = rtn.c;
-                //if (isUdf)
-                //{
-                //    if (rtn.r.v != null && !string.IsNullOrEmpty(rtn.r.v.ToString()))
-                //    {
-                //        var apiRst = JsonConvert.DeserializeObject<ApiResult>(rtn.r.v.ToString());
-                //        if (apiRst != null)
-                //        {
-                //            body = apiRst.Body;
-                //            context.Response.StatusCode = (int)apiRst.Code;
-                //            if (context.Response.StatusCode < 1) context.Response.StatusCode = 200;
-                //            if (!string.IsNullOrEmpty(apiRst.ContentType)) context.Response.ContentType = apiRst.ContentType;
-                //        }
-                //    }
-                //}
-                //using (var strStream = new StreamWriter(context.Response.Body))
-                //{
-                //    strStream.Write(body);
-                //    strStream.Flush();
-                //    strStream.Close();
-                //}
-
-                // mainLog.SetInfo(a, rtn.r);
+                mainLog.SetInfo(a, rt);
                 logger.LogInformation(new EventId(0, a.rid), mainLog.ToString());
             }
             catch (Exception e)
