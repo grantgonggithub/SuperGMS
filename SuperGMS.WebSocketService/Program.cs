@@ -5,12 +5,13 @@ using SuperGMS.WebSocketEx;
 
 using WebSocketService;
 {
-            ILogger _loger = LogFactory.CreateLogger<SuperWebSocket>();
-var builder = WebApplication.CreateBuilder(args);
+    ILogger _loger = LogFactory.CreateLogger<SuperWebSocket>();
+    var builder = WebApplication.CreateBuilder(args);
     var server = ServerSetting.GetRpcServer(SuperWebSocketProxy.WebSocketProxy);
 
     // 添加设置允许跨域的配置
-    builder.Services.AddCors(options => {
+    builder.Services.AddCors(options =>
+    {
         options.AddPolicy("AllowAll", p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
     });
 
@@ -44,8 +45,9 @@ var builder = WebApplication.CreateBuilder(args);
     app.UseCors("AllowAll");
 
     //设置支持websocket
-    app.UseWebSockets(new WebSocketOptions {
-         KeepAliveInterval=TimeSpan.FromSeconds(120),
+    app.UseWebSockets(new WebSocketOptions
+    {
+        KeepAliveInterval = TimeSpan.FromSeconds(120),
     });
 
     // 注册WebSocket服务为内部服务提供发送消息的接口（本地Rpc端口注册），接收后端消息，下行消息
