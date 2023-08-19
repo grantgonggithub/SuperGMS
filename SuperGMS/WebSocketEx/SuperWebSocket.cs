@@ -140,8 +140,8 @@ namespace SuperGMS.WebSocketEx
         /// <returns></returns>
         public Task OnConnetcion()
         {
+            _loger.LogInformation($"客户端连接成功：{JsonConvert.SerializeObject(_loginArgs, SuperHttpProxy.jsonSerializerSettings)}");
             sendMessage("pong"); // 连接成功给客户端发个消息
-            _loger.LogInformation($"客户端连接成功：{JsonConvert.SerializeObject(_loginArgs,SuperHttpProxy.jsonSerializerSettings)}");
             try
             {
                 var buffer = new byte[1024 * 4];
