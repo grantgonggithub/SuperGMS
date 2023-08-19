@@ -10,25 +10,17 @@
  功能描述：WebSocketProxy代理接入层
 
 ----------------------------------------------------------------*/
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
 
 using SuperGMS.HttpProxy;
 using SuperGMS.Log;
-using SuperGMS.Protocol.ApiProtocol;
 using SuperGMS.Protocol.RpcProtocol;
 using SuperGMS.Rpc.Client;
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using static Dapper.SqlMapper;
 
 namespace SuperGMS.WebSocketEx
 {
