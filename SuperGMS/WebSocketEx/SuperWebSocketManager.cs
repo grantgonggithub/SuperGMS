@@ -93,7 +93,6 @@ namespace SuperGMS.WebSocketEx
             else // 加入失败，说明已经存在，把新连接close掉
             {
                 webSocket.V2.Close();
-                webSocket = null;
             }
         }
 
