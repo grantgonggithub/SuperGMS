@@ -3,12 +3,11 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <LangVersion>7.1</LangVersion>
-    <PackageReleaseNotes>为升级.Net6.0做兼容准备
-grantgongjianchun(nnn987@126.com)</PackageReleaseNotes>
+    <PackageReleaseNotes></PackageReleaseNotes>
     <Version>6.0.15</Version>
     <Authors>grantgongjianchun</Authors>
     <Company>SuperGMS</Company>
-    <Description>SuperGMS,从此版本开始直接升级到Net6,所以版本号直接升级到6.0.0，以前的版本（仅支持3.1）不在维护升级</Description>
+    <Description></Description>
     <PackageIconUrl />
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
