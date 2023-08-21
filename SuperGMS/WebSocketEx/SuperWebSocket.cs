@@ -110,14 +110,21 @@ namespace SuperGMS.WebSocketEx
         /// 是否心跳超时,给外部调用
         /// </summary>
         /// <returns></returns>
-        public void Close()
+        public void Close(bool isCheckTimeOut=false)
         {
             lock (_lock) {
-                if (DateTime.Now.Subtract(_lastActiveTime).TotalMilliseconds > SuperWebSocketManager.TimeOutSpan)
+                if (isCheckTimeOut)
                 {
-                    close(WebSocketCloseStatus.EndpointUnavailable, "客户端连接被清理断开");
-                    _isClear = true;
+                    if (DateTime.Now.Subtract(_lastActiveTime).TotalMilliseconds > SuperWebSocketManager.TimeOutSpan)
+                    {
+                        close(WebSocketCloseStatus.EndpointUnavailable, "客户端连接被清理断开");
+                        // 上面语句执行时为_isClear=false，上面语句执行完会执行会触发200行代码的逻辑，
+                        // 客户端端开，也会走200行代码，所以就要区分一下，防止重复调用clsoe()方法，导致空引用的错误
+                        _isClear = true;
+                    }
                 }
+                else
+                    close(WebSocketCloseStatus.EndpointUnavailable, "客户端重复连接，拒绝");
             }
         }
 

@@ -57,7 +57,7 @@ namespace SuperGMS.WebSocketEx
                 _loger.LogInformation($"开始执行清理线程{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}");
                 try {
                     _sockets.Values.ToList().ForEach(s => {
-                        s.V2.Close();
+                        s.V2.Close(true);
                     });
                     Thread.Sleep(10 * 60 * 1000); // 每5分钟检查一次
                 }
@@ -68,12 +68,33 @@ namespace SuperGMS.WebSocketEx
             }
         }
 
+        /// <summary>
+        /// 客户端是否已经建立了socket，不可以重复创建
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public static bool IsExistClient(string token)
+        {
+            return _sockets.ContainsKey(token);
+        }
+
+        /// <summary>
+        /// 连接创建成功以后需要维护连接和token的关系
+        /// </summary>
+        /// <param name="webSocket"></param>
         public static void OnConnected(ComboxClass<UserType, SuperWebSocket> webSocket)
         {
             //加入管理器
-            _sockets.TryAdd(webSocket.V2.Token, webSocket);
-            // 进入消息监听
-            webSocket.V2.OnConnetcion();
+            if (_sockets.TryAdd(webSocket.V2.Token, webSocket))
+            {
+                // 进入消息监听
+                webSocket.V2.OnConnetcion();
+            }
+            else // 加入失败，说明已经存在，把新连接close掉
+            {
+                webSocket.V2.Close();
+                webSocket = null;
+            }
         }
 
         /// <summary>
