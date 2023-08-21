@@ -1,21 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>3.0.0</Version>
-    <Authors>SuperGMS</Authors>
+    <TargetFramework>net6.0</TargetFramework>
+    <Version>6.0.12</Version>
+    <Authors>gongjianchun</Authors>
     <Product>SuperGMS</Product>
-    <Description>SuperGMS</Description>
-    <PackageIcon>PackageIcon.png</PackageIcon>
+    <Description>SuperGMS,从此版本开始直接升级到Net6,所以版本号直接升级到6.0.0，以前的版本（仅支持3.1）不在维护升级</Description>
     <PackageIconUrl />
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Company>SuperGMS</Company>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="1.50.4" />
-    <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="3.1.2" />
+    <PackageReference Include="Dapper" Version="2.0.123" />
+    <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.500-preview2-1-003177" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>

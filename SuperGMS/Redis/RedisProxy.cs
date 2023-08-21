@@ -40,6 +40,21 @@ namespace SuperGMS.Redis
         }
 
         /// <summary>
+        /// 设置指定key的过期时间
+        /// </summary>
+        /// <param name="nodeName">节点名称</param>
+        /// <param name="logicName">业务名称</param>
+        /// <param name="key">key</param>
+        /// <param name="expiry">过期时间</param>
+        /// <returns></returns>
+        public static bool KeyExpire(string nodeName, string logicName, string key, TimeSpan? expiry)
+        {
+            RedisNode cfg = RedisConfig.GetNode(nodeName);
+            string k = getKey(logicName, key);
+            return cfg.Set(db => db.KeyExpire(k,expiry));
+        }
+
+        /// <summary>
         /// 保存一个string value
         /// </summary>
         /// <param name="nodeName">节点名称</param>

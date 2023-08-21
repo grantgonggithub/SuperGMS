@@ -120,9 +120,10 @@ namespace SuperGMS.DB.EFEx.DynamicSearch
         {
             var sb = new StringBuilder();
             List<string> groups = new List<string>();
+            QueryModel.Items.Sort((a, b) => { return a.Field.CompareTo(b.Field); });
+            StringBuilder noOrGroup = new StringBuilder();
             foreach (var conditionItem in QueryModel.Items)
             {
-                string sqlWhere = string.Empty;
                 if (!string.IsNullOrEmpty(conditionItem.OrGroup))
                 {
                     if (!groups.Contains(conditionItem.OrGroup))
@@ -134,24 +135,39 @@ namespace SuperGMS.DB.EFEx.DynamicSearch
                             {
                                 if (sbChild.Length > 0)
                                 {
-                                    sbChild.Append(" or ");
+                                    if (conditionItem.OrGroup.IndexOf(",") > -1)
+                                        sbChild.Append(" and ");
+                                    else
+                                        sbChild.Append(" or ");
                                 }
                                 sbChild.Append((string.IsNullOrEmpty(senItem.Prefix) ? "" : (senItem.Prefix + ".")) + senItem.Field + " " + ConvertMethodToSql(senItem.Method, senItem.Value));
                             }
                         }
                         if (sb.Length > 0)
-                            sb.Append(" and ");
+                        {
+                            if (conditionItem.OrGroup.IndexOf(",") > -1)
+                                sb.Append(" or ");
+                            else
+                                sb.Append(" and ");
+                        }
                         sb.Append("(" + sbChild.ToString() + ")");
                         groups.Add(conditionItem.OrGroup);
                     }
                 }
                 else
                 {
-                    if (sb.Length > 0)
-                        sb.Append(" and ");
-                    sb.Append((string.IsNullOrEmpty(conditionItem.Prefix) ? "" : (conditionItem.Prefix + ".")) + conditionItem.Field + " " + ConvertMethodToSql(conditionItem.Method, conditionItem.Value));
+                    if (noOrGroup.Length > 0)
+                        noOrGroup.Append(" and ");
+                    noOrGroup.Append((string.IsNullOrEmpty(conditionItem.Prefix) ? "" : (conditionItem.Prefix + ".")) + conditionItem.Field + " " + ConvertMethodToSql(conditionItem.Method, conditionItem.Value));
                 }
             }
+            if (sb.Length > 0)
+            {
+                if (noOrGroup.Length > 0) sb.Append(" and ").Append(noOrGroup); // 没有orgroup的拼到最后，这样都是and
+            }
+            else
+                sb.Append(noOrGroup);
+
             return sb.ToString();
         }
         /// <summary>
@@ -161,6 +177,10 @@ namespace SuperGMS.DB.EFEx.DynamicSearch
         public Dictionary<string, object> GetParameters()
         {
             var paraDic = new Dictionary<string, object>();
+            QueryModel.Items.Sort((a, b) =>
+            {
+                return a.Field.CompareTo(b.Field);
+            });
             for (int i = 0; i < QueryModel.Items.Count; i++)
             {
                 var item = QueryModel.Items[i];
@@ -206,12 +226,33 @@ namespace SuperGMS.DB.EFEx.DynamicSearch
         }
 
         /// <summary>
+        /// ConditionItem获取sql
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public string GetConditionItemSql(ConditionItem item)
+        {
+
+            return $"{GetQueryCloumn(item)} {ConvertMethodToSql(item.Method,item.Value)}";
+        }
+
+        /// <summary>
+        /// 转换列
+        /// </summary>
+        /// <param name="senItem">查询条件</param>
+        /// <returns>查询列名</returns>
+        public string GetQueryCloumn(ConditionItem senItem)
+        {
+            return (string.IsNullOrEmpty(senItem.Prefix) ? "" : (senItem.Prefix + ".")) + senItem.Field;
+        }
+
+        /// <summary>
         /// 将Method转换成sql语法的查询语句
         /// </summary>
         /// <param name="method"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        private string ConvertMethodToSql(QueryMethod method, object value)
+        public string ConvertMethodToSql(QueryMethod method, object value)
         {
             switch (method)
             {
@@ -261,6 +302,7 @@ namespace SuperGMS.DB.EFEx.DynamicSearch
         /// </summary>
         public void BuildEmptySearch()
         {
+            QueryModel.Items.Sort((a, b) => { return a.Field.CompareTo(b.Field); });
             if (this.QueryModel != null && this.QueryModel.Items != null && this.QueryModel.Items.Count > 0)
             {
                 foreach (var item in this.QueryModel.Items.ToArray())

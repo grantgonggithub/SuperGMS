@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using SuperGMS.ApiHelper.Xml;
 using SuperGMS.AttributeEx;
+using SuperGMS.Log;
 using SuperGMS.Rpc.Server;
 using SuperGMS.Tools;
 
@@ -27,8 +28,8 @@ namespace SuperGMS.ApiHelper
         private static readonly string RpcBaseName = typeof(RpcBaseServer<object, object>).GetGenericTypeDefinition().FullName;
 
         private readonly Assembly assembly;
-        private XmlCommentsFileCollection xmls;
-        private static Dictionary<string, List<ClassInfo>> sAllApiInfo = new Dictionary<string, List<ClassInfo>>();
+        private XmlCommentsFileCollection xmls=new XmlCommentsFileCollection();
+        //private static Dictionary<string, List<ClassInfo>> sAllApiInfo = new Dictionary<string, List<ClassInfo>>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiHelper"/> class.
@@ -48,14 +49,14 @@ namespace SuperGMS.ApiHelper
         public List<Type> GetAllInterface(bool bOpenApi = false)
         {
             var ts = this.assembly.GetTypes();
-            if (bOpenApi)
-            {
-                return ts.Where(this.IsGrantRpcBaseServerChildClass).Where(x=>x.GetCustomAttributes(typeof(OpenApiAttribute), true).Length > 0).ToList();
-            }
-            else
-            {
+            //if (bOpenApi)
+            //{
+            //    return ts.Where(this.IsGrantRpcBaseServerChildClass).Where(x=>x.GetCustomAttributes(typeof(OpenApiAttribute), true).Length > 0).ToList();
+            //}
+            //else
+            //{
                 return ts.Where(this.IsGrantRpcBaseServerChildClass).ToList();
-            }
+            //}
         }
 
         /// <summary>
@@ -64,22 +65,22 @@ namespace SuperGMS.ApiHelper
         /// <returns>所有的 GrantRpcBaseServer 继承类</returns>
         public List<ClassInfo> GetAllInterfaceClass()
         {
-            string lang = string.Empty;
-            if (string.IsNullOrEmpty(lang))
-            {
-                lang = "zh_cn";
-            }
+            //string lang = string.Empty;
+            //if (string.IsNullOrEmpty(lang))
+            //{
+            //    lang = "zh_cn";
+            //}
 
-            var key = lang + "_f";
-            if (sAllApiInfo.ContainsKey(key))
-            {
-                return sAllApiInfo[key];
-            }
+            //var key = lang + "_f";
+            //if (sAllApiInfo.ContainsKey(key))
+            //{
+            //    return sAllApiInfo[key];
+            //}
 
-            if (this.assembly == null)
-            {
-                return new List<ClassInfo>();
-            }
+            //if (this.assembly == null)
+            //{
+            //    return new List<ClassInfo>();
+            //}
 
 
             // var ts = this.assembly.GetTypes();
@@ -106,7 +107,7 @@ namespace SuperGMS.ApiHelper
                     try
                     {
                         var t = this.GetInterfaceParam(x);
-                        var info = this.GetInterfaceInfo(x, t.args, lang);
+                        var info = this.GetInterfaceInfo(x, t.args,"");
 
                         // var arg = new ParseTypeInfo(this.assembly, t.args);
                         // var infoArgs = arg.Parse();
@@ -132,7 +133,7 @@ namespace SuperGMS.ApiHelper
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"{x.FullName}:{ex.Message}");
+                        LogTextWriter.Write($"{x.FullName}:{ex.Message}");
                         var infoArgs = new ClassInfo(this.assembly.FullName);
                         infoArgs.Name = x.Name;
                         infoArgs.FullName = x.FullName;
@@ -145,8 +146,7 @@ namespace SuperGMS.ApiHelper
             sw.Stop();
             Trace.WriteLine($"Parallel.foreach {sw.ElapsedMilliseconds} ms");
 
-            sAllApiInfo[key] = infos.ToList();
-            return sAllApiInfo[key];
+            return infos.ToList();
         }
         /// <summary>
         /// 接口信息
@@ -156,17 +156,17 @@ namespace SuperGMS.ApiHelper
         /// <returns></returns>
         public List<ClassInfo> GetAllInterfaceClass(string lang, bool bOpenApi = false)
         {
-            if (string.IsNullOrEmpty(lang))
-            {
-                lang = "zh_cn";
-            }
+            //if (string.IsNullOrEmpty(lang))
+            //{
+            //    lang = "zh_cn";
+            //}
 
-            var key = lang + (bOpenApi ? "_t" : "_f");
+            //var key = lang + (bOpenApi ? "_t" : "_f");
 
-            if (sAllApiInfo.ContainsKey(key))
-            {
-                return sAllApiInfo[key];
-            }
+            //if (sAllApiInfo.ContainsKey(key))
+            //{
+            //    return sAllApiInfo[key];
+            //}
 
             if (this.assembly == null)
             {
@@ -225,7 +225,7 @@ namespace SuperGMS.ApiHelper
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"{x.FullName}:{ex.Message}");
+                        LogTextWriter.Write($"{x.FullName}:{ex.Message}");
                         var infoArgs = new ClassInfo(this.assembly.FullName);
                         infoArgs.Name = x.Name;
                         infoArgs.FullName = x.FullName;
@@ -238,8 +238,7 @@ namespace SuperGMS.ApiHelper
             sw.Stop();
             Trace.WriteLine($"Parallel.foreach {sw.ElapsedMilliseconds} ms");
 
-            sAllApiInfo[key] = infos.ToList();
-            return sAllApiInfo[key];
+            return infos.ToList();
         }
 
         /// <summary>
@@ -298,7 +297,7 @@ namespace SuperGMS.ApiHelper
             if (c.Length > 0)
             {
                 var oa = c[0] as OpenApiAttribute;
-                info.Desc = C.R(oa?.ApiDesc, lang);
+                info.Desc = oa?.ApiDesc;//C.R(oa?.ApiDesc, lang);
                 info.IsPublic = true;
             }
 
@@ -327,10 +326,10 @@ namespace SuperGMS.ApiHelper
 
             var xs = new XmlCommentsFileCollection();
 
-            // if (File.Exists(this.GetXmlDllPath()))
-            // {
-            //    this.xmls.Add(new XmlCommentsFile(this.GetXmlDllPath()));
-            // }
+            if (File.Exists(this.GetXmlDllPath()))
+            {
+                this.xmls.Add(new XmlCommentsFile(this.GetXmlDllPath()));
+            }
             this.GetAllXml().ForEach(x =>
             {
                 xs.Add(new XmlCommentsFile(x));
@@ -499,7 +498,7 @@ namespace SuperGMS.ApiHelper
         {
             FileInfo fi = new FileInfo(this.assembly.Location);
             var di = fi.Directory;
-            var xmlAlls = di.GetFiles("*.xml")?.Where(x => x.Name.StartsWith("grant.") || x.Name.StartsWith("SuperGMS"));
+            var xmlAlls = di.GetFiles("*.xml");
             if (xmlAlls?.Count() > 0)
             {
                 return xmlAlls.Select(x => x.FullName).ToList();

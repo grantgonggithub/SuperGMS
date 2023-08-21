@@ -28,6 +28,7 @@ using SuperGMS.DB.EFEx.DynamicSearch;
 using SuperGMS.DB.EFEx.GrantDbContext;
 using SuperGMS.Tools;
 using Z.EntityFramework.Plus;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace SuperGMS.DB.EFEx
 {
@@ -39,6 +40,10 @@ namespace SuperGMS.DB.EFEx
         //public event DbEFCommit OnDbCommit;
         private DbContext _dbContext;
         private DbInfo _dbInfo;
+        /// <summary>
+        /// 当前数据库信息
+        /// </summary>
+        public DbInfo DbInfo { get { return _dbInfo; } }
 
         private readonly object _rootObj = new object();
         private Dictionary<string, object> _repositories = new Dictionary<string, object>();
@@ -47,6 +52,11 @@ namespace SuperGMS.DB.EFEx
         {
             _dbContext = context;
             _dbInfo = dbInfo;
+        }
+
+        internal ChangeTracker GetChangeTracker()
+        {
+            return _dbContext.ChangeTracker;
         }
 
         /// <summary>
@@ -117,7 +127,7 @@ namespace SuperGMS.DB.EFEx
                             {
                                 // 防止回滚的异常将提交异常冲掉
                             }
-                            throw ex;
+                            throw;
                         }
                     }
                 }

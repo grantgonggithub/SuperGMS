@@ -32,6 +32,11 @@ namespace SuperGMS.UserSession
         public string LoginName { get; set; }
 
         /// <summary>
+        /// 登录人的真实姓名
+        /// </summary>
+        public string RealName { get; set; }
+
+        /// <summary>
         /// 租户信息
         /// </summary>
         public TenantInfo TenantInfo { get; set; }
@@ -60,5 +65,21 @@ namespace SuperGMS.UserSession
         /// 租户功能按钮列表
         /// </summary>
         internal List<FunctionInfo> FunctionInfos { get; set; }
+
+        /// <summary>
+        /// 用户需要扩展的信息
+        /// </summary>
+        public object UserInfoObjCtx { get; set; }
+
+        /// <summary>
+        /// 获取用户扩展信息
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetUserInfoObjCtx<T>() where T:class, new()
+        {
+            if (UserInfoObjCtx == null) return default(T);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(UserInfoObjCtx.ToString());
+        }
     }
 }

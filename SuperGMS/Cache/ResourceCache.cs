@@ -40,7 +40,7 @@ namespace SuperGMS.Cache
         /// 单元测试时, Mock 缓存时,使用,手动初始化
         /// </summary>
         /// <param name="cache">Mock 的缓存</param>
-        public static void Initlize(ICache cache)
+        internal static void Initlize(ICache cache)
         {
             if (_instance == null && cache != null)
             {

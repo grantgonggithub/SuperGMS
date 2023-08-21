@@ -18,10 +18,13 @@ namespace SuperGMS.DB.EFEx
 {
     /// <summary>
     /// IGrantDbContext
-    /// modified by mark add Idisposable interface
     /// </summary>
-   public interface IDbContext : IDisposable
+    public interface IDbContext : IDisposable
     {
-        // void Commit();
+        /// <summary>
+        /// 获取数据库信息
+        /// </summary>
+        /// <returns></returns>
+        DbInfo DbInfo { get; }
     }
 }

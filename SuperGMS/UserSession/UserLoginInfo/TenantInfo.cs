@@ -42,5 +42,21 @@ namespace SuperGMS.UserSession
         /// </summary>
         public DateTime EndTime { get; set; }
 
+        /// <summary>
+        /// 租户需要扩展的信息
+        /// </summary>
+        public object TenantObjCtx { get; set; }
+
+        /// <summary>
+        /// 获取租户扩展信息
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetTenantObjCtx<T>() where T : class, new()
+        {
+            if (TenantObjCtx == null) return default(T);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(TenantObjCtx.ToString());
+        }
+
     }
 }

@@ -99,7 +99,7 @@ namespace SuperGMS.Zookeeper
             catch (Exception e)
             {
                 logger.LogCritical(e, $"ZK连接:{connectionString}初始化异常");
-                throw e;
+                throw;
             }
         }
 
@@ -123,7 +123,7 @@ namespace SuperGMS.Zookeeper
                 if (try_num < 3)
                 {
                     reConnection(e);
-                    Thread.Sleep(500);
+                    Thread.Sleep(1000);
                     goto gotoHere;
                 }
 
@@ -150,7 +150,7 @@ namespace SuperGMS.Zookeeper
                     if (tryNum < 3)
                     {
                        reConnection(e);
-                        Thread.Sleep(500);
+                        Thread.Sleep(1000);
                         goto gotoLable;
                     }
 
@@ -189,7 +189,7 @@ namespace SuperGMS.Zookeeper
                                     break;
                                 }
 
-                                Thread.Sleep(500);
+                                Thread.Sleep(3000);
                                 state = currentZookeeper.getState();
                             }
                         }
@@ -234,7 +234,7 @@ namespace SuperGMS.Zookeeper
                 if (tryNum < 3)
                 {
                     reConnection(e);
-                    Thread.Sleep(500);
+                    Thread.Sleep(1000);
                     goto gotoLable;
                 }
                 logger.LogError(e, $"GetChildrenNode 获取数据异常：{path}");
@@ -262,7 +262,7 @@ namespace SuperGMS.Zookeeper
                     try
                     {
                         Random r = new Random();
-                        Thread.Sleep(r.Next(200,2000)); // 重连一定要随机等待一下，错开时间，这样如果zk端开瞬间，不至于同时形成重连风暴
+                        Thread.Sleep(r.Next(1000,6000)); // 重连一定要随机等待一下，错开时间，这样如果zk端开瞬间，不至于同时形成重连风暴
                         connection(ConnectionString, SessionTimeout, Watcher,reConnectionAction);
                     }
                     catch (Exception exception)
@@ -421,7 +421,7 @@ namespace SuperGMS.Zookeeper
             }
             catch (Exception e)
             {
-                Console.WriteLine(e); // 这里吞掉算了 ，服务要退出了，不管了···
+                LogTextWriter.Write(e); // 这里吞掉算了 ，服务要退出了，不管了···
             }
 
         }
@@ -463,7 +463,7 @@ namespace SuperGMS.Zookeeper
                 if (tryNum < 3)
                 {
                     reConnection(e);
-                    Thread.Sleep(500);
+                    Thread.Sleep(1000);
                     goto gotoLable;
                 }
             }
@@ -505,12 +505,12 @@ namespace SuperGMS.Zookeeper
                 if (tryNum < 3)
                 {
                     reConnection(e);
-                    Thread.Sleep(500);
+                    Thread.Sleep(1000);
                     goto gotoLable;
                 }
                 else
                 {
-                    throw e; // 设置数据的地方一定要抛异常 
+                    throw; // 设置数据的地方一定要抛异常 
                 }
             }
         }
@@ -552,12 +552,12 @@ namespace SuperGMS.Zookeeper
                 if (tryNum < 3)
                 {
                     reConnection(e);
-                    Thread.Sleep(500);
+                    Thread.Sleep(1000);
                     goto gotoLable;
                 }
                 else
                 {
-                    throw e; // 设置数据的地方一定要抛异常
+                    throw; // 设置数据的地方一定要抛异常
                 }
             }
         }
@@ -616,12 +616,12 @@ namespace SuperGMS.Zookeeper
                 if (tryNum < 3)
                 {
                     reConnection(e);
-                    Thread.Sleep(500);
+                    Thread.Sleep(1000);
                     goto gotoLable;
                 }
                 else
                 {
-                    throw e; // 设置数据的地方一定要抛异常 
+                    throw; // 设置数据的地方一定要抛异常 
                 }
             }
         }

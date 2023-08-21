@@ -100,10 +100,12 @@ namespace SuperGMS.Config
                         continue;
                     };
                     if (string.IsNullOrEmpty(file.Value)) continue;
-                    var filePath = $"{AppContext.BaseDirectory}Config{Path.DirectorySeparatorChar}{item.Name}{Path.DirectorySeparatorChar}{file.Value}";
+                    // 兼容sql文件配置指向文件时可以配置相对于config目录的文件，也可以配置默认路径的文件
+                    var partPath = file.Value.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries).Length > 1 ? "" : (Path.DirectorySeparatorChar.ToString() + item.Name);
+                    var filePath = $"{AppContext.BaseDirectory}config{partPath}{Path.DirectorySeparatorChar}{file.Value}";
                     if (!File.Exists(filePath))
                     {
-                        filePath = $"{AppContext.BaseDirectory}Config{Path.DirectorySeparatorChar}{item.Name}{Path.DirectorySeparatorChar}{file.Value}";
+                        filePath = $"{AppContext.BaseDirectory}Config{partPath}{Path.DirectorySeparatorChar}{file.Value}";
                         if(!File.Exists(filePath))
                            throw new Exception($"未找到路径{filePath}中的SQL配置文件");
                     }
@@ -162,7 +164,7 @@ namespace SuperGMS.Config
             catch (Exception e)
             {
                 logger.LogError(e, "SqlMapManager.AddSqlMap.Error");
-                throw e;
+                throw;
             }
             finally
             {

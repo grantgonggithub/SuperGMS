@@ -185,5 +185,13 @@ namespace SuperGMS.Cache
         /// <param name="value"></param>
         /// <returns></returns>
         bool LockRelease(string key, string value);
+
+        /// <summary>
+        /// 设置指定key的过期时间
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <param name="expiry">过期时间</param>
+        /// <returns></returns>
+        bool KeyExpire(string key, TimeSpan? expiry = null);
     }
 }

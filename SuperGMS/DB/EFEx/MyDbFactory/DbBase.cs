@@ -12,8 +12,12 @@
 ----------------------------------------------------------------*/
 
 using Dapper;
+
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
-using MySql.Data.MySqlClient;
+
+using MySqlConnector;
+
 using Npgsql;
 using Oracle.ManagedDataAccess.Client;
 using SuperGMS.Config;
@@ -26,7 +30,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -57,7 +60,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
         public DbBase(DbInfo dbInfo)
         {
             _dbInfo = dbInfo;
-            if (_dbInfo.CommandTimeout < 1) _dbInfo.CommandTimeout = 10 * 60 * 1000; // 默认10分钟 ，这是OMS统计W库存时,时间过长，nick要求修改的  2019-2-19 by grant
+            if (_dbInfo.CommandTimeout < 1) _dbInfo.CommandTimeout = 10 * 60 * 1000; // 默认10分钟
         }
 
         public IDbTransaction GetTransaction()
@@ -146,12 +149,17 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             searchParameters.BuildEmptySearch();
             // 复制一个,避免修改的时候影响外部数据
             var copyCondition = JsonEx.JsonConvert.CopyObject(searchParameters.QueryModel.Items);
+            copyCondition.Sort((a, b) =>
+            {
+                return a.Field.CompareTo(b.Field);
+            });
             var sb = new StringBuilder();
             List<string> groups = new List<string>();
 
             // 如果是Dapper 则把Condition 的 Field 和 Value 替换掉
 
-            var mapDic = DbColumnMaps.GetDbContextFiledMaps();
+            var mapDic = DbColumnMaps.GetDbContextFiledMaps(_dbInfo.DbContextName);
+            if (mapDic == null) throw new NotImplementedException($"请在项目的AppStart中初始化{_dbInfo.DbContextName}");
             for (int i = 0; i < copyCondition.Count; i++)
             {
                 var item = copyCondition[i];
@@ -170,7 +178,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                     item.Field = mapDic[item.Field];
                 }
             }
-
+            StringBuilder noOrGroup = new StringBuilder();
             foreach (var conditionItem in copyCondition)
             {
                 if (!string.IsNullOrEmpty(conditionItem.OrGroup))
@@ -184,24 +192,38 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                             {
                                 if (sbChild.Length > 0)
                                 {
-                                    sbChild.Append(" or ");
+                                    if (conditionItem.OrGroup.IndexOf(",") > -1)
+                                        sbChild.Append(" and ");
+                                    else
+                                        sbChild.Append(" or ");
                                 }
                                 sbChild.Append(GetQueryCloumn(senItem) + " " + ConvertMethodToSql(senItem.Method, senItem.Value));
                             }
                         }
                         if (sb.Length > 0)
-                            sb.Append(" and ");
+                        {
+                            if (conditionItem.OrGroup.IndexOf(",") > -1)
+                                sb.Append(" or ");
+                            else
+                                sb.Append(" and ");
+                        }
                         sb.Append("(" + sbChild.ToString() + ")");
                         groups.Add(conditionItem.OrGroup);
                     }
                 }
                 else
                 {
-                    if (sb.Length > 0)
-                        sb.Append(" and ");
-                    sb.Append((string.IsNullOrEmpty(conditionItem.Prefix) ? "" : (conditionItem.Prefix + ".")) + conditionItem.Field + " " + ConvertMethodToSql(conditionItem.Method, conditionItem.Value));
+                    if (noOrGroup.Length > 0)
+                        noOrGroup.Append(" and ");
+                    noOrGroup.Append((string.IsNullOrEmpty(conditionItem.Prefix) ? "" : (conditionItem.Prefix + ".")) + conditionItem.Field + " " + ConvertMethodToSql(conditionItem.Method, conditionItem.Value));
                 }
             }
+            if (sb.Length > 0)
+            {
+                if (noOrGroup.Length > 0) sb.Append(" and ").Append(noOrGroup); // 没有orgroup的拼到最后，这样都是and
+            }
+            else
+                sb.Append(noOrGroup);
             return sb.ToString();
         }
         /// <summary>
@@ -356,6 +378,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             DynamicParameters parameters = GetDynamicParametersBySearchParameter(searchParameters);
             try
             {
+                PrintSql(pageSql, parameters);
                 using (var connection = GetConnection())
                 {
                     return connection.Connection.Query<T>(pageSql, parameters, null, false, DbInfo.CommandTimeout, CommandType.Text).AsList();
@@ -363,7 +386,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -391,6 +414,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             }
             try
             {
+                PrintSql(pageSql, parameters);
                 using (var connection = GetConnection())
                 {
                     return connection.Connection.Query<T>(pageSql, parameters, null, false, DbInfo.CommandTimeout, CommandType.Text).AsList();
@@ -398,7 +422,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -409,6 +433,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             DynamicParameters parameters = GetDynamicParametersBySearchParameter(searchParameters);
             try
             {
+                PrintSql(pageSql, parameters);
                 using (var connection = GetConnection())
                 {
                     return connection.Connection.Query(pageSql, parameters, null, false, DbInfo.CommandTimeout, CommandType.Text).AsList();
@@ -416,7 +441,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
         private int GetTotalCountBySearchParameter(string sql, SearchParameters searchParameters)
@@ -438,14 +463,15 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
 
                 try
                 {
+                    PrintSql(sql, parameters);
                     using (var connection = GetConnection())
                     {
-                        searchParameters.PageInfo.TotalCount = connection.Connection.Query<int>(countParaSql, parameters, null, false, DbInfo.CommandTimeout, CommandType.Text).AsList().First();
+                        searchParameters.PageInfo.TotalCount = connection.Connection.Query<int>(countParaSql, parameters, null, false, DbInfo.CommandTimeout, CommandType.Text)?.FirstOrDefault()??0;
                     }
                 }
                 catch (Exception ex)
                 {
-                    throw ex;
+                    throw;
                 }
             }
 
@@ -478,12 +504,12 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                 {
                     using (var connection = GetConnection())
                     {
-                        pageInfo.TotalCount = connection.Connection.Query<int>(countSql, parameters, null, false, DbInfo.CommandTimeout, CommandType.Text).AsList().First();
+                        pageInfo.TotalCount = connection.Connection.Query<int>(countSql, parameters, null, false, DbInfo.CommandTimeout, CommandType.Text)?.FirstOrDefault()??0;
                     }
                 }
                 catch (Exception ex)
                 {
-                    throw ex;
+                    throw;
                 }
             }
 
@@ -513,7 +539,8 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                     char[] delimiters = { ',' };
                     string[] sorts =
                         searchParameters.PageInfo.SortField.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
-                    var mapDic = DbColumnMaps.GetDbContextFiledMaps();
+                    var mapDic = DbColumnMaps.GetDbContextFiledMaps(_dbInfo.DbContextName);
+                    if (mapDic == null) throw new NotImplementedException($"请在项目的AppStart中初始化{_dbInfo.DbContextName}");
                     for (int i = 0; i < sorts.Length; i++)
                     {
                         string[] values = sorts[i].Trim().Split(' ');
@@ -536,7 +563,8 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             }
             else
             {
-                var mapDic = DbColumnMaps.GetDbContextFiledMaps();
+                var mapDic = DbColumnMaps.GetDbContextFiledMaps(_dbInfo.DbContextName);
+                if (mapDic == null) throw new NotImplementedException($"请在项目的AppStart中初始化{_dbInfo.DbContextName}");
                 var sortName = searchParameters.PageInfo.SortField;
                 if (mapDic.ContainsKey(sortName))
                 {
@@ -599,6 +627,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                         {
                             continue;
                         }
+                        PrintSql(tmpSql, null);
                         //using (DbCommand cmd = new MySqlCommand(tmpSql, connection.Connection as MySqlConnection))
                         using (DbCommand cmd = connection.Connection.CreateCommand())
                         {
@@ -619,7 +648,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
         public List<dynamic> QuerySql(string sql, string[] paramsList, object[] valuesList,CommandType commandType=CommandType.Text)
@@ -629,12 +658,13 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                 using (var connection = GetConnection())
                 {
                     DynamicParameters ps = PrepareCommand(paramsList, valuesList);
+                    PrintSql(sql, ps);
                     return connection.Connection.Query(sql, ps, null, false, DbInfo.CommandTimeout, commandType).AsList();
                 }
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
         public List<dynamic> QuerySql(IDbTransaction trans, string sql, string[] paramsList, object[] valuesList,CommandType commandType = CommandType.Text)
@@ -650,12 +680,13 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                 using (var connection = GetConnection())
                 {
                     DynamicParameters ps = PrepareCommand(paramsList, valuesList);
+                    PrintSql(sql, ps);
                     return connection.Connection.Query<T>(sql, ps, null, false, DbInfo.CommandTimeout, commandType).AsList();
                 }
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
         public List<T> QuerySql<T>(IDbTransaction trans, string sql, string[] paramsList, object[] valuesList, CommandType commandType = CommandType.Text)
@@ -715,6 +746,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                         try
                         {
                             DynamicParameters ps = PrepareCommand(paramsList, valuesList);
+                            PrintSql(sql, ps);
                             dynamic v = connection.Connection.ExecuteScalar(sql, ps, tran, DbInfo.CommandTimeout, commandType);
                             //OnDbCommit?.Invoke(connection, new SqlPara { sql = sql, parameters = ps, dbTransaction = tran });
                             tran.Commit();
@@ -723,14 +755,14 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                         catch (Exception e)
                         {
                             tran.Rollback();
-                            throw e;
+                            throw;
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
         protected dynamic ExecuteScalarCommand(IDbTransaction trans, string sql, CommandType commandType, string[] paramsList, object[] valuesList)
@@ -759,14 +791,14 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                         catch (Exception e)
                         {
                             tran.Rollback();
-                            throw e;
+                            throw;
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
         protected T ExecuteScalarCommand<T>(IDbTransaction trans, string sql, CommandType commandType, string[] paramsList, object[] valuesList)
@@ -778,12 +810,12 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
         #endregion
 
         #region 非查询命令执行
-        public int ExecuteNoQuerySqlKey(string sqlKey, object param, CommandType commandType = CommandType.Text)
+        public int ExecuteNoQuerySqlKey(string sqlKey, DynamicParameters param, CommandType commandType = CommandType.Text)
         {
             string sql = ServerSetting.GetSql(DbInfo.DbContextName, sqlKey);
             return ExecuteNoQueryCommand(sql, param, commandType);
         }
-        public int ExecuteNoQuerySqlKey(IDbTransaction trans, string sqlKey, object param, CommandType commandType = CommandType.Text)
+        public int ExecuteNoQuerySqlKey(IDbTransaction trans, string sqlKey, DynamicParameters param, CommandType commandType = CommandType.Text)
         {
             string sql = ServerSetting.GetSql(DbInfo.DbContextName, sqlKey);
             return ExecuteNoQueryCommand(trans, sql, param, commandType);
@@ -798,11 +830,11 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             string sql = ServerSetting.GetSql(DbInfo.DbContextName, sqlKey);
             return ExecuteNoQuerySql(trans, sql, paramsList, valuesList, commandType);
         }
-        public int ExecuteNoQuerySql(string sql, object param, CommandType commandType = CommandType.Text)
+        public int ExecuteNoQuerySql(string sql, DynamicParameters param, CommandType commandType = CommandType.Text)
         {
             return ExecuteNoQueryCommand(sql, param, commandType);
         }
-        public int ExecuteNoQuerySql(IDbTransaction trans, string sql, object param, CommandType commandType = CommandType.Text)
+        public int ExecuteNoQuerySql(IDbTransaction trans, string sql, DynamicParameters param, CommandType commandType = CommandType.Text)
         {
             return ExecuteNoQueryCommand(trans, sql, param, commandType);
         }
@@ -827,7 +859,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
             DynamicParameters ps = PrepareCommand(paramsList, valuesList);
             return ExecuteNoQueryCommand(trans, sql, ps, commandType);
         }
-        protected int ExecuteNoQueryCommand(string sql, object param, CommandType commandType)
+        protected int ExecuteNoQueryCommand(string sql, DynamicParameters param, CommandType commandType)
         {
             try
             {
@@ -837,6 +869,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                     {
                         try
                         {
+                            PrintSql(sql, param);
                             int i = connection.Connection.Execute(sql, param, tran, DbInfo.CommandTimeout, commandType);
                             //OnDbCommit?.Invoke(connection, new SqlPara { sql = sql, param = param, dbTransaction = tran });
                             tran.Commit();
@@ -845,40 +878,40 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                         catch (Exception e)
                         {
                             tran.Rollback();
-                            throw e;
+                            throw;
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
-        protected int ExecuteNoQueryCommand(IDbTransaction trans, string sql, object param, CommandType commandType)
+        protected int ExecuteNoQueryCommand(IDbTransaction trans, string sql, DynamicParameters param, CommandType commandType)
         {
             PrintSql(sql, param);
             return trans.Connection.Execute(sql, param, trans, DbInfo.CommandTimeout, commandType);
         }
         #endregion
 
-        private void PrintSql(string sql, object param)
-        {
-            try
-            {
-                if (ServerSetting.GetConstValue("TrackSql")?.Value.ToLower() == "true")
-                {
-                    StringBuilder sb = new StringBuilder();
-                    sb.AppendLine("TrackSql=" + sql);
-                    sb.AppendLine(JsonEx.JsonConvert.JsonSerializer(param));
-                    logger.LogInformation(sb.ToString());
-                }
-            }
-            catch (Exception ex)
-            {
-                //打印SQL异常时不影响业务
-            }
-        }
+        //private void PrintSql(string sql, object param)
+        //{
+        //    try
+        //    {
+        //        if (ServerSetting.GetConstValue("TrackSql")?.Value.ToLower() == "true")
+        //        {
+        //            StringBuilder sb = new StringBuilder();
+        //            sb.AppendLine("TrackSql=" + sql);
+        //            sb.AppendLine(JsonEx.JsonConvert.JsonSerializer(param));
+        //            logger.LogInformation(sb.ToString());
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        //打印SQL异常时不影响业务
+        //    }
+        //}
 
         private void PrintSql(string sql, DynamicParameters ps)
         {

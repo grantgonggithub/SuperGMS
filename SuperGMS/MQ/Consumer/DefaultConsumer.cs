@@ -25,84 +25,6 @@ namespace SuperGMS.MQ
         ///// <summary>
         ///// 当收到底层消息时触发的事件
         ///// </summary>
-        // public event GrantMsgReceiveHandle<M> OnGrantMsgReceive;
-
-        // private Consumer consumer;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultConsumer{M}"/> class.
-        /// 注册一个消费者
-        /// </summary>
-        /// <returns>55</returns>
-        // public bool Register()
-        // {
-        //    return this.consumer.Register();
-        // }
-
-        /// <summary>
-        /// 手动释放消费者
-        /// </summary>
-        // public void Dispose()
-        // {
-        //    this.consumer.Dispose();
-        // }
-        /// <summary>
-        /// 消费者 最全构造
-        /// </summary>
-        /// <param name="queue"></param>
-        // public GrantDefaultConsumer(MQueue queue)
-        //    :base(queue)
-        // {
-        // if (this.consumer == null)
-        // {
-        //    this.consumer = new Consumer(queue);
-        //    this.consumer.OnMessageReceive += Consumer_OnMessageReceive;
-        // }
-        // }
-
-        // private bool Consumer_OnMessageReceive(string args, Exception ex)
-        // {
-        //    if (OnGrantMsgReceive != null)
-        //    {
-        //        M m = default(M);
-        //        if (ex != null)
-        //           return OnGrantMsgReceive(null, ex);
-        //        else
-        //        {
-        //            try
-        //            {
-        //                if (!string.IsNullOrEmpty(args))
-        //                    m = JsonConvert.DeserializeObject<M>(args);
-        //            }
-        //            catch (Exception ex1)
-        //            {
-        //                ex = new Exception("Consumer_OnMessageReceive.JsonConvert.DeserializeObject.Error", ex1);
-        //            }
-        //           return OnGrantMsgReceive(m, ex);
-        //        }
-        //    }
-        //    return true;//没有传回调直接删除掉
-        // }
-
-        /// <summary>
-        /// 订阅系统全部默认的消息   这个注释掉了，要不糊里糊涂搞乱了消息
-        /// </summary>
-        /// <param name="autoDelete"></param>
-        // public GrantDefaultConsumer(bool autoDelete)
-        //    : this(RouterKeyConst.DefaultRouterKey, autoDelete)
-        // {
-        // }
-
-        /// <summary>
-        /// 消费者，一个指定了特定routerKey的消费订阅，其他系统默认  这个也注释掉了，防止把一个RouterKey绑定到一个队列上，消息就乱套了
-        /// </summary>
-        /// <param name="routerKey">routerKey</param>
-        /// <param name="autoDelete">autoDelete</param>
-        // public GrantDefaultConsumer(string routerKey, bool autoDelete)
-        //    : this(routerKey, MQueueConst.DefaultGrantMQ, autoDelete)
-        // {
-
-        // }
 
         /// <summary>
         /// 消费者，一个指定了特定queueName上特定routeKey的消费，其他系统默认
@@ -111,8 +33,9 @@ namespace SuperGMS.MQ
         /// 真正决定消息的路由是routeKey,Queue是接收的容器，理论上不同的routeKey要定义不同的Queue,否则不同的key投送到同一个Queue上就乱了</param>
         /// <param name="routeKey">路由key</param>
         /// <param name="autoDelete">是否自动删除</param>
-        public DefaultConsumer(string routeKey, string queueName, bool autoDelete)
-            : this(ExchangeConst.DefaultExchange, routeKey, queueName, autoDelete)
+        /// <param name="_objCtx"></param>
+        public DefaultConsumer(string routeKey, string queueName, bool autoDelete, object _objCtx = null)
+            : this(ExchangeConst.DefaultExchange, routeKey, queueName, autoDelete,_objCtx)
         {
         }
 
@@ -124,7 +47,8 @@ namespace SuperGMS.MQ
         /// <param name="routeKey">routeKey</param>
         /// <param name="queueName">queueName</param>
         /// <param name="autoDelete">autoDelete</param>
-        public DefaultConsumer(string exchange, string routeKey, string queueName, bool autoDelete)
+        /// <param name="_objCtx"></param>
+        public DefaultConsumer(string exchange, string routeKey, string queueName, bool autoDelete, object _objCtx = null)
             : base(new MQueue()
             {
                 AutoDeclare = false,
@@ -142,7 +66,7 @@ namespace SuperGMS.MQ
                 QueueName = queueName,
                 RouteKey = routeKey,
                 Host = MQHostConfigManager.GetDefaultHost(),
-            })
+            },_objCtx)
         {
         }
     }

@@ -45,6 +45,11 @@ namespace SuperGMS.UserSession
         public string SortNo { get; set; }
 
         /// <summary>
+        /// 是否展示，有时只为控制按钮，不展示在菜单上
+        /// </summary>
+        public int Display { get; set; }
+
+        /// <summary>
         /// 菜单下的按钮列表， 便于查询，这里不构造树结构
         /// </summary>
         //public List<FunctionInfo> Functions { get; set; }

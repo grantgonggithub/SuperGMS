@@ -47,6 +47,8 @@ namespace SuperGMS.Config
 
         private static string _appName;
 
+        private static string _environmentVariable;
+
         private static int _pool;
 
         private static Action<string, Configuration> updateConfigurationAction;
@@ -56,6 +58,12 @@ namespace SuperGMS.Config
         public readonly string ServerInfo = ServiceEnvironment.EnvironmentInfo;
 
         private static ILogger logger = NullLogger.Instance;
+
+        /// <summary>
+        /// 取当前的环境变量
+        /// </summary>
+        public static string EnvironmentVariable => _environmentVariable;
+
         /// <summary>
         /// Gets appName
         /// </summary>
@@ -404,14 +412,15 @@ namespace SuperGMS.Config
                             configCenter.SessionTimeout, connectionWatcher);
 
                         initlizeData(appName);
-
+                        // 是ZK时数据库还是走本地配置文件
+                        updateDataBase(config);
                         break;
                 }
             }
             catch (Exception ex)
             {
                 logger.LogCritical(ex, "ServerSetting.Initlize.Error");
-                throw ex;
+                throw;
             }
         }
 
@@ -467,15 +476,17 @@ namespace SuperGMS.Config
                     Formatting = Formatting.Indented
                 };
                 standConfig.Add(SuperGMS.HttpProxy.SuperHttpProxy.HttpProxy, config.HttpProxy == null ? string.Empty : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration(){ HttpProxy = config.HttpProxy}, jsonSerializerSettings));
-                string dbStr = string.Empty;
-                if (config.DataBase != null && !string.IsNullOrEmpty(config.DataBase.DbFile))
-                {
-                    var db = DbModelContextManager.GetDataBase(config.DataBase.DbFile);
-                    var map = DbModelContextManager.GetSqlMap();
-                    dbStr = $"<DataBase>\r\n{db?.ToString()}\r\n{map?.ToString()}\r\n</DataBase>";
-                }
+                
+                // 数据库统一走本地配置，走ZK不合适
+                //string dbStr = string.Empty;
+                //if (config.DataBase != null && !string.IsNullOrEmpty(config.DataBase.DbFile))
+                //{
+                //    var db = DbModelContextManager.GetDataBase(config.DataBase.DbFile);
+                //    var map = DbModelContextManager.GetSqlMap();
+                //    dbStr = $"<DataBase>\r\n{db?.ToString()}\r\n{map?.ToString()}\r\n</DataBase>";
+                //}
 
-                standConfig.Add(DbModelContextManager.DATABASE, dbStr);
+                //standConfig.Add(DbModelContextManager.DATABASE, dbStr);
                 standConfig.Add(ConfigManager.CONSTKEYVALUE, config.ConstKeyValue == null ? string.Empty : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration(){ ConstKeyValue = config.ConstKeyValue}, jsonSerializerSettings));
                 standConfig.Add(CacheManager.RedisConfig, config.RedisConfig == null ? string.Empty : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration(){RedisConfig = config.RedisConfig},jsonSerializerSettings));
                 standConfig.Add(MQHostConfigManager.RabbitMQ, config.RabbitMQ == null ? string.Empty : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration(){ RabbitMQ = config.RabbitMQ},jsonSerializerSettings));
@@ -509,16 +520,17 @@ namespace SuperGMS.Config
             // ServerSetting的初始化依赖配置驱动的，只有配置了才会被初始化，如果某个微服务未使用到某个配置，不配置即可，这样可以做到按需初始化
             try
             {
-                if (configuration.DataBase != null)
-                {
-                    var dbstr = string.Format(dbXMl, configuration.DataBase.RefFile, configuration.DataBase.DbFile);
-                    if (!string.IsNullOrEmpty(dbstr))
-                    {
-                        XElement xml = XElement.Parse(dbstr);
-                        DbModelContextManager.Initlize(xml); // 初始化数据库配置和sql脚本
-                    }
+                //if (configuration.DataBase != null)
+                //{
+                //    var dbstr = string.Format(dbXMl, configuration.DataBase.RefFile, configuration.DataBase.DbFile);
+                //    if (!string.IsNullOrEmpty(dbstr))
+                //    {
+                //        XElement xml = XElement.Parse(dbstr);
+                //        DbModelContextManager.Initlize(xml); // 初始化数据库配置和sql脚本
+                //    }
 
-                }
+                //}
+                updateDataBase(configuration);
 
                 ConfigManager.Initlize(configuration.ConstKeyValue); // 初始化常量
 
@@ -529,7 +541,20 @@ namespace SuperGMS.Config
             catch (Exception ex)
             {
                 logger.LogError(ex, $"ServerSetting.UpdateLocal.Error");
-                throw ex;
+                throw;
+            }
+        }
+
+        private static void updateDataBase(Configuration configuration)
+        {
+            if (configuration.DataBase != null)
+            {
+                var dbstr = string.Format(dbXMl, configuration.DataBase.RefFile, configuration.DataBase.DbFile);
+                if (!string.IsNullOrEmpty(dbstr))
+                {
+                    XElement xml = XElement.Parse(dbstr);
+                    DbModelContextManager.Initlize(xml); // 初始化数据库配置和sql脚本
+                }
             }
         }
 
@@ -558,13 +583,14 @@ namespace SuperGMS.Config
                     string[] ps = path.Split("/", StringSplitOptions.RemoveEmptyEntries);
                     switch (ps[ps.Length - 1])
                     {
-                        case DbModelContextManager.DATABASE: // 数据库,从zookeeper推过来的直接就是数据库和脚本的xml内容，这个跟文件有区别，文件是通过 ref引到外部文件的
+                       // case DbModelContextManager.DATABASE: // 数据库,从zookeeper推过来的直接就是数据库和脚本的xml内容，这个跟文件有区别，文件是通过 ref引到外部文件的
                                                              // DataBase db = Newtonsoft.Json.JsonConvert.DeserializeObject<DataBase>(configData);
-                            var xmlStr = XElement.Parse(configData);
-                            DbModelContextManager.Initlize(xmlStr);
+                       //     var xmlStr = XElement.Parse(configData);
+                       //     DbModelContextManager.Initlize(xmlStr);
 
                             // Config.DataBase = db; // 把本地的完整配置更新,数据库配置不需要更新全局
-                            break;
+                        //    break;
+
                         case ConfigManager.CONSTKEYVALUE: // 常量
                             var keyValue =
                                 Newtonsoft.Json.JsonConvert.DeserializeObject<Configuration>(configData);
@@ -677,25 +703,27 @@ namespace SuperGMS.Config
             else
             {
                 env = env.ToLower().Trim();
-                switch (env)
-                {
-                    case "dev":
-                        configFile = string.Format(configFile, ".dev");
-                        break;
-                    case "test":
-                        configFile = string.Format(configFile, ".test");
-                        break;
-                    case "prod":
-                        configFile = string.Format(configFile, ".prod");
-                        break;
-                    default:
-                        configFile = string.Format(configFile, "");
-                        break;
-                }
+                //switch (env)
+                //{
+                //    case "dev":
+                //        configFile = string.Format(configFile, ".dev");
+                //        break;
+                //    case "test":
+                //        configFile = string.Format(configFile, ".test");
+                //        break;
+                //    case "prod":
+                //        configFile = string.Format(configFile, ".prod");
+                //        break;
+                //    default:
+                //        configFile = string.Format(configFile, "");
+                //        break;
+                //}
+                configFile = string.Format(configFile, "."+env);
             }
+            _environmentVariable = env;
             var configJson = Path.Combine(AppContext.BaseDirectory, configFile);
             // 在NLog配置没有初始化之前，只能靠Console输出日志
-            Console.WriteLine($"当前的环境变量是:{env},加载的指向配置文件是:{configJson}\r\n");
+            LogTextWriter.Write($"当前的环境变量是:{env},加载的指向配置文件是:{configJson}\r\n");
             if (!File.Exists(configJson))
                 throw new Exception($"在当前服务运行目录中找不到配置文件{configFile}");
             //配置源优先从服务本地根目录下的config.json获取,
@@ -743,7 +771,7 @@ namespace SuperGMS.Config
                 default:
                     throw new Exception($"The setting 'ConfigCenter.ConfigType':'{(int)ServerSetting.configCenter.ConfigType}' not support now!");
             }
-            Console.WriteLine($"最终的配置类型是:{ServerSetting.configCenter.ConfigType}, 最终的配置文件路径是:{configPath}\r\n");
+            LogTextWriter.Write($"最终的配置类型是:{ServerSetting.configCenter.ConfigType}, 最终的配置文件路径是:{configPath}\r\n");
             var settingsConfig = settingConfigBuilder.Build();
             //加载Nlog配置
             NLog.LogManager.Configuration = new NLogLoggingConfiguration(settingsConfig.GetSection("NLog"));

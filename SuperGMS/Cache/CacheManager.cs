@@ -20,6 +20,7 @@ namespace SuperGMS.Cache
     /// 默认的Default的Redis
     /// </summary>
     // [InitlizeMethod]
+    [Obsolete("此类在后期不在维护，请用DefaultCach.Instance替换")]
     public class CacheManager
     {
         public const string RedisConfig = "RedisConfig";
@@ -40,8 +41,10 @@ namespace SuperGMS.Cache
             }
             Redis.RedisConfig.Initlize(redisConfig);
             instance = new RedisCache();
-
-            ResourceCache.Initlize(); // 初始化ResourceCache
+            // 系统默认的Redis
+            DefaultCache.Initlize(instance);
+            // 初始化ResourceCache
+            ResourceCache.Initlize();
         }
         /// <summary>
         /// 单元测试时, Mock 缓存时,使用,手动初始化
@@ -238,6 +241,17 @@ namespace SuperGMS.Cache
         public static List<string> PopAllQueue(string key)
         {
             return instance.PopAllQueue(key);
+        }
+
+        /// <summary>
+        /// 设置指定key的过期时间
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <param name="expiry">过期时间</param>
+        /// <returns></returns>
+        public static bool KeyExpire(string key, TimeSpan? expiry = null)
+        {
+            return instance.KeyExpire(key, expiry);
         }
     }
 }

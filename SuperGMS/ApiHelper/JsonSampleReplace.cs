@@ -68,9 +68,22 @@ namespace SuperGMS.ApiHelper
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Handling the failure by returning the original string.")]
         private string TryReplaceFormatJson(string str)
         {
-            JObject jObect = JObject.Parse(str);
-            SetJsonTimeOrDecmail(jObect);
-            return JsonConvert.SerializeObject(jObect);
+            object jObject = null;
+            try
+            {
+                jObject = JObject.Parse(str);
+            }
+            catch { jObject = null; }
+            if (jObject == null)
+                try
+                {
+                    jObject = JArray.Parse(str);
+                }
+                catch { jObject = null; }
+            if (jObject == null)
+                jObject = JToken.Parse(str);
+            SetJsonTimeOrDecmail(jObject);
+            return JsonConvert.SerializeObject(jObject);
         }
 
         /// <summary>
@@ -78,9 +91,29 @@ namespace SuperGMS.ApiHelper
         /// </summary>
         /// <param name="obj">JSON对象</param>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Handling the failure by returning the original string.")]
-        private void SetJsonTimeOrDecmail(JObject obj)
+        private void SetJsonTimeOrDecmail(object obj)
         {
-            foreach (var item in obj.Children())
+            IJEnumerable<JToken> tokens = null;
+            if (obj is JObject)
+            {
+                var tmpObject = obj as JObject;
+                if (tmpObject != null)
+                    tokens = tmpObject.Children();
+            }
+            else if (obj is JArray)
+            {
+                var tmpArray = obj as JArray;
+                if (tmpArray != null)
+                    tokens = tmpArray.AsJEnumerable();
+            }
+            else
+            {
+                var tmpArray = obj as JToken;
+                if (tmpArray != null)
+                    tokens = tmpArray.Children();
+            }
+
+            foreach (var item in tokens)
             {
                 if (item is JObject)
                 {
@@ -89,7 +122,6 @@ namespace SuperGMS.ApiHelper
                 else if (item is JProperty)
                 {
                     JProperty jProperty = (JProperty)item;
-                    SetValue(jProperty);
                     if (jProperty.Value.GetType() == typeof(JObject))
                     {
                         SetJsonTimeOrDecmail((JObject)jProperty.Value);
@@ -101,7 +133,10 @@ namespace SuperGMS.ApiHelper
                             var jArraies = ((JArray)jProperty.Value).AsJEnumerable();
                             foreach (var jToken in jArraies)
                             {
-                                SetJsonTimeOrDecmail((JObject)jToken);
+                                if(jToken is JObject)
+                                    SetJsonTimeOrDecmail((JObject)jToken);
+                                else
+                                    SetJProperty(jProperty);
                             }
                         }
                         catch (Exception ex)
@@ -111,11 +146,18 @@ namespace SuperGMS.ApiHelper
                             var jProp = (JProperty)jArraies;
                             if (jProp?.Value != null)
                             {
-                                JObject js = (JObject)jProp.Value;
-                                SetJsonTimeOrDecmail(js);
+                                if (jProp.Value is JObject)
+                                {
+                                    JObject js = (JObject)jProp.Value;
+                                    SetJsonTimeOrDecmail(js);
+                                }
+                                else
+                                    SetJProperty(jProp);
                             }
                         }
                     }
+                    else
+                        SetValue(jProperty);
                 }
             }
         }
@@ -143,6 +185,8 @@ namespace SuperGMS.ApiHelper
             {
                 SetJProperty(jp);
             }
+            else
+                SetJProperty(jp);
         }
 
         private void SetJProperty(JProperty jp)
@@ -153,7 +197,7 @@ namespace SuperGMS.ApiHelper
                 {
                     var keyPair = propList.First(x => x.Key == jp.Name);
                     jp.Value = keyPair.Value;
-                    propList.Remove(keyPair);
+                    //propList.Remove(keyPair);
                 }
             }
         }

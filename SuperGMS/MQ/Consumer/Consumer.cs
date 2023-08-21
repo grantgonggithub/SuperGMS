@@ -21,8 +21,9 @@ namespace SuperGMS.MQ
     /// </summary>
     /// <param name="msg">msg</param>
     /// <param name="ex">ex</param>
+    /// <param name="objCtx"></param>
     /// <returns>返回处理成功还是失败</returns>
-    public delegate bool GrantMsgReceiveHandle<M>(M msg, Exception ex);
+    public delegate bool GrantMsgReceiveHandle<M>(M msg, Exception ex,object objCtx);
 
     /// <summary>
     /// 所有消费者的基类
@@ -37,6 +38,15 @@ namespace SuperGMS.MQ
         public event GrantMsgReceiveHandle<M> OnGrantMsgReceive;
 
         private RabbitMQ.Consumer consumer;
+
+        private object objCtx;
+
+        /// <summary>
+        /// 获取用户自定义的要传递的上下文信息
+        /// </summary>
+        public object ObjCtx {
+            get { return objCtx; }
+        }
 
         /// <summary>
         /// 注册一个消费者
@@ -61,47 +71,16 @@ namespace SuperGMS.MQ
         /// 消费者 最全构造
         /// </summary>
         /// <param name="queue">queue</param>
-        public Consumer(MQueue queue)
+        /// <param name="_objCtx"></param>
+        public Consumer(MQueue queue,object _objCtx=null)
         {
             if (this.consumer == null)
             {
                 this.consumer = new RabbitMQ.Consumer(queue);
                 this.consumer.OnMessageReceive += Consumer_OnMessageReceive;
             }
+            this.objCtx = _objCtx;
         }
-
-        ///// <summary>
-        ///// 订阅系统全部默认的消息
-        ///// </summary>
-        ///// <param name="autoDelete"></param>
-        // public GrantConsumer(bool autoDelete)
-        //    :this(RouterKeyConst.DefaultRouterKey,autoDelete)
-        // {
-
-        // }
-
-        ///// <summary>
-        ///// 消费者，一个指定了特定routerKey的消费订阅，其他系统默认
-        ///// </summary>
-        ///// <param name="routerKey"></param>
-        ///// <param name="autoDelete"></param>
-        // public GrantConsumer(string routerKey, bool autoDelete)
-        //    : this(routerKey, MQueueConst.DefaultGrantMQ, autoDelete)
-        // {
-
-        // }
-
-        ///// <summary>
-        ///// 消费者，一个指定了特定queueName上特定routeKey的消费，其他系统默认
-        ///// </summary>
-        ///// <param name="routeKey">路由key</param>
-        ///// <param name="queueName">队列</param>
-        ///// <param name="autoDelete"></param>
-        // public GrantConsumer(string routeKey, string queueName, bool autoDelete)
-        //    : this(ExchangeConst.DefaultExchange, routeKey, queueName, autoDelete)
-        // {
-
-        // }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GrantConsumer{M}"/> class.
@@ -112,7 +91,9 @@ namespace SuperGMS.MQ
         /// <param name="queueName">queueName</param>
         /// <param name="autoDelete">autoDelete</param>
         /// <param name="host">虚拟主机(可以用HostConfigManager.GetHost获取)</param>
-        public Consumer(string exchange, string routeKey, string queueName, bool autoDelete, VirtualHost host)
+        /// <param name="exChangeType"></param>
+        /// <param name="_objCtx"></param>
+        public Consumer(string exchange, string routeKey, string queueName, bool autoDelete, VirtualHost host, object _objCtx = null, string exChangeType=ExchangeType.Direct)
             : this(new MQueue()
             {
                 AutoDeclare = false,
@@ -123,14 +104,14 @@ namespace SuperGMS.MQ
                     AutoDeclare = false,
                     AutoDelete = false,
                     Durable = true,
-                    ExchangeType = ExchangeType.Direct,
+                    ExchangeType = exChangeType,
                     ExchangeName = exchange,
                 },
                 Exclusive = false,
                 QueueName = queueName,
                 RouteKey = routeKey,
                 Host = host,
-            })
+            },_objCtx)
         {
         }
 
@@ -141,7 +122,7 @@ namespace SuperGMS.MQ
                 M m = default(M);
                 if (ex != null)
                 {
-                    return OnGrantMsgReceive(null, ex);
+                    return OnGrantMsgReceive(null, ex,this.objCtx);
                 }
                 else
                 {
@@ -157,7 +138,7 @@ namespace SuperGMS.MQ
                         ex = new Exception("Consumer_OnMessageReceive.JsonConvert.DeserializeObject.Error", ex1);
                     }
 
-                    return OnGrantMsgReceive(m, ex);
+                    return OnGrantMsgReceive(m, ex,this.objCtx);
                 }
             }
 
