@@ -13,6 +13,7 @@
 
 using Microsoft.Extensions.Logging;
 
+using SuperGMS.Cache;
 using SuperGMS.Log;
 using SuperGMS.Protocol.MQProtocol;
 using SuperGMS.Tools;
@@ -115,7 +116,7 @@ namespace SuperGMS.WebSocketEx
         {
             if (msg.Broadcast == Broadcast.None) // 非广播消息，以to为准
             {
-                msg.To.ForEach(to =>
+                msg?.To?.Distinct().ToList()?.ForEach(to =>
                 {
                     if (_sockets.TryGetValue(to, out var webSocket))
                         webSocket.V2.SendMessage(msg);

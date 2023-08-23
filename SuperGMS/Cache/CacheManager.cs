@@ -253,5 +253,17 @@ namespace SuperGMS.Cache
         {
             return instance.KeyExpire(key, expiry);
         }
+
+        /// <summary>
+        /// 获取符合指定匹配条件的所有keys，为了保证性能一次最多只能提取1000条
+        /// </summary>
+        /// <param name="matchPaten">要匹配key的关键字表达式</param>
+        /// <param name="pageSize">一次提取的数量，最大1000</param>
+        /// <param name="pageIndex">取页数</param>
+        /// <returns></returns>
+        IEnumerable<string> GetAllKeys(string matchPaten, int pageSize = 250, int pageIndex = 0)
+        {
+            return instance.GetAllKeys(matchPaten, pageSize, pageIndex);
+        }
     }
 }

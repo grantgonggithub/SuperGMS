@@ -49,18 +49,19 @@ namespace SuperGMS.Redis
         /// 写库
         /// </summary>
         /// <param name="fn">fn</param>
+        /// <param name="needServer"></param>
         /// <returns>bool</returns>
-        public bool Set(Func<IDatabase, bool> fn)
+        public bool Set(Func<IDatabase,IServer, bool> fn,bool needServer=false)
         {
             try
             {
                 if (this.IsMasterSlave)
                 {
-                    return setMaster(fn);
+                    return setMaster(fn,needServer);
                 }
                 else
                 {
-                    return setSlave(fn);
+                    return setSlave(fn,needServer);
                 }
             }
             catch (Exception ex)
@@ -70,17 +71,27 @@ namespace SuperGMS.Redis
             }
         }
 
+        /// <summary>
+        /// 写库
+        /// </summary>
+        /// <param name="fn"></param>
+        /// <returns></returns>
+        public bool Set(Func<IDatabase, bool> fn)
+        {
+            return Set((db, server) => fn(db));
+        }
 
         /// <summary>
         /// 查库
         /// </summary>
         /// <param name="fn">fn</param>
+        /// <param name="needServer"></param>
         /// <returns>T</returns>
-        public T Get<T>(Func<IDatabase, T> fn)
+        public T Get<T>(Func<IDatabase,IServer, T> fn,bool needServer=false)
         {
             try
             {
-                return GetSlave<T>(fn);
+                return GetSlave<T>(fn,needServer);
             }
             catch (Exception ex)
             {
@@ -89,14 +100,26 @@ namespace SuperGMS.Redis
             }
         }
 
+        /// <summary>
+        /// 查库
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="fn"></param>
+        /// <returns></returns>
+        public T Get<T>(Func<IDatabase, T> fn)
+        {
+            return Get((db, server) => fn(db));
+        }
+
         #region  set 操作
 
         /// <summary>
         /// 操作主库，一般都是set操作
         /// </summary>
         /// <param name="fn">fn</param>
+        /// <param name="needServer"></param>
         /// <returns>bool</returns>
-        private bool setMaster(Func<IDatabase, bool> fn)
+        private bool setMaster(Func<IDatabase, IServer, bool> fn, bool needServer = false)
         {
             int error = 0;
         gotoHere:
@@ -110,7 +133,8 @@ namespace SuperGMS.Redis
                 }
 
                 IDatabase db = conn.GetDatabase(this.MasterServer.DbIndex);
-                return fn(db);
+                IServer server = needServer? conn.GetServer(this.MasterServer.Server, this.MasterServer.Port):null;
+                return fn(db, server);
             }
             catch (Exception ex)
             {
@@ -135,8 +159,9 @@ namespace SuperGMS.Redis
         /// 操作从库，一般是不分主从的set,不能乱了
         /// </summary>
         /// <param name="fn">fn</param>
+        /// <param name="needServer"></param>
         /// <returns>bool</returns>
-        private bool setSlave(Func<IDatabase, bool> fn)
+        private bool setSlave(Func<IDatabase,IServer, bool> fn, bool needServer=false)
         {
             int error = 0;
         gotHere:
@@ -158,7 +183,8 @@ namespace SuperGMS.Redis
                     }
 
                     IDatabase db = conn.GetDatabase(this.SlaveServers[i].DbIndex);
-                    num += fn(db) ? 1 : 0;
+                    IServer server =needServer? conn.GetServer(this.SlaveServers[i].Server, this.SlaveServers[i].Port):null;
+                    num += fn(db,server) ? 1 : 0;
                 }
                 catch (Exception ex)
                 {
@@ -186,7 +212,7 @@ namespace SuperGMS.Redis
 
         #region get操作
 
-        private T GetSlave<T>(Func<IDatabase, T> fn)
+        private T GetSlave<T>(Func<IDatabase,IServer, T> fn,bool needServer=false)
         {
             int error = 0;
         gotoHere:
@@ -201,9 +227,10 @@ namespace SuperGMS.Redis
                 }
 
                 IDatabase db = conn.GetDatabase(this.SlaveServers[idx].DbIndex);
+                IServer server = needServer? conn.GetServer(this.SlaveServers[idx].Server, this.SlaveServers[idx].Port):null;
                 try
                 {
-                    return fn(db);  // 回调异常和连接异常分开处理，回调异常是业务处理异常，连接异常底层做重试
+                    return fn(db, server);  // 回调异常和连接异常分开处理，回调异常是业务处理异常，连接异常底层做重试
                 }
                 catch (Exception e)
                 {
