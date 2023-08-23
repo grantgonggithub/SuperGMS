@@ -71,8 +71,9 @@ namespace SuperGMS.UserSession
         ///     判断当前用户有没有访问当前接口的权限
         /// </summary>
         /// <param name="funName">当前接口名称</param>
+        /// <param name="serviceName"></param>
         /// <returns>是否有权限</returns>
-        public bool HavRights(string funName)
+        public bool HavRights(string funName,string serviceName="")
         {
             var roleFunctionList = GetRoleFunctionList();
 
@@ -80,7 +81,7 @@ namespace SuperGMS.UserSession
             {
                 return false;
             }
-            return roleFunctionList.Any(x => string.Compare(x?.ServiceName, ServerSetting.AppName,StringComparison.OrdinalIgnoreCase)==0 &&
+            return roleFunctionList.Any(x => string.Compare(x?.ServiceName, string.IsNullOrEmpty(serviceName)? ServerSetting.AppName:serviceName,StringComparison.OrdinalIgnoreCase)==0 &&
             string.Compare(x?.ApiName,funName,StringComparison.OrdinalIgnoreCase)==0);
         }
 

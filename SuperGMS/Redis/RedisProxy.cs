@@ -358,6 +358,23 @@ namespace SuperGMS.Redis
             return cfg.Get<bool>(db => db.KeyExists(k));
         }
 
+        /// <summary>
+        /// 获取符合指定匹配条件的所有keys，为了保证性能一次最多只能提取1000条
+        /// </summary>
+        /// <param name="nodeName"></param>
+        /// <param name="matchPaten">要匹配key的关键字表达式</param>
+        /// <param name="pageSize">一次提取的数量，最大1000</param>
+        /// <param name="pageIndex">取页数</param>
+        /// <returns></returns>
+        public static IEnumerable<string> GetAllKeys(string nodeName,string matchPaten,int pageSize=250,int pageIndex=0) {
+            RedisNode cfg=  RedisConfig.GetNode(nodeName);
+            if(pageSize>1000) pageSize = 1000;
+            return cfg.Get<IEnumerable<string>>((db, server) =>
+            {
+                return server.Keys(cfg.IsMasterSlave? cfg.MasterServer.DbIndex : cfg.SlaveServers[0].DbIndex, matchPaten, pageSize,0,pageIndex).Select(k => k.ToString());
+            },true);
+        }
+
 
 
         private static string getKey(string logicName, string orgKey)
