@@ -277,7 +277,7 @@ namespace SuperGMS.Cache
         /// <returns></returns>
         public IEnumerable<string> GetAllKeys(string matchPaten, int pageSize = 250, int pageIndex = 0)
         {
-            return RedisProxy.GetAllKeys(_redisName, matchPaten, pageSize, pageIndex);
+            return RedisProxy.GetAllKeys(_redisName, _redisName, matchPaten, pageSize, pageIndex);
         }
 
     }
