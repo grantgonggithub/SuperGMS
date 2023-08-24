@@ -19,6 +19,7 @@ using StackExchange.Redis;
 using Newtonsoft.Json;
 using SuperGMS.Log;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace SuperGMS.Redis
 {
@@ -362,16 +363,17 @@ namespace SuperGMS.Redis
         /// 获取符合指定匹配条件的所有keys，为了保证性能一次最多只能提取1000条
         /// </summary>
         /// <param name="nodeName"></param>
+        /// <param name="logicName"></param>
         /// <param name="matchPaten">要匹配key的关键字表达式</param>
         /// <param name="pageSize">一次提取的数量，最大1000</param>
         /// <param name="pageIndex">取页数</param>
         /// <returns></returns>
-        public static IEnumerable<string> GetAllKeys(string nodeName,string matchPaten,int pageSize=250,int pageIndex=0) {
+        public static IEnumerable<string> GetAllKeys(string nodeName, string logicName, string matchPaten,int pageSize=250,int pageIndex=0) {
             RedisNode cfg=  RedisConfig.GetNode(nodeName);
             if(pageSize>1000) pageSize = 1000;
             return cfg.Get<IEnumerable<string>>((db, server) =>
             {
-                return server.Keys(cfg.IsMasterSlave? cfg.MasterServer.DbIndex : cfg.SlaveServers[0].DbIndex, matchPaten, pageSize,0,pageIndex).Select(k => k.ToString());
+                return server.Keys(cfg.IsMasterSlave? cfg.MasterServer.DbIndex : cfg.SlaveServers[0].DbIndex, matchPaten, pageSize,0,pageIndex).Select(k => trimKeyPrix(logicName,k.ToString()));
             },true);
         }
 
@@ -380,6 +382,15 @@ namespace SuperGMS.Redis
         private static string getKey(string logicName, string orgKey)
         {
             return string.Format("{0}:{1}",logicName, orgKey);
+        }
+
+        private static string trimKeyPrix(string logicName,string fullKey) {
+            var prix = fullKey.Split(":", StringSplitOptions.RemoveEmptyEntries).ToList();
+            if (prix[0] == logicName)
+            {
+                prix.Remove(prix[0]);// 把前缀去掉
+            }
+            return string.Join(":",prix);
         }
 
         private static T[] ConvetValueList<T>(RedisValue[] values)
