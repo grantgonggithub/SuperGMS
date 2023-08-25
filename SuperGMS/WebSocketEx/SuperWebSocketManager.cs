@@ -112,7 +112,7 @@ namespace SuperGMS.WebSocketEx
         /// 按照消息指定的To数组，群发给对于的客户端
         /// </summary>
         /// <param name="msg"></param>
-        public static void SendMessage(EventMsg<string> msg)
+        public static void SendMessage(EventMsg<object> msg)
         {
             if (msg.Broadcast == Broadcast.None) // 非广播消息，以to为准
             {

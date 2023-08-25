@@ -150,9 +150,9 @@ namespace SuperGMS.WebSocketEx
         ///  当前WebSocket客户端发送消息
         /// </summary>
         /// <param name="msg"></param>
-        public void SendMessage(EventMsg<string> msg)
+        public void SendMessage(EventMsg<object> msg)
         {
-            sendMessage(msg.Msg);
+            sendMessage(JsonConvert.SerializeObject(msg, SuperHttpProxy.jsonSerializerSettings));
         }
 
         /// <summary>
