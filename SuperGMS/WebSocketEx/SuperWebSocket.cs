@@ -152,6 +152,7 @@ namespace SuperGMS.WebSocketEx
         /// <param name="msg"></param>
         public void SendMessage(EventMsg<object> msg)
         {
+            msg.To = null; msg.From=null; msg.Broadcast = Broadcast.None;
             sendMessage(JsonConvert.SerializeObject(msg, SuperHttpProxy.jsonSerializerSettings));
         }
 
