@@ -38,17 +38,18 @@ namespace WebSocketService
                         }
                         else
                         {
-                            if (!SuperWebSocketManager.IsExistClient(token))
-                            {
-                                var websocket = httpContext.WebSockets.AcceptWebSocketAsync().Result;
-                                a.Headers = SuperHttpProxy.GetRequestIp(httpContext);
-                                var superSocket = new SuperWebSocket(websocket, DateTime.Now, DateTime.Now, a);
-                                SuperWebSocketManager.OnConnected(new ComboxClass<UserType, SuperWebSocket> { V1 = (UserType)userCtx.UserInfo.UserType, V2 = superSocket });
-                            }
-                            else
-                            {
-                                httpContext.Response.StatusCode = 401; // 同一个客户端不可以重复创建socket连接
-                            }
+                            SuperWebSocketManager.IsExistClient(token);
+                            //if (!SuperWebSocketManager.IsExistClient(token))
+                            //{
+                            var websocket = httpContext.WebSockets.AcceptWebSocketAsync().Result;
+                            a.Headers = SuperHttpProxy.GetRequestIp(httpContext);
+                            var superSocket = new SuperWebSocket(websocket, DateTime.Now, DateTime.Now, a);
+                            SuperWebSocketManager.OnConnected(new ComboxClass<UserType, SuperWebSocket> { V1 = (UserType)userCtx.UserInfo.UserType, V2 = superSocket });
+                            //}
+                            //else
+                            //{
+                            //    httpContext.Response.StatusCode = 401; // 同一个客户端不可以重复创建socket连接
+                            //}
                         }
                     }
                 }

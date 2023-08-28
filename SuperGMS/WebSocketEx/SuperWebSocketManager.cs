@@ -70,13 +70,19 @@ namespace SuperGMS.WebSocketEx
         }
 
         /// <summary>
-        /// 客户端是否已经建立了socket，不可以重复创建
+        /// 同一个token客户端是否已经建立了socket，如果已经存在则下线旧的socket
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
         public static bool IsExistClient(string token)
         {
-            return _sockets.ContainsKey(token);
+            if (_sockets.TryGetValue(token, out var oldSocket))
+            {
+                oldSocket.V2.SendMessage(new EventMsg<object>("new_connection_created_by_some_token","已经在新客户端登录",null,null)) ;
+                oldSocket.V2.Close();
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -105,7 +111,9 @@ namespace SuperGMS.WebSocketEx
         public static bool OnClose(string token)
         {
             if (string.IsNullOrEmpty(token)) return true;
-            return _sockets.TryRemove(token, out _);
+            bool isOK = _sockets.TryRemove(token, out _);
+            _loger.LogInformation($"当前在线用户：{string.Join(",", _sockets.Keys)}");
+            return isOK;
         }
 
         /// <summary>

@@ -124,7 +124,7 @@ namespace SuperGMS.WebSocketEx
                     }
                 }
                 else
-                    close(WebSocketCloseStatus.EndpointUnavailable, "客户端重复连接，拒绝");
+                    close(WebSocketCloseStatus.EndpointUnavailable, "客户端重复连接，旧客户端被T掉");
             }
         }
 
