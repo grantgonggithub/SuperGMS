@@ -34,6 +34,7 @@ namespace SuperGMS.WebSocketEx
         /// 超时时间，单位毫秒，（15分钟）
         /// </summary>
         public const int TimeOutSpan= 15 * 60 * 1000;
+        private static object _lock = new object();
         private static readonly ILogger _loger = LogFactory.CreateLogger<SuperWebSocketManager>();
         private static ConcurrentDictionary<string,ComboxClass<UserType,SuperWebSocket>> _sockets = new ConcurrentDictionary<string, ComboxClass<UserType, SuperWebSocket>>();
 
@@ -76,13 +77,21 @@ namespace SuperGMS.WebSocketEx
         /// <returns></returns>
         public static bool IsExistClient(string token)
         {
-            if (_sockets.TryGetValue(token, out var oldSocket))
+            if (_sockets.ContainsKey(token))
             {
-                oldSocket.V2.SendMessage(new EventMsg<object>("new_connection_created_by_some_token","已经在新客户端登录",null,null)) ;
-                oldSocket.V2.Close();
-                return true;
+                lock (_lock)
+                {
+                    if (_sockets.TryGetValue(token, out var oldSocket))
+                    {
+                        oldSocket.V2.SendMessage(new EventMsg<object>("new_connection_created_by_some_token", "已经在新客户端登录", null, null));
+                        oldSocket.V2.Close();
+                        Thread.Sleep(800);
+                        return true;
+                    }
+                    return false;
+                }
             }
-            return false;
+            else return false;
         }
 
         /// <summary>
