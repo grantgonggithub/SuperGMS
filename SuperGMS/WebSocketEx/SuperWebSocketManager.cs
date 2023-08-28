@@ -105,7 +105,9 @@ namespace SuperGMS.WebSocketEx
         public static bool OnClose(string token)
         {
             if (string.IsNullOrEmpty(token)) return true;
-            return _sockets.TryRemove(token, out _);
+            bool isOK = _sockets.TryRemove(token, out _);
+            _loger.LogInformation($"当前在线用户：{string.Join(",", _sockets.Keys)}");
+            return isOK;
         }
 
         /// <summary>
