@@ -21,6 +21,7 @@ using SuperGMS.Tools;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Threading;
 
 namespace SuperGMS.WebSocketEx
@@ -59,7 +60,7 @@ namespace SuperGMS.WebSocketEx
                 _loger.LogInformation($"开始执行清理线程{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}");
                 try {
                     _sockets.Values.ToList().ForEach(s => {
-                        s.V2.Close(true);
+                        s.V2.Close(true,WebSocketCloseStatus.EndpointUnavailable,"客户端超时被清理");// 超时清理：1001
                     });
                     Thread.Sleep(10 * 60 * 1000); // 每5分钟检查一次
                 }
@@ -83,8 +84,8 @@ namespace SuperGMS.WebSocketEx
                 {
                     if (_sockets.TryGetValue(token, out var oldSocket))
                     {
-                        oldSocket.V2.SendMessage(new EventMsg<object>("new_connection_created_by_some_token", "已经在新客户端登录", null, null));
-                        oldSocket.V2.Close();
+                        //oldSocket.V2.SendMessage(new EventMsg<object>("new_connection_created_by_some_token", "已经在新客户端登录", null, null));
+                        oldSocket.V2.Close(closeStatus:WebSocketCloseStatus.ProtocolError,msgPrifx:"客户端重复登录被T掉");// 重复登录：1002
                         Thread.Sleep(800);
                         return true;
                     }
@@ -108,7 +109,7 @@ namespace SuperGMS.WebSocketEx
             }
             else // 加入失败，说明已经存在，把新连接close掉
             {
-                webSocket.V2.Close();
+                webSocket.V2.Close(closeStatus:WebSocketCloseStatus.ProtocolError,msgPrifx:"客户端重复登录被T掉");// 重复登录1002
             }
         }
 
