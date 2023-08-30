@@ -32,24 +32,27 @@ namespace WebSocketService
                         // 查找redis的token是否存在，构建字典
                         RpcContext ctx = new RpcContext(null, a);
                         var userCtx = ctx.GetUserContext();
+
+                        // 不能在这里判断，因为及时不对，也必须接受websocket，然后返回websocket的状态码才行，要不前端接不到任何状态码
+                        // https://stackoverflow.com/questions/21762596/how-to-read-status-code-from-rejected-websocket-opening-handshake-with-javascrip
+                        //if (userCtx == null || userCtx.UserInfo == null)
+                        //{
+                        //    httpContext.Response.StatusCode = 403; // tk错误或者用户未登录
+                        //}
+
+                        var websocket = httpContext.WebSockets.AcceptWebSocketAsync().Result;
+                        a.Headers = SuperHttpProxy.GetRequestIp(httpContext);
+                        var superSocket = new SuperWebSocket(websocket, DateTime.Now, DateTime.Now, a);
                         if (userCtx == null || userCtx.UserInfo == null)
                         {
-                            httpContext.Response.StatusCode = 403; // tk错误或者用户未登录
+                            // httpContext.Response.StatusCode = 403; // tk错误或者用户未登录
+                            superSocket.Close(closeStatus: System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, msgPrifx: "登录失败，客户端token超时");// tk超时：1000
                         }
                         else
                         {
                             SuperWebSocketManager.IsExistClient(token);
-                            //if (!SuperWebSocketManager.IsExistClient(token))
-                            //{
-                            var websocket = httpContext.WebSockets.AcceptWebSocketAsync().Result;
-                            a.Headers = SuperHttpProxy.GetRequestIp(httpContext);
-                            var superSocket = new SuperWebSocket(websocket, DateTime.Now, DateTime.Now, a);
+
                             SuperWebSocketManager.OnConnected(new ComboxClass<UserType, SuperWebSocket> { V1 = (UserType)userCtx.UserInfo.UserType, V2 = superSocket });
-                            //}
-                            //else
-                            //{
-                            //    httpContext.Response.StatusCode = 401; // 同一个客户端不可以重复创建socket连接
-                            //}
                         }
                     }
                 }
