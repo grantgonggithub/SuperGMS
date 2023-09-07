@@ -68,9 +68,8 @@ namespace SuperGMS.DB.EFEx
         /// 如果T中有OraModel，并且查询总记录数，并且查询条件都隶属于OraModel，则使用单表查询
         /// </summary>
         /// <param name="searchParameters">查询参数 <see cref="DynamicSearch.SearchParameters" /></param>
-        /// <param name="sqlwhere">字符串的查询条件</param>
         /// <returns>一个待查询的结果集</returns>
-        IQueryable<T> GetByPage(SearchParameters searchParameters, string sqlwhere = "");
+        IQueryable<T> GetByPage(SearchParameters searchParameters);
 
         /// <summary>
         /// 通过主键获取一个对象，如果是组合主键，必须按照主键顺序填写
