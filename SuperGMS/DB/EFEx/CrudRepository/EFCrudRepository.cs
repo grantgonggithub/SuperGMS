@@ -9,13 +9,9 @@ using System.Text.RegularExpressions;
 using SuperGMS.DB.EFEx.DynamicSearch;
 using Microsoft.EntityFrameworkCore;
 using SuperGMS.Tools;
-using System.Linq.Dynamic;
 using SuperGMS.DB.AttributeEx;
 using System.Linq.Dynamic.Core;
-using System.Text;
-using AutoMapper;
 using SuperGMS.Config;
-using SuperGMS.ExceptionEx;
 using SuperGMS.DB.EFEx.DynamicSearch.Model;
 
 #endregion
@@ -113,40 +109,12 @@ namespace SuperGMS.DB.EFEx
         /// 如果T中有OraModel，并且查询总记录数，并且查询条件都隶属于OraModel，则使用单表查询
         /// </summary>
         /// <param name="searchParameters">查询参数 <see cref="DynamicSearch.SearchParameters" /></param>
-        /// <param name="sqlwhere">字符串的查询条件</param>
         /// <returns>一个待查询的结果集</returns>
-        public IQueryable<T> GetByPage(SearchParameters searchParameters, string sqlwhere = "")
+        public IQueryable<T> GetByPage(SearchParameters searchParameters)
         {
             //处理EF查询时，查询null值问题
             searchParameters.BuildEmptySearch();
-            if (searchParameters.PageInfo.IsGetTotalCount && searchParameters.PageInfo.PageSize <= 1)
-            {
-                var attr = ReflectionTool.GetCustomAttributeEx<ViewOraModelAttribute>(typeof(T));
-                if (attr != null)
-                {
-                    var oraModelPropInfos = ReflectionTool.GetPropertyInfosFromCache(attr.OraModel);
-
-                    // 判断是否所有的查询条件都在单表内
-                    var sqlWhereCondition = sqlwhere.Split(
-                        new[] { " And ", " Or ", " AND ", " OR ", " and ", " or " },
-                        StringSplitOptions.RemoveEmptyEntries);
-                    sqlWhereCondition = GetPropNameBySqlWhere(sqlWhereCondition);
-                    if (searchParameters.QueryModel?.Items != null
-                        && searchParameters.QueryModel.Items.All(a => oraModelPropInfos.Any(b => b.Name == a.Field))
-                        && sqlWhereCondition.All(a => oraModelPropInfos.Any(b => a.ToLower().Equals(b.Name.ToLower()))))
-                    {
-                        GetSingleTableQuickCount(searchParameters, sqlwhere, attr);
-                        return new List<T>().AsQueryable();
-                    }
-                }
-            }
-
             IQueryable<T> list = _dbSet.Where(searchParameters.QueryModel);
-            if (!string.IsNullOrEmpty(sqlwhere))
-            {
-                list = list.Where(sqlwhere);
-            }
-
             var totalCount = 0;
             var result = GetByPage(list, searchParameters.PageInfo, out totalCount);
             searchParameters.PageInfo.TotalCount = totalCount;
