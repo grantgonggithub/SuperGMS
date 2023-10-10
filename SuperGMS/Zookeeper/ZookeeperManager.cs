@@ -421,7 +421,7 @@ namespace SuperGMS.Zookeeper
             }
             catch (Exception e)
             {
-                LogTextWriter.Write(e); // 这里吞掉算了 ，服务要退出了，不管了···
+                logger.LogError(e, "ClearRouter.Error");
             }
 
         }

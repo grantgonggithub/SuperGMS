@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <LangVersion>7.1</LangVersion>
     <PackageReleaseNotes></PackageReleaseNotes>
-    <Version>6.0.18</Version>
+    <Version>6.0.19</Version>
     <Authors>grantgongjianchun</Authors>
     <Company>SuperGMS</Company>
     <Description></Description>

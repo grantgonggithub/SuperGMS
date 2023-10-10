@@ -90,7 +90,7 @@ namespace SuperGMS.Rpc
                 if (server.ServerType == ServerType.Thrift || server.ServerType == ServerType.Grpc)
                 {
                     IsExit = true; // 通知所有注册方，停止注册，系统要撤销所有资源了，防止其他异常，优雅一点点，不能太暴力
-                    logger.LogWarning($"\r\n rpc端口监听异常退出：{server.ServerName}{server.Port}{server.AssemblyPath}" + "  \r\n time=" +
+                    logger.LogWarning($"    rpc端口监听异常退出：{server.ServerName}{server.Port}{server.AssemblyPath}" + "   |  time=" +
                         DateTime.Now.ToString("yy-MM-dd HH:mm:ss:ffff"));
 
                     if (ServerSetting.ConfigCenter.ConfigType == ConfigType.Zookeeper)
@@ -108,7 +108,7 @@ namespace SuperGMS.Rpc
             }
             catch (Exception ex)
             {
-                logger.LogCritical(ex, "\r\n Error 服务异常退出  " + DateTime.Now.ToString("yy-MM-dd HH:mm:ss:ffff"));
+                logger.LogCritical(ex, "  Error 服务异常退出  " + DateTime.Now.ToString("yy-MM-dd HH:mm:ss:ffff"));
 
                 // 让他等一下，把日志写完
                 System.Threading.Thread.Sleep(1000);
@@ -127,7 +127,7 @@ namespace SuperGMS.Rpc
             {
                 distributer.Dispose(); // 先释放业务
                 Dispose(); // 在释放框架
-                logger.LogInformation("\r\n 应用程序停止，并成功回收GrantBaseServer.QtDispose");
+                logger.LogInformation("   应用程序停止，并成功回收GrantBaseServer.QtDispose");
             }
             catch (Exception e)
             {
