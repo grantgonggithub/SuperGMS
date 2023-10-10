@@ -87,6 +87,7 @@ namespace SuperGMS.HttpProxy
             try
             {
                 content = GetRequestValue(context.Request);
+                logger.LogInformation($"收到请求：{content},上下文信息：{mainLog.ToString()}");
                 var isUdf = IsController(context);
                 if (isUdf)
                 {
