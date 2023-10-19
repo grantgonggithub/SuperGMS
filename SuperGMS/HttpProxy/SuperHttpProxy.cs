@@ -87,7 +87,8 @@ namespace SuperGMS.HttpProxy
             try
             {
                 content = GetRequestValue(context.Request);
-                logger.LogInformation($"收到请求：{content},上下文信息：{mainLog.ToString()}");
+                string rid= Guid.NewGuid().ToString("N");
+                logger.LogInformation($"收到请求：rid:{rid},{content},上下文信息：{mainLog.ToString()}");
                 var isUdf = IsController(context);
                 if (isUdf)
                 {
@@ -108,7 +109,7 @@ namespace SuperGMS.HttpProxy
                 if (string.IsNullOrEmpty(a.rid))
                 {
                     // 提前端产生一个rid
-                    a.rid = Guid.NewGuid().ToString("N");
+                    a.rid = rid;
                 }
 
                 var rtn = RpcClientManager.Send(a, context.Request.Path);
