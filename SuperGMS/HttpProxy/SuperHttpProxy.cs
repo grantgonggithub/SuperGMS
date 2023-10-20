@@ -103,6 +103,7 @@ namespace SuperGMS.HttpProxy
                 else
                 {
                     a = JsonConvert.DeserializeObject<Args<object>>(content, jsonSerializerSettings);
+                    a=a==null? new Args<object>() : a;
                 }
 
                 a.Headers = GetRequestIp(context);
