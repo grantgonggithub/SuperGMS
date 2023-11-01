@@ -109,10 +109,10 @@ namespace SuperGMS.DB.EFEx
             }
         }
 
-        public static IEFDbContext GetEFContext<TContext>(RpcContext rpcContext)
+        public static IEFDbContext GetEFContext<TContext>(RpcContext rpcContext,string dbModelName=null)
             where TContext : DbContext
         {
-            var dbName = typeof(TContext).Name.ToLower();
+            var dbName = string.IsNullOrWhiteSpace(dbModelName)? typeof(TContext).Name.ToLower():dbModelName;
             var info = DBContextOptionsLoader.IsMemoryDb ? new DbInfo() : GetDbInfo(rpcContext, dbName);
             var options = DBContextOptionsLoader.CreateDbOption<TContext>(info);
 
