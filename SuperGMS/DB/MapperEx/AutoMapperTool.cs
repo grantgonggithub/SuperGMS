@@ -36,23 +36,5 @@ namespace SuperGMS.DB.MapperEx
                     }
                 }
         }
-
-        /// <summary>
-        /// 自定义Automaper 属性Name转换,全属性转换
-        /// </summary>
-        internal class MyConvention : INamingConvention
-        {
-            /// <summary>
-            /// Grant没意义, 因为写成空或者Null 会报错.
-            /// </summary>
-            public Regex SplittingExpression { get; } = new Regex(@"Grant");
-
-            public string SeparatorCharacter => string.Empty;
-
-            public string ReplaceValue(Match match)
-            {
-                return match.Value;
-            }
-        }
     }
 }
