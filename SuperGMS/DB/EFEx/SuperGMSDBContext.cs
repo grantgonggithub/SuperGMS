@@ -109,27 +109,62 @@ namespace SuperGMS.DB.EFEx
             }
         }
 
+        /// <summary>
+        /// 根据登录用户上下文获取DbContext
+        /// </summary>
+        /// <typeparam name="TContext"></typeparam>
+        /// <param name="rpcContext"></param>
+        /// <param name="dbModelName"></param>
+        /// <returns></returns>
         public static IEFDbContext GetEFContext<TContext>(RpcContext rpcContext,string dbModelName=null)
             where TContext : DbContext
         {
-            var dbName = string.IsNullOrWhiteSpace(dbModelName)? typeof(TContext).Name.ToLower():dbModelName;
+            var dbName = string.IsNullOrWhiteSpace(dbModelName) ? typeof(TContext).Name.ToLower() : dbModelName;
             var info = DBContextOptionsLoader.IsMemoryDb ? new DbInfo() : GetDbInfo(rpcContext, dbName);
-            var options = DBContextOptionsLoader.CreateDbOption<TContext>(info);
+            return GetEFDbContext<TContext>(info);
+        }
 
+        /// <summary>
+        /// 直接通过DbInfo创建DbContext,用于非用户登录的上下文中
+        /// </summary>
+        /// <typeparam name="TContext"></typeparam>
+        /// <param name="dbInfo">数据库连接信息</param>
+        /// <returns></returns>
+        public static IEFDbContext GetEFDbContext<TContext>(DbInfo dbInfo)
+            where TContext : DbContext
+        {
+            if (dbInfo == null) throw new Exception("数据库连接信息DbInfo不能为空，请检查");
+            var options = DBContextOptionsLoader.CreateDbOption<TContext>(dbInfo);
             if (ServerSetting.GetConstValue("TrackSql")?.Value.ToLower() == "true")
             {
                 options.UseLoggerFactory(LogFactory.LoggerFactory);
                 options.EnableSensitiveDataLogging();
             }
             var dbContext = (TContext)Activator.CreateInstance(typeof(TContext), options.Options);
-            return new EFDbContext(dbContext, info);
+            return new EFDbContext(dbContext, dbInfo);
         }
 
+        /// <summary>
+        /// 根据登录用户上下文获取DbContext
+        /// </summary>
+        /// <param name="rpcContext"></param>
+        /// <param name="dbContextName"></param>
+        /// <returns></returns>
         public static IDapperDbContext GetDapperContext(RpcContext rpcContext, string dbContextName)
         {
             var dbName = dbContextName.ToLower();
             var info = GetDbInfo(rpcContext, dbName);
-            return new DapperDBContext(info);
+            return GetDapperContext(info);
+        }
+
+        /// <summary>
+        /// 直接通过DbInfo创建DbContext,用于非用户登录的上下文中
+        /// </summary>
+        /// <param name="dbInfo">数据库连接信息</param>
+        /// <returns></returns>
+        public static IDapperDbContext GetDapperContext(DbInfo dbInfo)
+        {
+            return new DapperDBContext(dbInfo);
         }
     }
 }
