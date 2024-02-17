@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <LangVersion>7.1</LangVersion>
-    <PackageReleaseNotes></PackageReleaseNotes>
+    <PackageReleaseNotes>grantgongjianchun(nnn987@126.com)</PackageReleaseNotes>
     <Version>6.0.22</Version>
     <Authors>grantgongjianchun</Authors>
     <Company>SuperGMS</Company>
