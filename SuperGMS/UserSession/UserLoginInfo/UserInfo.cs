@@ -32,6 +32,11 @@ namespace SuperGMS.UserSession
         public string LoginName { get; set; }
 
         /// <summary>
+        /// 用于区分用户的分类，这里先定义1、user；2、employee，根据业务定义
+        /// </summary>
+        public int UserType { get; set; }
+
+        /// <summary>
         /// 登录人的真实姓名
         /// </summary>
         public string RealName { get; set; }

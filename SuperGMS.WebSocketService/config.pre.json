@@ -2,7 +2,7 @@
   "ServerConfig": {
     "ConfigCenter": {
       "ConfigType": 3,
-      "Ip": "http://xxx.com/config/config.prod.json"
+      "Ip": "http://xxx.com/config/config.pre.json"
     }
   }
 }

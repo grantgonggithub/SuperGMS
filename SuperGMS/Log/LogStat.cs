@@ -187,10 +187,10 @@ namespace SuperGMS.Log
         /// <returns>字符串</returns>
         public override string ToString()
         {
-            return $"url:/{this.ServiceName}/{this.ApiName}\r\n\t" +
-                $"Execute Time:{this.ExecuteTime} ms\r\n\tcode:{this.Code},msg:{this.CodeMsg},serverIp:{this.ComputerIp},srcUrl:{this.SourceUrl}\r\n\t" +
-                $"user:{this.UserId},lang:{this.Lang},token:{this.Token},bt:{this.BusinessType}\r\n\t" +
-                $"client:{this.ClientIp},cv:{this.ClientVersion},ct:{this.ClientType},client info:{this.ClientInfo}\r\n\tdesc:{this.Desc}\r\n";
+            return $"url:/{this.ServiceName}/{this.ApiName}|" +
+                $"Execute Time:{this.ExecuteTime} ms  |  code:{this.Code},msg:{this.CodeMsg},serverIp:{this.ComputerIp},srcUrl:{this.SourceUrl}|" +
+                $"user:{this.UserId},lang:{this.Lang},token:{this.Token},bt:{this.BusinessType}|" +
+                $"client:{this.ClientIp},cv:{this.ClientVersion},ct:{this.ClientType},client info:{this.ClientInfo}|desc:{this.Desc}|";
         }
     }
 }

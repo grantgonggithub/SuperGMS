@@ -2,19 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Version>6.0.12</Version>
+    <Version>6.0.22</Version>
     <Authors>gongjianchun</Authors>
     <Product>SuperGMS</Product>
-    <Description>SuperGMS,从此版本开始直接升级到Net6,所以版本号直接升级到6.0.0，以前的版本（仅支持3.1）不在维护升级</Description>
+    <Description></Description>
     <PackageIconUrl />
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Company>SuperGMS</Company>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.0.123" />
-    <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.500-preview2-1-003177" />
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>

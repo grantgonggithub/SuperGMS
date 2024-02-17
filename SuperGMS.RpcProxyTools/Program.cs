@@ -68,7 +68,7 @@ namespace SuperGMS.RpcProxyTools
             }
             catch (Exception ex)
             {
-                Console.WriteLine("生成失败:" + ex.Message + "\r\n" + ex.StackTrace);
+                Console.WriteLine("生成失败:" + ex.Message + "   |   " + ex.StackTrace);
                 if (args?.Length >= 2)
                 {
                     return;

@@ -148,7 +148,7 @@ namespace SuperGMS.MQ.RabbitMQ
                 }
                 catch (Exception e)
                 {
-                    LogTextWriter.Write(e);
+                    logger.LogError(e, "checkTimeOut.Error");
                 }
 
             }

@@ -126,24 +126,26 @@ namespace SuperGMS.Rpc.Server
         /// RpcBaseServer中是可以保证事物的
         /// </summary>
         /// <param name="newOne">是否新创建，不共享，在多线程相互隔离的上下文中使用</param>
+        /// <param name="dbModelName">自定义的数据库连接模型 如：UserDbContext.0  UserDbContext.1 UserDbContext.2 和数据库配置件相对应</param>
         /// <typeparam name="TContext">tcontext</typeparam>
         /// <returns>IGrantDbContext</returns>
-        public IEFDbContext GetDbContext<TContext>(bool newOne = false)
+        public IEFDbContext GetDbContext<TContext>(bool newOne = false, string dbModelName = null)
             where TContext : DbContext
         {
-            var key = typeof(TContext).FullName.ToLower();
+            string key = null;
             if (newOne)
             {
                 lock (rootLock)
                 {
                     key = Guid.NewGuid().ToString("N");
-                    IEFDbContext newOneValue = SuperGMSDBContext.GetEFContext<TContext>(this);
+                    IEFDbContext newOneValue = SuperGMSDBContext.GetEFContext<TContext>(this,dbModelName);
                     // 这里不加 lock 放入是为了回收，不用关心脏不脏 , 如果丢了, 则不能手工回收调用Dispose, 只能靠系统自动回收
                     dbContexts.Add(key, newOneValue);
                     return newOneValue;
                 }
             }
 
+            key = string.IsNullOrWhiteSpace(dbModelName) ? typeof(TContext).FullName.ToLower() : dbModelName;
             if (dbContexts.ContainsKey(key))
             {
                 return dbContexts[key];
@@ -158,7 +160,7 @@ namespace SuperGMS.Rpc.Server
                         return dbContexts[key];
                     }
 
-                    var dbctx = SuperGMSDBContext.GetEFContext<TContext>(this);
+                    var dbctx = SuperGMSDBContext.GetEFContext<TContext>(this,dbModelName);
                     dbContexts.Add(key, dbctx);
                     return dbctx;
                 }
@@ -170,11 +172,12 @@ namespace SuperGMS.Rpc.Server
         /// 之所以要引入DapperDbContext是为了保持和EF在语法结构上的一致性，对上层开发人员不至于变化太大
         /// </summary>
         /// <typeparam name="TContext">TContext</typeparam>
+        /// <param name="dbModelName">自定义的数据库连接模型如：UserDbContext.0  UserDbContext.1 UserDbContext.2 和数据库配置件相对应</param>
         /// <returns>IGrantDapperDbContext</returns>
-        public IDapperDbContext GetDapperDbContext<TContext>()
+        public IDapperDbContext GetDapperDbContext<TContext>(string dbModelName = null)
         {
             // Dapper的DbContext不需要换成，只是一个空壳引用，没有任何性能问题，唯一的数据库连接使用连接池
-            return SuperGMSDBContext.GetDapperContext(this, typeof(TContext).Name);
+            return SuperGMSDBContext.GetDapperContext(this, string.IsNullOrWhiteSpace(dbModelName) ? typeof(TContext).Name : dbModelName);
         }
 
         /// <summary>

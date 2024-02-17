@@ -43,7 +43,7 @@ namespace SuperGMS.Log
             while (ex != null)
             {
                 sb.AppendFormat(
-                    "[{0}]\r\n{1}\r\n[ExceptionMessage]:{2}\r\n[ExceptionStackTrace]:{3}\r\n-------------------------------------------------------------------------------\r\n",
+                    "[{0}] | {1} | [ExceptionMessage]:{2} | [ExceptionStackTrace]:{3} | -------------------------------------------------------------------------------",
                     "Error", ServiceEnvironment.EnvironmentInfo, ex.Message, ex.StackTrace);
                 ex = ex.InnerException;
             }
@@ -109,7 +109,7 @@ namespace SuperGMS.Log
                         }
                     }
 
-                    WriteTextLog(string.Join("\r\n", traceArry.ToArray()));
+                    WriteTextLog(string.Join(" | ", traceArry.ToArray()));
                     traceArry.Clear();
 
                     // 给入队lock留点空隙，要不影响入队，

@@ -36,6 +36,7 @@ namespace SuperGMS.HttpProxy
         public static string HttpProxyName = HttpProxy; // 这个是做为webApi时，可能就会被改变
         public const string HttpProxy = "HttpProxy"; // 这个指的httpProxy这个服务，是个固定的名称，也指配置
         private readonly static ILogger logger = LogFactory.CreateLogger<SuperHttpProxy>();
+        public readonly static JsonSerializerSettings jsonSerializerSettings = GetJsonSerializerSettings();
         public static void Register()
         {
             ServerSetting.Initlize(SuperGMS.HttpProxy.SuperHttpProxy.HttpProxyName, 0);
@@ -56,9 +57,20 @@ namespace SuperGMS.HttpProxy
             }
         }
 
-        private static JsonSerializerSettings jSetting = new JsonSerializerSettings {
-            FloatParseHandling = FloatParseHandling.Decimal,
-        };
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static JsonSerializerSettings GetJsonSerializerSettings()
+        {
+            JsonSerializerSettings jSetting = new JsonSerializerSettings
+            {
+                FloatParseHandling = FloatParseHandling.Decimal,
+                NullValueHandling = NullValueHandling.Ignore,
+            };
+            jSetting.DateFormatString = "yyyy-MM-dd HH:mm:ss";
+            return jSetting;
+        }
 
         /// <summary>
         /// 前端代理处理程序，收和发
@@ -75,6 +87,8 @@ namespace SuperGMS.HttpProxy
             try
             {
                 content = GetRequestValue(context.Request);
+                string rid= Guid.NewGuid().ToString("N");
+                logger.LogInformation($"收到请求：rid:{rid},{content},上下文信息：{mainLog.ToString()}");
                 var isUdf = IsController(context);
                 if (isUdf)
                 {
@@ -88,14 +102,15 @@ namespace SuperGMS.HttpProxy
                 }
                 else
                 {
-                    a = JsonConvert.DeserializeObject<Args<object>>(content, jSetting);
+                    a = JsonConvert.DeserializeObject<Args<object>>(content, jsonSerializerSettings);
+                    a=a==null? new Args<object>() : a;
                 }
 
                 a.Headers = GetRequestIp(context);
                 if (string.IsNullOrEmpty(a.rid))
                 {
                     // 提前端产生一个rid
-                    a.rid = Guid.NewGuid().ToString("N");
+                    a.rid = rid;
                 }
 
                 var rtn = RpcClientManager.Send(a, context.Request.Path);
@@ -154,10 +169,7 @@ namespace SuperGMS.HttpProxy
                     rr.rid = Guid.NewGuid().ToString("N");
                 }
 
-                var jSetting = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
-                jSetting.DateFormatString = "yyyy-MM-dd HH:mm:ss";
-
-                var rst = JsonConvert.SerializeObject(rr, jSetting);
+                var rst = JsonConvert.SerializeObject(rr, jsonSerializerSettings);
                 using (var strStream = new StreamWriter(context.Response.Body))
                 {
                     strStream.Write(rst);
@@ -191,7 +203,6 @@ namespace SuperGMS.HttpProxy
         {
             var content = GetRequestValue(context.Request);
             Args<object> a = JsonConvert.DeserializeObject<Args<object>>(content);
-            var jSetting = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
             a.Headers = GetRequestIp(context);
             if (string.IsNullOrEmpty(a.rid))
             {
@@ -205,13 +216,12 @@ namespace SuperGMS.HttpProxy
                 rr.msg = "Uri Error rid=" + a.rid;
                 rr.c = 503;
                 rr.v = default(object);
-                return JsonConvert.SerializeObject(rr, jSetting);
+                return JsonConvert.SerializeObject(rr, jsonSerializerSettings);
             }
             else
             {
                 a.m = motheds[motheds.Length - 1];
-                jSetting.DateFormatString = "yyyy-MM-dd HH:mm:ss";
-                return ServerProxy.HttpSend(JsonConvert.SerializeObject(a, jSetting), a.Headers);
+                return ServerProxy.HttpSend(JsonConvert.SerializeObject(a, jsonSerializerSettings), a.Headers);
             }
         }
 
@@ -245,7 +255,12 @@ namespace SuperGMS.HttpProxy
             Reg(items);
         }
 
-        private static string GetRequestValue(HttpRequest request)
+        /// <summary>
+        /// 获取http请求中的body内容
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public static string GetRequestValue(HttpRequest request)
         {
             // 仅支持json解析
             string args = request.Query["args"]; // get,post不区分了
@@ -281,7 +296,7 @@ namespace SuperGMS.HttpProxy
             return args.Replace("#{#}#","");
         }
 
-        private static Dictionary<string, HeaderValue> GetRequestIp(HttpContext ctx)
+        public static Dictionary<string, HeaderValue> GetRequestIp(HttpContext ctx)
         {
             string ipValue = string.Empty;
             try

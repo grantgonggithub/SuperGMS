@@ -73,7 +73,7 @@ namespace SuperGMS.Rpc.Server
         /// <returns>string</returns>
         public string Distributer(string args, object context)
         {
-            var msg = $"收到请求：\r\n\targs={args}\r\n\tcontext={JsonConvert.SerializeObject(context)}";
+            var msg = $"收到请求：  args={args}  |  context={JsonConvert.SerializeObject(context)}";
             logger.LogInformation(msg);
             // 构造一个请求日志
             var requestLog = new LogRequest()

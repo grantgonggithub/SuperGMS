@@ -2,7 +2,7 @@
   "ServerConfig": {
     "ConfigCenter": {
       "ConfigType": 3,
-      "Ip": "http://xxx.com/config/config.prod.json"
+      "Ip": "http://192.168.7.201/config/config.test_a.json"
     }
   }
 }

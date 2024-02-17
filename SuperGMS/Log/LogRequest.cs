@@ -173,9 +173,9 @@ namespace SuperGMS.Log
         /// <returns>字符串</returns>
         public override string ToString()
         {
-            return $"Execute Time:{(int)(DateTime.Now - this.CreatedDate).TotalMilliseconds}ms, Url:/{this.ServiceName}/{this.ApiName}, Code:{this.Code}, CodeMsg:{this.CodeMsg}\r\n\t" +
-                $"User:{this.UserId}, Lang:{this.Lang}, Token:{this.Token}, ServerIp:{this.ComputerIp}, SrcUrl:{this.SourceUrl}\r\n\t" +
-                $"Parameters:{this.Parameters}, Client:{this.ClientIp},cv:{this.ClientVersion},ct:{this.ClientType},client info:{this.ClientInfo},desc:{this.Desc}\r\n\t" +
+            return $"Execute Time:{(int)(DateTime.Now - this.CreatedDate).TotalMilliseconds}ms, Url:/{this.ServiceName}/{this.ApiName}, Code:{this.Code}, CodeMsg:{this.CodeMsg}|" +
+                $"User:{this.UserId}, Lang:{this.Lang}, Token:{this.Token}, ServerIp:{this.ComputerIp}, SrcUrl:{this.SourceUrl}|" +
+                $"Parameters:{this.Parameters}, Client:{this.ClientIp},cv:{this.ClientVersion},ct:{this.ClientType},client info:{this.ClientInfo},desc:{this.Desc}|" +
                 $"Result:{this.Result}";
         }
     }
