@@ -86,7 +86,11 @@ namespace SuperGMS.RpcProxy
 
         public static I#assembly_name# Proxy
         {
-            get { return _proxy; }
+            get
+            {
+                if (_proxy == null) throw new System.Exception("请先在项目的AppInitlize中注册#assembly_name#Manager.Initlize()");
+                return _proxy;
+            }
         }
 
         #endregion

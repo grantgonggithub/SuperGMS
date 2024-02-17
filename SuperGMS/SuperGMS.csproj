@@ -3,12 +3,11 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <LangVersion>7.1</LangVersion>
-    <PackageReleaseNotes>为升级.Net6.0做兼容准备
-grantgongjianchun(nnn987@126.com)</PackageReleaseNotes>
-    <Version>6.0.12</Version>
+    <PackageReleaseNotes>grantgongjianchun(nnn987@126.com)</PackageReleaseNotes>
+    <Version>6.0.22</Version>
     <Authors>grantgongjianchun</Authors>
     <Company>SuperGMS</Company>
-    <Description>SuperGMS,从此版本开始直接升级到Net6,所以版本号直接升级到6.0.0，以前的版本（仅支持3.1）不在维护升级</Description>
+    <Description></Description>
     <PackageIconUrl />
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
@@ -36,8 +35,8 @@ grantgongjianchun(nnn987@126.com)</PackageReleaseNotes>
 
   <ItemGroup>
     <PackageReference Include="apache-thrift-netcore" Version="0.9.3.2" />
-    <PackageReference Include="AutoMapper" Version="11.0.1" />
-    <PackageReference Include="Dapper" Version="2.0.123" />
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="Dapper" Version="2.1.24" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="6.2.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.0" />
@@ -49,17 +48,17 @@ grantgongjianchun(nnn987@126.com)</PackageReleaseNotes>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
     <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.2.22" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />
     <PackageReference Include="Nito.AsyncEx.Coordination" Version="5.1.2" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="5.0.0-preview.3" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.7" />
     <PackageReference Include="Npgsql" Version="6.0.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.0" />
     <PackageReference Include="NPOI.Core.Extension" Version="1.0.0" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.90" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.0" />
-    <PackageReference Include="RabbitMQ.Client" Version="6.2.2" />
-    <PackageReference Include="StackExchange.Redis" Version="2.6.66" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
+    <PackageReference Include="StackExchange.Redis" Version="2.7.10" />
     <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="6.13.0" />
     <!--<PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta004" />-->
     <PackageReference Include="ZooKeeperNetEx" Version="3.4.12.4" />
