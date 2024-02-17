@@ -771,11 +771,12 @@ namespace SuperGMS.Config
                 default:
                     throw new Exception($"The setting 'ConfigCenter.ConfigType':'{(int)ServerSetting.configCenter.ConfigType}' not support now!");
             }
-            LogTextWriter.Write($"最终的配置类型是:{ServerSetting.configCenter.ConfigType}, 最终的配置文件路径是:{configPath}\r\n");
+
             var settingsConfig = settingConfigBuilder.Build();
             //加载Nlog配置
             NLog.LogManager.Configuration = new NLogLoggingConfiguration(settingsConfig.GetSection("NLog"));
             logger = LogFactory.CreateLogger<ServerSetting>();
+            logger.LogInformation($"最终的配置类型是:{ServerSetting.configCenter.ConfigType}, 最终的配置文件路径是:{configPath}");
             //加载服务配置项
             ServerSetting.config = settingsConfig.Get<Configuration>();
             ServerSetting.configCenter = config.ServerConfig.ConfigCenter;

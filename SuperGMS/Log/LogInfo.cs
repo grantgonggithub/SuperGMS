@@ -91,11 +91,11 @@ namespace SuperGMS.Log
         {
             if (this.CreatedBy == "FrameWork")
             {
-                return $"[{this.CreatedDate:yyyy-MM-dd HH:mm:ss:fffff}]\r\n\t{this.Desc}\r\n";
+                return $"[{this.CreatedDate:yyyy-MM-dd HH:mm:ss:fffff}]|{this.Desc}|";
             }
             else
             {
-                return $"[{this.CreatedDate:yyyy-MM-dd HH:mm:ss:fffff}]\r\n\trid:{this.TransactionId} , url:/{this.ServiceName}/{this.ApiName}\r\n\tcode:{this.Code},msg:{this.CodeMsg},serverIp:{this.ComputerIp},name:{this.ComputerName}\r\n\tParam:{this.Parameters}\r\n\tchain:{this.UseChain}\r\n\tdesc:{this.Desc}\r\n";
+                return $"[{this.CreatedDate:yyyy-MM-dd HH:mm:ss:fffff}]|rid:{this.TransactionId} , url:/{this.ServiceName}/{this.ApiName}|code:{this.Code},msg:{this.CodeMsg},serverIp:{this.ComputerIp},name:{this.ComputerName}|Param:{this.Parameters}|chain:{this.UseChain}|desc:{this.Desc}|";
             }
         }
     }

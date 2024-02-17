@@ -278,7 +278,7 @@ namespace SuperGMS.Rpc.Client
                 }
                 else
                 {
-                    logger.LogInformation(eventId, $"Client发送请求\r\n\tserver={cServer.ServerName},ip={cItem.Ip},port={cItem.Port}\r\n\targs={sendValue}");
+                    logger.LogInformation(eventId, $"Client发送请求:  server={cServer.ServerName},ip={cItem.Ip},port={cItem.Port} | args={sendValue}");
                     bool isOk = false;
                     using (ISuperGMSRpcClient rpcClient = ClientConnectionManager.GetClient(cItem))
                     {
@@ -309,7 +309,7 @@ namespace SuperGMS.Rpc.Client
                         code = new StatusCode(rr.c, rr.msg);
                     }
                 }
-                logger.LogInformation(eventId, $"Client返回结果\r\n\tServiceName:{server},ApiName:{a.m},Code:{code.code},CodeMsg:{code.msg},\r\n\tUseChain{JsonConvert.SerializeObject(a.Headers)}\r\n\tResult:{JsonConvert.SerializeObject(rr)}");
+                logger.LogInformation(eventId, $"Client返回结果  ServiceName:{server},ApiName:{a.m},Code:{code.code},CodeMsg:{code.msg}, UseChain{JsonConvert.SerializeObject(a.Headers)} |  Result:{JsonConvert.SerializeObject(rr)}");
                 return rr.v;
 
                 #endregion 发送请求
