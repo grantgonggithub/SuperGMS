@@ -545,12 +545,21 @@ namespace SuperGMS.Extend.Extensions
     {
         public static TR CallService<TA, TR>(this RpcContext rpcContext, string relatedUrl, TA model, int timeout)
         {
-            if (relatedUrl.StartsWith("/"))
+            string url;
+            if (relatedUrl.StartsWith("http://") || relatedUrl.StartsWith("https://"))
             {
-                relatedUrl = relatedUrl.Substring(1);
+                url=relatedUrl; // 绝对url不做任何处理
             }
-            var httpProxyHost = ServerSetting.GetConstValue("HttpProxy")?.Value;
-            if (string.IsNullOrEmpty(httpProxyHost)) httpProxyHost = ServerSetting.Config.ServerConfig.RpcService.Ip;
+            else //相对url需要拼上网关的地址
+            {
+                if (relatedUrl.StartsWith("/"))
+                {
+                    relatedUrl = relatedUrl.Substring(1);
+                }
+                var httpProxyHost = ServerSetting.GetConstValue("HttpProxy")?.Value;
+                if (string.IsNullOrEmpty(httpProxyHost)) httpProxyHost = ServerSetting.Config.ServerConfig.RpcService.Ip;
+                url = $"{httpProxyHost}/{relatedUrl}";
+            }
             try
             {
                 using (var wc = new WebClientEx { Encoding = Encoding.UTF8, TimeOut = timeout })
@@ -569,7 +578,7 @@ namespace SuperGMS.Extend.Extensions
                             Formatting = Newtonsoft.Json.Formatting.Indented
                         });
                     var postData = Encoding.UTF8.GetBytes(args);
-                    byte[] responseData = wc.UploadData($"{httpProxyHost}/{relatedUrl}", "POST", postData);
+                    byte[] responseData = wc.UploadData(url, "POST", postData);
                     var result = Encoding.UTF8.GetString(responseData);
                     Result<TR> apiResult = null;
 
@@ -587,7 +596,7 @@ namespace SuperGMS.Extend.Extensions
             }
             catch (Exception ex)
             {
-                throw new Exception("url:" + httpProxyHost + "/" + relatedUrl + ",token:" + rpcContext.Args.tk + ",状态码:" + ex.Message);
+                throw new Exception("url:" + url + ",token:" + rpcContext.Args.tk + ",状态码:" + ex.Message);
             }
         }
     }
