@@ -1,7 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+	  <TargetFramework>net6.0</TargetFramework>
+	  <LangVersion>7.1</LangVersion>
     <Version>6.0.24</Version>
     <Authors>gongjianchun</Authors>
     <Product>SuperGMS</Product>
