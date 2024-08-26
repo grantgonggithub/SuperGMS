@@ -3,7 +3,7 @@
   <PropertyGroup>
 	  <TargetFramework>net6.0</TargetFramework>
 	  <LangVersion>7.1</LangVersion>
-    <Version>6.0.24</Version>
+    <Version>6.0.25</Version>
     <Authors>gongjianchun</Authors>
     <Product>SuperGMS</Product>
     <Description></Description>
