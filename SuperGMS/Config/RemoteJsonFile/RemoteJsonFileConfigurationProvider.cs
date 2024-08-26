@@ -1,5 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
+
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 using SuperGMS.Extensions;
 using System;
 using System.Collections.Generic;
@@ -50,7 +54,9 @@ namespace SuperGMS.Config.RemoteJsonFile
                     }
                     try
                     {
-                        base.Data = JsonConfigurationFileParser.Parse(stream);
+                        var jsonConfigurationFileParser = new JsonConfigurationFileParser();
+                        base.Data = jsonConfigurationFileParser.Parse(stream);
+                        _jObject= jsonConfigurationFileParser.jObject;
                     }
                     catch (JsonReaderException ex)
                     {
@@ -80,10 +86,10 @@ namespace SuperGMS.Config.RemoteJsonFile
                     Task.Run(() =>
                     {
                         var configStr = Encoding.UTF8.GetString(dataBytes);
-                        string rootPath = Path.Combine(Directory.GetCurrentDirectory(), "temp");
+                        string rootPath = GetRootPath();
                         if (!Directory.Exists(rootPath))
                             Directory.CreateDirectory(rootPath);
-                        using (var fileWriter = File.CreateText(Path.Combine(rootPath, "config.json")))
+                        using (var fileWriter = File.CreateText(GetTempConfigPath()))
                         {
                             fileWriter.Write(configStr);
                         }
@@ -98,5 +104,27 @@ namespace SuperGMS.Config.RemoteJsonFile
                 throw new Exception($"Download configuration file Error:{e.Message}", e);
             }
         }
+
+        private JObject _jObject;
+
+        public JObject jObject { get { return _jObject; } }
+
+        /// <summary>
+        /// 获取配置根路径
+        /// </summary>
+        /// <returns></returns>
+        public static string GetRootPath()=> Path.Combine(Directory.GetCurrentDirectory(), "temp");
+
+        /// <summary>
+        /// 获取临时配置文件的路径
+        /// </summary>
+        /// <returns></returns>
+        public static string GetTempConfigPath() => Path.Combine(GetRootPath(), ConfigFileName);
+
+        /// <summary>
+        /// 配置文件名称
+        /// </summary>
+        public static string ConfigFileName = "config.json";
+
     }
 }

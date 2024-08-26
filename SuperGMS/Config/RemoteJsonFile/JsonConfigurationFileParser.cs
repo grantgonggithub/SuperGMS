@@ -11,13 +11,16 @@ namespace SuperGMS.Config.RemoteJsonFile
 {
     internal class JsonConfigurationFileParser : object
     {
-        private JsonConfigurationFileParser()
+        public JsonConfigurationFileParser()
         {
         }
 
-        public static IDictionary<string, string> Parse(Stream input)
+        public JObject jObject { get { return _jObject; } }
+        private JObject _jObject;
+
+        public IDictionary<string, string> Parse(Stream input)
         {
-            return new JsonConfigurationFileParser().ParseStream(input);
+            return ParseStream(input);
         }
 
         private IDictionary<string, string> ParseStream(Stream input)
@@ -25,8 +28,8 @@ namespace SuperGMS.Config.RemoteJsonFile
             this._data.Clear();
             this._reader = new JsonTextReader(new StreamReader(input));
             this._reader.DateParseHandling = 0;
-            JObject jObject = JObject.Load(this._reader);
-            this.VisitJObject(jObject);
+            _jObject = JObject.Load(this._reader);
+            this.VisitJObject(_jObject);
             return this._data;
         }
 
