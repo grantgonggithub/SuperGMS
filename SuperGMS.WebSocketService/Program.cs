@@ -50,16 +50,19 @@ using WebSocketService;
         KeepAliveInterval = TimeSpan.FromSeconds(120),
     });
 
-    // 注册WebSocket服务为内部服务提供发送消息的接口（本地Rpc端口注册），接收后端消息，下行消息
-    ServerProxy.Register(typeof(Program));
-
-    // 作为代理层，需要注册拉取后端的所有服务的负载地址
-    SuperWebSocketProxy.Register();
-
     // 注册WebSocket，接收前端消息，上行消息
     app.UseMiddleware<SuperWebSocketMiddleware>();
 
     SuperWebSocketManager.Initlize();
+
+    _=Task.Run(() =>
+    {
+        // 注册WebSocket服务为内部服务提供发送消息的接口（本地Rpc端口注册），接收后端消息，下行消息
+        ServerProxy.Register(typeof(Program));
+        // 作为代理层，需要注册拉取后端的所有服务的负载地址
+        // Websocket只做后端推送，前端调用直接走接口，简化复杂度
+       // SuperWebSocketProxy.Register();
+    });
 
     app.Run();
 }
