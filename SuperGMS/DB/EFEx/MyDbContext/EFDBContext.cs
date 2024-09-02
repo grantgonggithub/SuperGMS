@@ -64,24 +64,24 @@ namespace SuperGMS.DB.EFEx
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <returns></returns>
-        public ICrudRepository<TEntity> GetRepository<TEntity>() where TEntity : class
+        public ICrudRepository<TEntity> GetRepository<TEntity>(string name = null) where TEntity : class
         {
             // 先检查，检查没有，锁住再检查，保证原子性，又保证性能
-            var type = typeof(TEntity).FullName.ToLower();
-            if (_repositories.ContainsKey(type))
+            var key = !string.IsNullOrWhiteSpace(name) ? name : typeof(TEntity).FullName.ToLower();
+            if (_repositories.ContainsKey(key))
             {
-                return (ICrudRepository<TEntity>)_repositories[type];
+                return (ICrudRepository<TEntity>)_repositories[key];
             }
 
             lock (_rootObj)
             {
-                if (_repositories.ContainsKey(type))
+                if (_repositories.ContainsKey(key))
                 {
-                    return (ICrudRepository<TEntity>)_repositories[type];
+                    return (ICrudRepository<TEntity>)_repositories[key];
                 }
 
-                ICrudRepository<TEntity> crud = new EFCrudRepository<TEntity>(_dbContext, _dbInfo);
-                _repositories.Add(type, crud);
+                ICrudRepository<TEntity> crud = new EFCrudRepository<TEntity>(_dbContext, _dbInfo, name);
+                _repositories.Add(key, crud);
                 return crud;
             }
         }

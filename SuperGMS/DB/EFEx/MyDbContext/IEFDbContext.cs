@@ -25,7 +25,7 @@ namespace SuperGMS.DB.EFEx.GrantDbContext
     /// </summary>
     public interface IEFDbContext : IDbContext
     {
-        ICrudRepository<TEntity> GetRepository<TEntity>()
+        ICrudRepository<TEntity> GetRepository<TEntity>(string name = null)
             where TEntity : class;
         void Commit();
     }

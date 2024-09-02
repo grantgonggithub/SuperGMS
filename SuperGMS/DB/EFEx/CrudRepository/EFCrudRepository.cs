@@ -41,11 +41,19 @@ namespace SuperGMS.DB.EFEx
         /// </summary>
         /// <param name="dbContext">dbContext</param>
         /// <param name="dbInfo">dbInfo</param>
+        /// <param name="entityName"></param>
         [Obsolete("已过时, 请直接使用GrantEFDBContext")]
-        public EFCrudRepository(DbContext dbContext, DbInfo dbInfo)
+        public EFCrudRepository(DbContext dbContext, DbInfo dbInfo, string entityName = null)
         {
             Context = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-            _dbSet = Context.Set<T>();
+            if (!string.IsNullOrWhiteSpace(entityName))
+            {
+                _dbSet = Context.Set<T>(entityName);
+            }
+            else
+            {
+                _dbSet = Context.Set<T>();
+            }
             _dbInfo = dbInfo;
         }
 
