@@ -19,9 +19,11 @@
     <TreatSpecificWarningsAsErrors />-->
     <OutputPath>bin\Debug\</OutputPath>
     <DocumentationFile>bin\Release\netcoreapp3.1\SuperGMS.xml</DocumentationFile>
+    <IsAotCompatible>False</IsAotCompatible>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp3.1\SuperGMS.xml</DocumentationFile>
+    <DocumentationFile></DocumentationFile>
+    <IsAotCompatible>False</IsAotCompatible>
   </PropertyGroup>
 
   <ItemGroup>
