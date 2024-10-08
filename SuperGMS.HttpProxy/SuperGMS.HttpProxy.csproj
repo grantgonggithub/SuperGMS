@@ -3,7 +3,7 @@
   <PropertyGroup>
     <ServerGarbageCollection>false</ServerGarbageCollection>
     <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Authors>gongjianchun</Authors>
     <Product>SuperGMS</Product>
     <Description>SuperGMS,从此版本开始直接升级到Net6,所以版本号直接升级到6.0.0，以前的版本（仅支持3.1）不在维护升级</Description>
