@@ -4,12 +4,14 @@
 	  <TargetFramework>net6.0</TargetFramework>
 	  <LangVersion>7.1</LangVersion>
     <PackageReleaseNotes>grantgongjianchun(nnn987@126.com)</PackageReleaseNotes>
-    <Version>6.0.27</Version>
+    <Version>6.0.28</Version>
     <Authors>grantgongjianchun</Authors>
     <Company>SuperGMS</Company>
     <Description></Description>
     <PackageIconUrl />
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageOutputPath />
+    <PackAsTool>False</PackAsTool>
   </PropertyGroup>
   <!--<PropertyGroup>
     <CodeAnalysisRuleSet>$(SolutionDir)\_stylecop\StyleCopeRules.ruleset</CodeAnalysisRuleSet>
@@ -18,7 +20,7 @@
     <!--<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <TreatSpecificWarningsAsErrors />-->
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>bin\Release\netcoreapp3.1\SuperGMS.xml</DocumentationFile>
+    <DocumentationFile></DocumentationFile>
     <IsAotCompatible>False</IsAotCompatible>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

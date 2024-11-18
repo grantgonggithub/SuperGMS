@@ -79,25 +79,9 @@ namespace SuperGMS.DB.EFEx
                 else
                 {
                     // 如果私有化的表没有，找全局的表
-                    var dbModel = ServerSetting.GetDbModelContext(dbName);
-                    if (dbModel == null)
-                    {
+                    info = ServerSetting.GetDbModelContext(dbName);
+                    if (info == null)
                         throw new Exception($"DataModel Info :{dbName} Is Not Found");
-                    }
-
-                    DbType dType = DbTypeParser.Parser(dbModel.DbType);
-
-                    // 需要根据接口配置的主从来选择主从，这里先暂时全部取主，有空了在完善接口主从配置
-                    info = new DbInfo()
-                    {
-                        DbName = dbModel.Database,
-                        DbType = dType,
-                        Ip = dbModel.Master.Ip,
-                        Port = dbModel.Master.Port,
-                        UserName = dbModel.UserName,
-                        Pwd = dbModel.PassWord,
-                        DbContextName = dbName,
-                    };
                 }
                 logger.LogDebug($"获取的数据库信息是：{info?.ToString()}");
                 return info;
