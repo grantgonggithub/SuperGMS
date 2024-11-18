@@ -11,21 +11,22 @@
 
 ----------------------------------------------------------------*/
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading;
-using System.Xml.Linq;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
+
+using NLog.Config;
 using NLog.Extensions.Logging;
+
+using NPOI.OpenXmlFormats.Wordprocessing;
+
 using org.apache.zookeeper;
+
 using SuperGMS.Cache;
 using SuperGMS.Config.RemoteJsonFile;
 using SuperGMS.HttpProxy;
@@ -34,6 +35,14 @@ using SuperGMS.MQ;
 using SuperGMS.Router;
 using SuperGMS.Tools;
 using SuperGMS.Zookeeper;
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Xml.Linq;
 
 namespace SuperGMS.Config
 {
@@ -53,12 +62,13 @@ namespace SuperGMS.Config
 
         private static Action<string, Configuration> updateConfigurationAction;
 
-        private static Dictionary<string,Action<Configuration>> callBackList = new Dictionary<string, Action<Configuration>>();
+        private static Dictionary<string, Action<Configuration>> callBackList = new Dictionary<string, Action<Configuration>>();
 
         public readonly string ServerInfo = ServiceEnvironment.EnvironmentInfo;
 
         private static ILogger logger = NullLogger.Instance;
 
+        private static string nlogConf = string.Empty;
         /// <summary>
         /// 取当前的环境变量
         /// </summary>
@@ -153,13 +163,13 @@ namespace SuperGMS.Config
         /// <param name="port"></param>
         /// <param name="enable"></param>
         /// <param name="timeout"></param>
-        public static void RegisterRouter(string serverName, string ip, int port, bool enable,int timeout)
+        public static void RegisterRouter(string serverName, string ip, int port, bool enable, int timeout)
         {
             if (configCenter.ConfigType != ConfigType.Zookeeper)
             {
                 return; // 本地配置不走zookeeper;
-            } 
-           string path = ZookeeperManager.SetRouter(serverName, ip, port, enable, timeout);
+            }
+            string path = ZookeeperManager.SetRouter(serverName, ip, port, enable, timeout);
             var cfgWatcher = new ConfigWatcher();
             cfgWatcher.OnChange += (string p) =>
             {
@@ -180,7 +190,7 @@ namespace SuperGMS.Config
                             logger.LogInformation($"我被管理员上线了,哈哈哈哈。。。。serverName={serverName},ip={ip},port = {port}");
                         }
                         // 在这里修改本地配置快照
-                        if(clientItem==null||string.IsNullOrEmpty(clientItem.Ip)||clientItem.Port<1) return;
+                        if (clientItem == null || string.IsNullOrEmpty(clientItem.Ip) || clientItem.Port < 1) return;
                         config.ServerConfig.RpcService.Ip = clientItem.Ip;
                         config.ServerConfig.RpcService.Port = clientItem.Port;
                         config.ServerConfig.RpcService.Pool = clientItem.Pool;
@@ -193,7 +203,7 @@ namespace SuperGMS.Config
                         logger.LogCritical(e, $"RegisterRouter.cfgWatcher.OnChange.Error,serverName={serverName},ip={ip},port = {port}");
                     }
                 }
-               
+
             };
             ZookeeperManager.GetNodeData(path, cfgWatcher); // 监控自己router节点的内容，有可能被置为下线；
         }
@@ -302,12 +312,12 @@ namespace SuperGMS.Config
         /// <returns></returns>
         public static Client GetAllClientsByServiceName(string serviceName)
         {
-           return  config?.RpcClients?.Clients?.FirstOrDefault(x => x.ServerName.ToLower() == serviceName.ToLower());
+            return config?.RpcClients?.Clients?.FirstOrDefault(x => x.ServerName.ToLower() == serviceName.ToLower());
         }
 
-        private static RpcClients getRouters(string appName,Watcher serviceRouterWatcher)
+        private static RpcClients getRouters(string appName, Watcher serviceRouterWatcher)
         {
-            List<string> nodeList = ZookeeperManager.GetRouterChildren(appName,serviceRouterWatcher); // 路由是整个获取节点整个跟节点监控，因为子节点是虚拟的
+            List<string> nodeList = ZookeeperManager.GetRouterChildren(appName, serviceRouterWatcher); // 路由是整个获取节点整个跟节点监控，因为子节点是虚拟的
             if (nodeList == null || nodeList.Count < 1)
             {
                 string msg = $"你代码里面调用了 {appName} ,但是从zookeeper中取不到这个服务的路由信息，GetAppClient.appName={appName}.GetChildrenNode==null";
@@ -327,7 +337,7 @@ namespace SuperGMS.Config
             }
             foreach (var item in nodeList)
             {
-                string nodeData = ZookeeperManager.GetNodeData(p + "/" + item,serviceRouterWatcher);
+                string nodeData = ZookeeperManager.GetNodeData(p + "/" + item, serviceRouterWatcher);
                 if (string.IsNullOrEmpty(nodeData))
                 {
                     continue;
@@ -352,7 +362,7 @@ namespace SuperGMS.Config
             try
             {
                 checkInitlize();
-                
+
                 ServerSetting._appName = appName;
                 ServerSetting._pool = pool;
 
@@ -376,7 +386,7 @@ namespace SuperGMS.Config
                                     try
                                     {
                                         // Initlize(appName, pool); // 更新了config 
-                                       initlizeData(appName);
+                                        initlizeData(appName);
                                     }
                                     catch (Exception e) // 重连的就不能抛异常了
                                     {
@@ -475,8 +485,8 @@ namespace SuperGMS.Config
                     NullValueHandling = NullValueHandling.Ignore,
                     Formatting = Formatting.Indented
                 };
-                standConfig.Add(SuperGMS.HttpProxy.SuperHttpProxy.HttpProxy, config.HttpProxy == null ? string.Empty : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration(){ HttpProxy = config.HttpProxy}, jsonSerializerSettings));
-                
+                standConfig.Add(SuperGMS.HttpProxy.SuperHttpProxy.HttpProxy, config.HttpProxy == null ? string.Empty : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration() { HttpProxy = config.HttpProxy }, jsonSerializerSettings));
+
                 // 数据库统一走本地配置，走ZK不合适
                 //string dbStr = string.Empty;
                 //if (config.DataBase != null && !string.IsNullOrEmpty(config.DataBase.DbFile))
@@ -487,10 +497,11 @@ namespace SuperGMS.Config
                 //}
 
                 //standConfig.Add(DbModelContextManager.DATABASE, dbStr);
-                standConfig.Add(ConfigManager.CONSTKEYVALUE, config.ConstKeyValue == null ? string.Empty : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration(){ ConstKeyValue = config.ConstKeyValue}, jsonSerializerSettings));
-                standConfig.Add(CacheManager.RedisConfig, config.RedisConfig == null ? string.Empty : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration(){RedisConfig = config.RedisConfig},jsonSerializerSettings));
-                standConfig.Add(MQHostConfigManager.RabbitMQ, config.RabbitMQ == null ? string.Empty : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration(){ RabbitMQ = config.RabbitMQ},jsonSerializerSettings));
-                standConfig.Add(FileServerManager.FileServerName, config.FileServer == null ? string.Empty : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration(){ FileServer = config.FileServer},jsonSerializerSettings));
+                standConfig.Add(ConfigManager.CONSTKEYVALUE, config.ConstKeyValue == null ? string.Empty : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration() { ConstKeyValue = config.ConstKeyValue }, jsonSerializerSettings));
+                standConfig.Add(CacheManager.RedisConfig, config.RedisConfig == null ? string.Empty : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration() { RedisConfig = config.RedisConfig }, jsonSerializerSettings));
+                standConfig.Add(MQHostConfigManager.RabbitMQ, config.RabbitMQ == null ? string.Empty : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration() { RabbitMQ = config.RabbitMQ }, jsonSerializerSettings));
+                standConfig.Add(FileServerManager.FileServerName, config.FileServer == null ? string.Empty : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration() { FileServer = config.FileServer }, jsonSerializerSettings));
+                standConfig.Add("NLog", nlogConf);
             }
             catch (Exception e)
             {
@@ -583,12 +594,12 @@ namespace SuperGMS.Config
                     string[] ps = path.Split("/", StringSplitOptions.RemoveEmptyEntries);
                     switch (ps[ps.Length - 1])
                     {
-                       // case DbModelContextManager.DATABASE: // 数据库,从zookeeper推过来的直接就是数据库和脚本的xml内容，这个跟文件有区别，文件是通过 ref引到外部文件的
-                                                             // DataBase db = Newtonsoft.Json.JsonConvert.DeserializeObject<DataBase>(configData);
-                       //     var xmlStr = XElement.Parse(configData);
-                       //     DbModelContextManager.Initlize(xmlStr);
+                        // case DbModelContextManager.DATABASE: // 数据库,从zookeeper推过来的直接就是数据库和脚本的xml内容，这个跟文件有区别，文件是通过 ref引到外部文件的
+                        // DataBase db = Newtonsoft.Json.JsonConvert.DeserializeObject<DataBase>(configData);
+                        //     var xmlStr = XElement.Parse(configData);
+                        //     DbModelContextManager.Initlize(xmlStr);
 
-                            // Config.DataBase = db; // 把本地的完整配置更新,数据库配置不需要更新全局
+                        // Config.DataBase = db; // 把本地的完整配置更新,数据库配置不需要更新全局
                         //    break;
 
                         case ConfigManager.CONSTKEYVALUE: // 常量
@@ -617,6 +628,22 @@ namespace SuperGMS.Config
                             var pxyName = Newtonsoft.Json.JsonConvert.DeserializeObject<Configuration>(configData);
                             Config.HttpProxy = pxyName.HttpProxy;
                             break;
+                        case "NLog":// NLog
+                            // Config.NLog = JObject.FromObject(configData);
+                            configData=string.Format("{{\"NLog\":{0}}}",configData);
+                            var byteValue = Encoding.UTF8.GetBytes(configData);
+                            MemoryStream stream=new MemoryStream(byteValue,0,byteValue.Length);
+                            
+                            var jsonConfigurationFileParser = new JsonConfigurationFileParser();
+                            var configDic = jsonConfigurationFileParser.Parse(stream);
+                            //List<KeyValuePair<string, string>> keyValuePairs = new List<KeyValuePair<string, string>>();
+                            //keyValuePairs.Add(new KeyValuePair<string, string>("NLog", $"{configData}"));
+                            ConfigurationBuilder builder = new ConfigurationBuilder();
+                            builder.Sources.Add(new MemoryConfigurationSource() { InitialData = configDic });
+                            IConfigurationRoot configurationRoot = builder.Build();
+
+                            NLog.LogManager.Configuration = new NLogLoggingConfiguration(configurationRoot.GetSection("NLog"));
+                            break;
                     }
 
                     updateConfigurationAction?.Invoke(ps[ps.Length - 1], Config); // 执行用户自定义的回调，目前只有log在用，其他不用
@@ -635,7 +662,7 @@ namespace SuperGMS.Config
         /// 这里还没有设置config,只有经过Initlize才设置
         /// </summary>
         /// <returns>XElement</returns>
-        public static RpcService GetRpcServer(string servserName="")
+        public static RpcService GetRpcServer(string servserName = "")
         {
             checkInitlize();
             if (string.IsNullOrEmpty(servserName))
@@ -645,7 +672,7 @@ namespace SuperGMS.Config
             else
             {
                 var ports = config.ServerConfig.RpcService.PortList;
-                if (ports!=null&&ports.Count>0)
+                if (ports != null && ports.Count > 0)
                 {
                     if (ports.ContainsKey(servserName))
                     {
@@ -718,7 +745,7 @@ namespace SuperGMS.Config
                 //        configFile = string.Format(configFile, "");
                 //        break;
                 //}
-                configFile = string.Format(configFile, "."+env);
+                configFile = string.Format(configFile, "." + env);
             }
             _environmentVariable = env;
             var configJson = Path.Combine(AppContext.BaseDirectory, configFile);
@@ -733,10 +760,11 @@ namespace SuperGMS.Config
             //如未获取到,则配置源默认为ConfigType.Local
             if (ServerSetting.configCenter == null)
             {
-                ServerSetting.configCenter = new ConfigCenter() { ConfigType = ConfigType.Local};
+                ServerSetting.configCenter = new ConfigCenter() { ConfigType = ConfigType.Local };
             }
             var settingConfigBuilder = new ConfigurationBuilder();
             string configPath = string.Empty;
+            RemoteJsonFileConfigurationSource remoteJsonFileConfigurationSource = null;
             switch (ServerSetting.configCenter.ConfigType)
             {
                 //配置源为ConfigType.Local时,优先读取内部config.json文件,不存在则读取上级目录Conf下的config.json
@@ -765,7 +793,12 @@ namespace SuperGMS.Config
                     }
                     break;
                 case ConfigType.HttpFile:
-                    settingConfigBuilder.Sources.Add(new RemoteJsonFileConfigurationSource() { Uri = ServerSetting.configCenter.Ip, Optional = false });
+                    remoteJsonFileConfigurationSource = new RemoteJsonFileConfigurationSource() { Uri = ServerSetting.configCenter.Ip, Optional = false };
+                    settingConfigBuilder.Sources.Add(remoteJsonFileConfigurationSource);
+                    configPath = ServerSetting.configCenter.Ip;
+                    break;
+                case ConfigType.Zookeeper:// 如果是zk配置，第一次需要根据配置文件来初始化，简化配置难度
+                    settingConfigBuilder.SetBasePath(RemoteJsonFileConfigurationProvider.GetRootPath()).AddJsonFile(RemoteJsonFileConfigurationProvider.ConfigFileName, optional: false, reloadOnChange: false);
                     configPath = ServerSetting.configCenter.Ip;
                     break;
                 default:
@@ -779,6 +812,8 @@ namespace SuperGMS.Config
             logger.LogInformation($"最终的配置类型是:{ServerSetting.configCenter.ConfigType}, 最终的配置文件路径是:{configPath}");
             //加载服务配置项
             ServerSetting.config = settingsConfig.Get<Configuration>();
+            // nlogConf= remoteJsonFileConfigurationSource?.jObject;
+            nlogConf = remoteJsonFileConfigurationSource.remoteJsonFileConfigurationProvider.jObject.Values().First(x => x.Path == "NLog").ToString();
             ServerSetting.configCenter = config.ServerConfig.ConfigCenter;
             if (config.ServerConfig.RpcService == null)
             {
@@ -790,6 +825,7 @@ namespace SuperGMS.Config
             config.ConfigPath = ServerSetting.configCenter.Ip;
             getLocalIp();
         }
+
         /// <summary>
         /// 通过通配符来匹配本地Ip，主要为了适应多台机器共享配置，多台机器肯定是同一个局域网，Ip规则如：192.168.100.121  192.168.100.126  所以通配符配置如：192.168.100.*  因为对于多网卡的机器来说，多个网卡肯定是不同网段的，否则就没有意义了，所以使用通配符既可以适应多台机器，又能过滤出来正确的Ip
         /// </summary>
@@ -820,7 +856,7 @@ namespace SuperGMS.Config
                             }
                         }
                     }
-                    if(!isFind)
+                    if (!isFind)
                     {
                         throw new Exception("当前机器的Ip无法和RpcServer配置的Ip规则匹配到结果，请检查配置是否正确");
                     }
