@@ -9,28 +9,28 @@ using WebSocketService;
     var builder = WebApplication.CreateBuilder(args);
     var server = ServerSetting.GetRpcServer(SuperWebSocketProxy.WebSocketProxy);
 
-    // Ìí¼ÓÉèÖÃÔÊĞí¿çÓòµÄÅäÖÃ
+    // æ·»åŠ è®¾ç½®å…è®¸è·¨åŸŸçš„é…ç½®
     builder.Services.AddCors(options =>
     {
         options.AddPolicy("AllowAll", p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
     });
 
-    if (server == null || server.Port < 1) throw new Exception("ÇëÅäÖÃWebSocketµÄ¶Ë¿ÚºÅ");
+    if (server == null || server.Port < 1) throw new Exception("è¯·é…ç½®WebSocketçš„ç«¯å£å·");
     var url = $"http://*:{server.Port}/";
-    _loger.LogInformation($"WebSocket¼àÌıµØÖ·£º{url}");
+    _loger.LogInformation($"WebSocketç›‘å¬åœ°å€ï¼š{url}");
 
-    // ÉèÖÃ¼àÌı¶Ë¿ÚºÍ°üÌå´óĞ¡µÄÅäÖÃ
+    // è®¾ç½®ç›‘å¬ç«¯å£å’ŒåŒ…ä½“å¤§å°çš„é…ç½®
     builder.WebHost.UseUrls(url).UseKestrel(options =>
     {
-        //ÇëÇóÄÚÈİ³¤¶ÈÏŞÖÆ(µ¥Î»B)
+        //è¯·æ±‚å†…å®¹é•¿åº¦é™åˆ¶(å•ä½B)
         int maxLength = 0;
         var maxBody = ServerSetting.Config.ConstKeyValue.Items.FirstOrDefault(i => i.Key == "MaxHttpBody")?.Value;
         if (!string.IsNullOrEmpty(maxBody))
         {
             int.TryParse(maxBody, out maxLength);
         }
-        if (maxLength < 4194304) maxLength = 4194304; // ×îĞ¡4M
-        if (maxLength > 104857600) maxLength = 104857600; // ×î´ó100M
+        if (maxLength < 4194304) maxLength = 4194304; // æœ€å°4M
+        if (maxLength > 104857600) maxLength = 104857600; // æœ€å¤§100M
         options.Limits.MaxRequestBodySize = maxLength;
         options.AllowSynchronousIO = true;
     });
@@ -44,25 +44,25 @@ using WebSocketService;
 
     app.UseCors("AllowAll");
 
-    //ÉèÖÃÖ§³Öwebsocket
+    //è®¾ç½®æ”¯æŒwebsocket
     app.UseWebSockets(new WebSocketOptions
     {
         KeepAliveInterval = TimeSpan.FromSeconds(120),
     });
 
-    // ×¢²áWebSocket£¬½ÓÊÕÇ°¶ËÏûÏ¢£¬ÉÏĞĞÏûÏ¢
+    // æ³¨å†ŒWebSocketï¼Œæ¥æ”¶å‰ç«¯æ¶ˆæ¯ï¼Œä¸Šè¡Œæ¶ˆæ¯
     app.UseMiddleware<SuperWebSocketMiddleware>();
 
     SuperWebSocketManager.Initlize();
 
     _=Task.Run(() =>
     {
-        // ×¢²áWebSocket·şÎñÎªÄÚ²¿·şÎñÌá¹©·¢ËÍÏûÏ¢µÄ½Ó¿Ú£¨±¾µØRpc¶Ë¿Ú×¢²á£©£¬½ÓÊÕºó¶ËÏûÏ¢£¬ÏÂĞĞÏûÏ¢
+        // æ³¨å†ŒWebSocketæœåŠ¡ä¸ºå†…éƒ¨æœåŠ¡æä¾›å‘é€æ¶ˆæ¯çš„æ¥å£ï¼ˆæœ¬åœ°Rpcç«¯å£æ³¨å†Œï¼‰ï¼Œæ¥æ”¶åç«¯æ¶ˆæ¯ï¼Œä¸‹è¡Œæ¶ˆæ¯
         ServerProxy.Register(typeof(Program));
-        // ×÷Îª´úÀí²ã£¬ĞèÒª×¢²áÀ­È¡ºó¶ËµÄËùÓĞ·şÎñµÄ¸ºÔØµØÖ·
-        // WebsocketÖ»×öºó¶ËÍÆËÍ£¬Ç°¶Ëµ÷ÓÃÖ±½Ó×ß½Ó¿Ú£¬¼ò»¯¸´ÔÓ¶È
+        // ä½œä¸ºä»£ç†å±‚ï¼Œéœ€è¦æ³¨å†Œæ‹‰å–åç«¯çš„æ‰€æœ‰æœåŠ¡çš„è´Ÿè½½åœ°å€
+        // Websocketåªåšåç«¯æ¨é€ï¼Œå‰ç«¯è°ƒç”¨ç›´æ¥èµ°æ¥å£ï¼Œç®€åŒ–å¤æ‚åº¦
        // SuperWebSocketProxy.Register();
     });
-
+  
     app.Run();
 }

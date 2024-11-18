@@ -29,6 +29,7 @@ using org.apache.zookeeper;
 
 using SuperGMS.Cache;
 using SuperGMS.Config.RemoteJsonFile;
+using SuperGMS.DB.EFEx;
 using SuperGMS.HttpProxy;
 using SuperGMS.Log;
 using SuperGMS.MQ;
@@ -702,9 +703,27 @@ namespace SuperGMS.Config
         /// </summary>
         /// <param name="dbContextName">dbContextName</param>
         /// <returns>DbModelContext</returns>
-        internal static DbModelContext GetDbModelContext(string dbContextName)
+        public static DbInfo GetDbModelContext(string dbContextName)
         {
-            return DbModelContextManager.GetDbModelContext(dbContextName);
+            var dbModel = DbModelContextManager.GetDbModelContext(dbContextName);
+            if (dbModel == null)
+            {
+                return null;
+            }
+
+            DbType dType = DbTypeParser.Parser(dbModel.DbType);
+
+            // 需要根据接口配置的主从来选择主从，这里先暂时全部取主，有空了在完善接口主从配置
+            return new DbInfo()
+            {
+                DbName = dbModel.Database,
+                DbType = dType,
+                Ip = dbModel.Master.Ip,
+                Port = dbModel.Master.Port,
+                UserName = dbModel.UserName,
+                Pwd = dbModel.PassWord,
+                DbContextName = dbContextName,
+            };
         }
 
         /// <summary>
