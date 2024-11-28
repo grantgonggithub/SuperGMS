@@ -11,12 +11,14 @@
 
 ----------------------------------------------------------------*/
 
+using System.Threading;
+
 namespace SuperGMS.Rpc
 {
     /// <summary>
     /// 微服务接口
     /// </summary>
-    public interface ISuperGMSRpcServer : Iface
+    public interface ISuperGMSRpcServer : IAsync
     {
         /// <summary>
         /// 程序停止时，回收系统资源，包括调用应用标记的回收方法
@@ -34,7 +36,7 @@ namespace SuperGMS.Rpc
     /// <summary>
     /// 消息接口, Thrift 直接调用此接口的 Send 方法
     /// </summary>
-    public interface ISync
+    public interface IAsync
     {
         /// <summary>
         /// 发送
@@ -42,10 +44,10 @@ namespace SuperGMS.Rpc
         /// <param name="my_args">参数</param>
         /// <param name="appContext">调用上下文</param>
         /// <returns>返回结果</returns>
-        string Send(string my_args, object appContext);
+        global::System.Threading.Tasks.Task<string> Send(string my_args, object appContext, CancellationToken cancellationToken = default);
     }
 
-    public interface Iface : ISync
-    {
-    }
+    //public interface Iface : IAsync
+    //{
+    //}
 }

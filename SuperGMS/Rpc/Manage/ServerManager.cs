@@ -17,6 +17,9 @@ using Thrift;
 using Thrift.Protocol;
 using Thrift.Server;
 using Thrift.Transport;
+using Thrift.Transport.Server;
+
+using static SuperGMS.Rpc.Thrift.Server.ThriftService;
 
 namespace SuperGMS.Rpc.Manage
 {
@@ -39,10 +42,11 @@ namespace SuperGMS.Rpc.Manage
                 if (servers == null || servers.Length < 1) throw new Exception("no Server can Register");
                 foreach (SuperGMSServer s in servers)
                 {
-                    TServerSocket serverTransport = new TServerSocket(s.Config.Port);
+                    TServerSocketTransport serverTransport = new TServerSocketTransport(s.Config.Port,new TConfiguration());
                     TBinaryProtocol.Factory factory = new TBinaryProtocol.Factory();//传输协议
-                    TProcessor processor = new ThriftService.Processor(s.Server);
-                    TServer server = new TThreadPoolServer(processor, serverTransport, new TTransportFactory(), factory);
+                    AsyncProcessor processor = new ThriftService.AsyncProcessor(s.Server);
+                    TServer server = new TThreadPoolAsyncServer(processor, serverTransport, new TTransportFactory(), factory);
+                   // server.Start();
                 }
             }
             catch (TTransportException tex)

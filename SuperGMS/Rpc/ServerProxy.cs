@@ -33,7 +33,7 @@ namespace SuperGMS.Rpc
         /// 注意这一句是Program最后一句代码，任何放到这句后的代码都不会被执行
         /// </summary>
         /// <param name="programNamespace"></param>
-        [Obsolete("建议用更简单的构造：Register(Type typeOfClass)")]
+       // [Obsolete("建议用更简单的构造：Register(Type typeOfClass)")]
         public static void Register(string programNamespace)
         {
             if (string.IsNullOrEmpty(programNamespace))
@@ -70,7 +70,7 @@ namespace SuperGMS.Rpc
             logger.LogInformation($"ThreadPool.GetMinThreads: worker-{Math.Max(wt, 1000)}; io-{Math.Max(ct, 1000)}");
 
             // 阻止主线程，防止退出
-           // Thread.Sleep(int.MaxValue);
+            Thread.Sleep(int.MaxValue);
         }
 
         /// <summary>

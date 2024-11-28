@@ -16,7 +16,12 @@ using System;
 using Thrift;
 using Thrift.Protocol;
 using Thrift.Server;
+using Thrift.Processor;
 using Thrift.Transport;
+using Thrift.Transport.Server;
+
+using static SuperGMS.Rpc.Thrift.Server.ThriftService;
+using System.Threading;
 
 namespace SuperGMS.Rpc.Thrift.Server
 {
@@ -25,8 +30,8 @@ namespace SuperGMS.Rpc.Thrift.Server
     /// </summary>
     public class ThriftRpcServer : SuperGMSBaseServer
     {
-        private TServer ts;
-        private TServerSocket serverTransport;
+        private TThreadPoolAsyncServer ts;
+        private TServerSocketTransport serverTransport;
 
         protected override void Dispose()
         {
@@ -38,13 +43,13 @@ namespace SuperGMS.Rpc.Thrift.Server
         {
             try
             {
-                serverTransport = new TServerSocket(server.Port);
+                serverTransport = new TServerSocketTransport(server.Port,null);
 
                 // 传输协议
                 TBinaryProtocol.Factory factory = new TBinaryProtocol.Factory();
-                TProcessor processor = new ThriftService.Processor(this);
-                ts = new TThreadedServer(processor, serverTransport, new TTransportFactory(), factory);
-                ts.Serve();
+                AsyncProcessor processor = new ThriftService.AsyncProcessor(this);
+                ts = new TThreadPoolAsyncServer(processor, serverTransport, new TTransportFactory(), factory);
+                ts.ServeAsync(CancellationToken.None).Wait();
             }
             catch (TTransportException tex)
             {
