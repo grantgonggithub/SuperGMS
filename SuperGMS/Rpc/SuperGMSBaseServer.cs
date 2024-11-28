@@ -12,16 +12,14 @@
 ----------------------------------------------------------------*/
 
 using System;
-using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting.Internal;
+
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.PlatformAbstractions;
+
 using SuperGMS.Config;
 using SuperGMS.Log;
 using SuperGMS.Rpc.Server;
-using SuperGMS.Tools;
 using SuperGMS.Zookeeper;
 
 namespace SuperGMS.Rpc
@@ -148,7 +146,7 @@ namespace SuperGMS.Rpc
         /// <returns>发送结果</returns>
         public string Send(string my_args, object appContext)
         {
-            return OnReceive(my_args, appContext);
+           return OnReceive(my_args, appContext);
         }
 
         /// <summary>
@@ -182,6 +180,11 @@ namespace SuperGMS.Rpc
                 logger.LogError(ex, $"GrantBaseServer.OnReceive.Error{args}");
                 return msg;
             }
+        }
+
+        public Task<string> Send(string my_args,object appContext, CancellationToken cancellationToken = default)
+        {
+            return Task.Run<string>(() => { return OnReceive(my_args, appContext); });
         }
     }
 }

@@ -17,8 +17,11 @@ using Microsoft.Extensions.Logging;
 using SuperGMS.Log;
 using SuperGMS.Rpc.Client;
 using SuperGMS.Rpc.Thrift.Server;
+
+using Thrift;
 using Thrift.Protocol;
 using Thrift.Transport;
+using Thrift.Transport.Client;
 
 namespace SuperGMS.Rpc.Thrift.Client
 {
@@ -48,9 +51,10 @@ namespace SuperGMS.Rpc.Thrift.Client
             try
             {
                 clientItem = client;
-                transport = new TSocket(client.Ip, client.Port, client.TimeOut);
-                transport.Open();
+                transport = new TSocketTransport(client.Ip, client.Port,true,null, client.TimeOut);
                 this.client = new ThriftService.Client(new TBinaryProtocol(transport));
+                if(!transport.IsOpen)
+                    transport.OpenAsync(CancellationToken.None).Wait();
                 isConnected = true;
             }
             catch (Exception ex)
@@ -65,7 +69,7 @@ namespace SuperGMS.Rpc.Thrift.Client
             result = null;
             try
             {
-                result = client.Send(args, null);
+                result = client.Send(args, null).Result;
                 return true;
             }
             catch (Exception ex)

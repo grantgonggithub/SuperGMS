@@ -19,445 +19,450 @@ using Thrift.Protocol;
 using Thrift.Transport;
 using SuperGMS.Log;
 using Microsoft.Extensions.Logging;
+using Thrift.Protocol.Entities;
+using Thrift.Protocol.Utilities;
+using Microsoft.Extensions.Primitives;
+using System.Threading;
+using System.Threading.Tasks;
+using Thrift.Processor;
 
 namespace SuperGMS.Rpc.Thrift.Server
 {
     public partial class ThriftService
     {
-        public class Client : IDisposable, Iface
+        public class Client : TBaseClient, IDisposable, IAsync
         {
-            private readonly static ILogger logger = LogFactory.CreateLogger<Client>();
-            public Client(TProtocol prot) : this(prot, prot)
+            public Client(TProtocol protocol) : this(protocol, protocol)
             {
             }
 
-            public Client(TProtocol iprot, TProtocol oprot)
+            public Client(TProtocol inputProtocol, TProtocol outputProtocol) : base(inputProtocol, outputProtocol)
             {
-                iprot_ = iprot;
-                oprot_ = oprot;
             }
 
-            protected TProtocol iprot_;
-            protected TProtocol oprot_;
-            protected int seqid_;
-
-            public TProtocol InputProtocol
+            public async global::System.Threading.Tasks.Task<string> Send(string my_args, object appContext, CancellationToken cancellationToken = default)
             {
-                get { return iprot_; }
+                await send_Send(my_args, cancellationToken);
+                return await recv_Send(cancellationToken);
             }
 
-            public TProtocol OutputProtocol
+            public async global::System.Threading.Tasks.Task send_Send(string my_args, CancellationToken cancellationToken = default)
             {
-                get { return oprot_; }
-            }
+                await OutputProtocol.WriteMessageBeginAsync(new TMessage("Send", TMessageType.Call, SeqId), cancellationToken);
 
-            #region " IDisposable Support "
-
-            private bool _IsDisposed;
-
-            // IDisposable
-            public void Dispose()
-            {
-                Dispose(true);
-            }
-
-            protected virtual void Dispose(bool disposing)
-            {
-                if (!_IsDisposed)
+                var tmp0 = new InternalStructs.Send_args()
                 {
-                    if (disposing)
-                    {
-                        if (iprot_ != null)
-                        {
-                            ((IDisposable)iprot_).Dispose();
-                        }
-                        if (oprot_ != null)
-                        {
-                            ((IDisposable)oprot_).Dispose();
-                        }
-                    }
-                }
-                _IsDisposed = true;
+                    My_args = my_args,
+                };
+
+                await tmp0.WriteAsync(OutputProtocol, cancellationToken);
+                await OutputProtocol.WriteMessageEndAsync(cancellationToken);
+                await OutputProtocol.Transport.FlushAsync(cancellationToken);
             }
 
-            #endregion " IDisposable Support "
-
-#if SILVERLIGHT
-      public IAsyncResult Begin_Send(AsyncCallback callback, object state, string my_args)
-      {
-        return send_Send(callback, state, my_args);
-      }
-
-      public string End_Send(IAsyncResult asyncResult)
-      {
-        oprot_.Transport.EndFlush(asyncResult);
-        return recv_Send();
-      }
-
-#endif
-
-            public string Send(string my_args, object appContext)
+            public async global::System.Threading.Tasks.Task<string> recv_Send(CancellationToken cancellationToken = default)
             {
-#if !SILVERLIGHT
-                send_Send(my_args);
-                return recv_Send();
 
-#else
-        var asyncResult = Begin_Send(null, null, my_args);
-        return End_Send(asyncResult);
-
-#endif
-            }
-
-#if SILVERLIGHT
-      public IAsyncResult send_Send(AsyncCallback callback, object state, string my_args)
-#else
-
-            public void send_Send(string my_args)
-#endif
-            {
-                oprot_.WriteMessageBegin(new TMessage("Send", TMessageType.Call, seqid_));
-                Send_args args = new Send_args();
-                args.My_args = my_args;
-                args.Write(oprot_);
-                oprot_.WriteMessageEnd();
-#if SILVERLIGHT
-        return oprot_.Transport.BeginFlush(callback, state);
-#else
-                oprot_.Transport.Flush();
-#endif
-            }
-
-            public string recv_Send()
-            {
-                TMessage msg = iprot_.ReadMessageBegin();
-                if (msg.Type == TMessageType.Exception)
+                var tmp1 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+                if (tmp1.Type == TMessageType.Exception)
                 {
-                    TApplicationException x = TApplicationException.Read(iprot_);
-                    iprot_.ReadMessageEnd();
-                    logger.LogError(x, "GrantService.recv_Send.Error");
-                    return null;
+                    var tmp2 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+                    await InputProtocol.ReadMessageEndAsync(cancellationToken);
+                    throw tmp2;
                 }
-                Send_result result = new Send_result();
-                result.Read(iprot_);
-                iprot_.ReadMessageEnd();
-                if (result.__isset.success)
+
+                var tmp3 = new InternalStructs.Send_result();
+                await tmp3.ReadAsync(InputProtocol, cancellationToken);
+                await InputProtocol.ReadMessageEndAsync(cancellationToken);
+                if (tmp3.__isset.success)
                 {
-                    return result.Success;
+                    return tmp3.Success;
                 }
-                logger.LogError(new TApplicationException(TApplicationException.ExceptionType.MissingResult, "Send failed: unknown result"), "Send failed: unknown result");
-                return null;
+                throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "Send failed: unknown result");
             }
+
         }
 
-        public class Processor : TProcessor
+        public class AsyncProcessor : ITAsyncProcessor
         {
-            public Processor(ISync iface)
+            private readonly IAsync _iAsync;
+            private readonly ILogger<AsyncProcessor> _logger;
+
+            public AsyncProcessor(IAsync iAsync, ILogger<AsyncProcessor> logger = default)
             {
-                iface_ = iface;
-                processMap_["Send"] = Send_Process;
+                _iAsync = iAsync ?? throw new ArgumentNullException(nameof(iAsync));
+                _logger = logger;
+                processMap_["Send"] = Send_ProcessAsync;
             }
 
-            protected delegate void ProcessFunction(int seqid, TProtocol iprot, TProtocol oprot);
-            private readonly static ILogger logger = LogFactory.CreateLogger<Processor>();
-            private ISync iface_;
+            protected delegate global::System.Threading.Tasks.Task ProcessFunction(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken);
             protected Dictionary<string, ProcessFunction> processMap_ = new Dictionary<string, ProcessFunction>();
 
-            public bool Process(TProtocol iprot, TProtocol oprot)
+            public async Task<bool> ProcessAsync(TProtocol iprot, TProtocol oprot)
+            {
+                return await ProcessAsync(iprot, oprot, CancellationToken.None);
+            }
+
+            public async Task<bool> ProcessAsync(TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
             {
                 try
                 {
-                    TMessage msg = iprot.ReadMessageBegin();
-                    ProcessFunction fn;
-                    processMap_.TryGetValue(msg.Name, out fn);
+                    var msg = await iprot.ReadMessageBeginAsync(cancellationToken);
+
+                    processMap_.TryGetValue(msg.Name, out var fn);
+
                     if (fn == null)
                     {
-                        TProtocolUtil.Skip(iprot, TType.Struct);
-                        iprot.ReadMessageEnd();
-                        TApplicationException x = new TApplicationException(TApplicationException.ExceptionType.UnknownMethod, "Invalid method name: '" + msg.Name + "'");
-                        oprot.WriteMessageBegin(new TMessage(msg.Name, TMessageType.Exception, msg.SeqID));
-                        x.Write(oprot);
-                        oprot.WriteMessageEnd();
-                        oprot.Transport.Flush();
+                        await TProtocolUtil.SkipAsync(iprot, TType.Struct, cancellationToken);
+                        await iprot.ReadMessageEndAsync(cancellationToken);
+                        var x = new TApplicationException(TApplicationException.ExceptionType.UnknownMethod, "Invalid method name: '" + msg.Name + "'");
+                        await oprot.WriteMessageBeginAsync(new TMessage(msg.Name, TMessageType.Exception, msg.SeqID), cancellationToken);
+                        await x.WriteAsync(oprot, cancellationToken);
+                        await oprot.WriteMessageEndAsync(cancellationToken);
+                        await oprot.Transport.FlushAsync(cancellationToken);
                         return true;
                     }
-                    fn(msg.SeqID, iprot, oprot);
+
+                    await fn(msg.SeqID, iprot, oprot, cancellationToken);
+
                 }
                 catch (IOException)
                 {
                     return false;
                 }
+
                 return true;
             }
 
-            public void Send_Process(int seqid, TProtocol iprot, TProtocol oprot)
+            public async global::System.Threading.Tasks.Task Send_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
             {
-                Send_args args = new Send_args();
-                args.Read(iprot);
-                iprot.ReadMessageEnd();
-                Send_result result = new Send_result();
+                var tmp4 = new InternalStructs.Send_args();
+                await tmp4.ReadAsync(iprot, cancellationToken);
+                await iprot.ReadMessageEndAsync(cancellationToken);
+                var tmp5 = new InternalStructs.Send_result();
                 try
                 {
-                    TSocket t = (TSocket)iprot.Transport;
-                    result.Success = iface_.Send(args.My_args, t.TcpClient.Client.RemoteEndPoint.ToString());
-                    oprot.WriteMessageBegin(new TMessage("Send", TMessageType.Reply, seqid));
-                    result.Write(oprot);
+                    tmp5.Success = await _iAsync.Send(tmp4.My_args, cancellationToken);
+                    await oprot.WriteMessageBeginAsync(new TMessage("Send", TMessageType.Reply, seqid), cancellationToken);
+                    await tmp5.WriteAsync(oprot, cancellationToken);
                 }
-                catch (TTransportException ttx)
+                catch (TTransportException)
                 {
-                    logger.LogError(ttx, "GrantService.Send_Process.ttx.Error");
+                    throw;
                 }
-                catch (Exception ex)
+                catch (Exception tmp6)
                 {
-                    logger.LogError(ex, "GrantService.Send_Process.ex.Error");
-                    TApplicationException x = new TApplicationException(TApplicationException.ExceptionType.InternalError, " Internal error.");
-                    oprot.WriteMessageBegin(new TMessage("Send", TMessageType.Exception, seqid));
-                    x.Write(oprot);
+                    var tmp7 = $"Error occurred in {GetType().FullName}: {tmp6.Message}";
+                    if (_logger != null)
+                        _logger.LogError("{Exception}, {Message}", tmp6, tmp7);
+                    else
+                        Console.Error.WriteLine(tmp7);
+                    var tmp8 = new TApplicationException(TApplicationException.ExceptionType.InternalError, " Internal error.");
+                    await oprot.WriteMessageBeginAsync(new TMessage("Send", TMessageType.Exception, seqid), cancellationToken);
+                    await tmp8.WriteAsync(oprot, cancellationToken);
                 }
-                oprot.WriteMessageEnd();
-                oprot.Transport.Flush();
+                await oprot.WriteMessageEndAsync(cancellationToken);
+                await oprot.Transport.FlushAsync(cancellationToken);
             }
+
         }
 
-#if !SILVERLIGHT
-
-        [Serializable]
-#endif
-        public partial class Send_args : TBase
+        public class InternalStructs
         {
-            private string _my_args;
 
-            public string My_args
+            public partial class Send_args : TBase
             {
-                get
+                private string _my_args;
+
+                public string My_args
                 {
-                    return _my_args;
-                }
-                set
-                {
-                    __isset.my_args = true;
-                    this._my_args = value;
-                }
-            }
-
-            public Isset __isset;
-#if !SILVERLIGHT
-
-            [Serializable]
-#endif
-            public struct Isset
-            {
-                public bool my_args;
-            }
-
-            public Send_args()
-            {
-            }
-
-            public void Read(TProtocol iprot)
-            {
-                iprot.IncrementRecursionDepth();
-                try
-                {
-                    TField field;
-                    iprot.ReadStructBegin();
-                    while (true)
+                    get
                     {
-                        field = iprot.ReadFieldBegin();
-                        if (field.Type == TType.Stop)
-                        {
-                            break;
-                        }
-                        switch (field.ID)
-                        {
-                            case 1:
-                                if (field.Type == TType.String)
-                                {
-                                    My_args = iprot.ReadString();
-                                }
-                                else
-                                {
-                                    TProtocolUtil.Skip(iprot, field.Type);
-                                }
-                                break;
-
-                            default:
-                                TProtocolUtil.Skip(iprot, field.Type);
-                                break;
-                        }
-                        iprot.ReadFieldEnd();
+                        return _my_args;
                     }
-                    iprot.ReadStructEnd();
-                }
-                finally
-                {
-                    iprot.DecrementRecursionDepth();
-                }
-            }
-
-            public void Write(TProtocol oprot)
-            {
-                oprot.IncrementRecursionDepth();
-                try
-                {
-                    TStruct struc = new TStruct("Send_args");
-                    oprot.WriteStructBegin(struc);
-                    TField field = new TField();
-                    if (My_args != null && __isset.my_args)
+                    set
                     {
-                        field.Name = "my_args";
-                        field.Type = TType.String;
-                        field.ID = 1;
-                        oprot.WriteFieldBegin(field);
-                        oprot.WriteString(My_args);
-                        oprot.WriteFieldEnd();
+                        __isset.my_args = true;
+                        this._my_args = value;
                     }
-                    oprot.WriteFieldStop();
-                    oprot.WriteStructEnd();
                 }
-                finally
+
+
+                public Isset __isset;
+                public struct Isset
                 {
-                    oprot.DecrementRecursionDepth();
+                    public bool my_args;
+                }
+
+                public Send_args()
+                {
+                }
+
+                public Send_args DeepCopy()
+                {
+                    var tmp9 = new Send_args();
+                  if ((My_args != null) && __isset.my_args)
+                    {
+                        tmp9.My_args = this.My_args;
+                    }
+                    tmp9.__isset.my_args = this.__isset.my_args;
+                    return tmp9;
+                }
+
+                public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
+                {
+                    iprot.IncrementRecursionDepth();
+                    try
+                    {
+                        TField field;
+                        await iprot.ReadStructBeginAsync(cancellationToken);
+                        while (true)
+                        {
+                            field = await iprot.ReadFieldBeginAsync(cancellationToken);
+                            if (field.Type == TType.Stop)
+                            {
+                                break;
+                            }
+
+                            switch (field.ID)
+                            {
+                                case 1:
+                                    if (field.Type == TType.String)
+                                    {
+                                        My_args = await iprot.ReadStringAsync(cancellationToken);
+                                    }
+                                    else
+                                    {
+                                        await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                                    }
+                                    break;
+                                default:
+                                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                                    break;
+                            }
+
+                            await iprot.ReadFieldEndAsync(cancellationToken);
+                        }
+
+                        await iprot.ReadStructEndAsync(cancellationToken);
+                    }
+                    finally
+                    {
+                        iprot.DecrementRecursionDepth();
+                    }
+                }
+
+                public async global::System.Threading.Tasks.Task WriteAsync(TProtocol oprot, CancellationToken cancellationToken)
+                {
+                    oprot.IncrementRecursionDepth();
+                    try
+                    {
+                        var tmp10 = new TStruct("Send_args");
+                        await oprot.WriteStructBeginAsync(tmp10, cancellationToken);
+                        var tmp11 = new TField();
+                        if ((My_args != null) && __isset.my_args)
+                        {
+                            tmp11.Name = "my_args";
+                            tmp11.Type = TType.String;
+                            tmp11.ID = 1;
+                            await oprot.WriteFieldBeginAsync(tmp11, cancellationToken);
+                            await oprot.WriteStringAsync(My_args, cancellationToken);
+                            await oprot.WriteFieldEndAsync(cancellationToken);
+                        }
+                        await oprot.WriteFieldStopAsync(cancellationToken);
+                        await oprot.WriteStructEndAsync(cancellationToken);
+                    }
+                    finally
+                    {
+                        oprot.DecrementRecursionDepth();
+                    }
+                }
+
+                public override bool Equals(object that)
+                {
+                    if (!(that is Send_args other)) return false;
+                    if (ReferenceEquals(this, other)) return true;
+                    return ((__isset.my_args == other.__isset.my_args) && ((!__isset.my_args) || (global::System.Object.Equals(My_args, other.My_args))));
+                }
+
+                public override int GetHashCode()
+                {
+                    int hashcode = 157;
+                    unchecked
+                    {
+                        if ((My_args != null) && __isset.my_args)
+                        {
+                            hashcode = (hashcode * 397) + My_args.GetHashCode();
+                        }
+                    }
+                    return hashcode;
+                }
+
+                public override string ToString()
+                {
+                    var tmp12 = new StringBuilder("Send_args(");
+                    int tmp13 = 0;
+                    if ((My_args != null) && __isset.my_args)
+                    {
+                        if (0 < tmp13++) { tmp12.Append(", "); }
+                        tmp12.Append("My_args: ");
+                        My_args.ToString(tmp12);
+                    }
+                    tmp12.Append(')');
+                    return tmp12.ToString();
                 }
             }
 
-            public override string ToString()
+
+            public partial class Send_result : TBase
             {
-                StringBuilder __sb = new StringBuilder("Send_args(");
-                bool __first = true;
-                if (My_args != null && __isset.my_args)
+                private string _success;
+
+                public string Success
                 {
-                    if (!__first) { __sb.Append(", "); }
-                    __first = false;
-                    __sb.Append("My_args: ");
-                    __sb.Append(My_args);
+                    get
+                    {
+                        return _success;
+                    }
+                    set
+                    {
+                        __isset.@success = true;
+                        this._success = value;
+                    }
                 }
-                __sb.Append(")");
-                return __sb.ToString();
+
+
+                public Isset __isset;
+                public struct Isset
+                {
+                    public bool @success;
+                }
+
+                public Send_result()
+                {
+                }
+
+                public Send_result DeepCopy()
+                {
+                    var tmp14 = new Send_result();
+                  if ((Success != null) && __isset.@success)
+                    {
+                        tmp14.Success = this.Success;
+                    }
+                    tmp14.__isset.@success = this.__isset.@success;
+                    return tmp14;
+                }
+
+                public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
+                {
+                    iprot.IncrementRecursionDepth();
+                    try
+                    {
+                        TField field;
+                        await iprot.ReadStructBeginAsync(cancellationToken);
+                        while (true)
+                        {
+                            field = await iprot.ReadFieldBeginAsync(cancellationToken);
+                            if (field.Type == TType.Stop)
+                            {
+                                break;
+                            }
+
+                            switch (field.ID)
+                            {
+                                case 0:
+                                    if (field.Type == TType.String)
+                                    {
+                                        Success = await iprot.ReadStringAsync(cancellationToken);
+                                    }
+                                    else
+                                    {
+                                        await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                                    }
+                                    break;
+                                default:
+                                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                                    break;
+                            }
+
+                            await iprot.ReadFieldEndAsync(cancellationToken);
+                        }
+
+                        await iprot.ReadStructEndAsync(cancellationToken);
+                    }
+                    finally
+                    {
+                        iprot.DecrementRecursionDepth();
+                    }
+                }
+
+                public async global::System.Threading.Tasks.Task WriteAsync(TProtocol oprot, CancellationToken cancellationToken)
+                {
+                    oprot.IncrementRecursionDepth();
+                    try
+                    {
+                        var tmp15 = new TStruct("Send_result");
+                        await oprot.WriteStructBeginAsync(tmp15, cancellationToken);
+                        var tmp16 = new TField();
+
+                        if (this.__isset.@success)
+                        {
+                            if (Success != null)
+                            {
+                                tmp16.Name = "Success";
+                                tmp16.Type = TType.String;
+                                tmp16.ID = 0;
+                                await oprot.WriteFieldBeginAsync(tmp16, cancellationToken);
+                                await oprot.WriteStringAsync(Success, cancellationToken);
+                                await oprot.WriteFieldEndAsync(cancellationToken);
+                            }
+                        }
+                        await oprot.WriteFieldStopAsync(cancellationToken);
+                        await oprot.WriteStructEndAsync(cancellationToken);
+                    }
+                    finally
+                    {
+                        oprot.DecrementRecursionDepth();
+                    }
+                }
+
+                public override bool Equals(object that)
+                {
+                    if (!(that is Send_result other)) return false;
+                    if (ReferenceEquals(this, other)) return true;
+                    return ((__isset.@success == other.__isset.@success) && ((!__isset.@success) || (global::System.Object.Equals(Success, other.Success))));
+                }
+
+                public override int GetHashCode()
+                {
+                    int hashcode = 157;
+                    unchecked
+                    {
+                        if ((Success != null) && __isset.@success)
+                        {
+                            hashcode = (hashcode * 397) + Success.GetHashCode();
+                        }
+                    }
+                    return hashcode;
+                }
+
+                public override string ToString()
+                {
+                    var tmp17 = new StringBuilder("Send_result(");
+                    int tmp18 = 0;
+                    if ((Success != null) && __isset.@success)
+                    {
+                        if (0 < tmp18++) { tmp17.Append(", "); }
+                        tmp17.Append("Success: ");
+                        Success.ToString(tmp17);
+                    }
+                    tmp17.Append(')');
+                    return tmp17.ToString();
+                }
             }
+
         }
 
-#if !SILVERLIGHT
-
-        [Serializable]
-#endif
-        public partial class Send_result : TBase
-        {
-            private string _success;
-
-            public string Success
-            {
-                get
-                {
-                    return _success;
-                }
-                set
-                {
-                    __isset.success = true;
-                    this._success = value;
-                }
-            }
-
-            public Isset __isset;
-#if !SILVERLIGHT
-
-            [Serializable]
-#endif
-            public struct Isset
-            {
-                public bool success;
-            }
-
-            public Send_result()
-            {
-            }
-
-            public void Read(TProtocol iprot)
-            {
-                iprot.IncrementRecursionDepth();
-                try
-                {
-                    TField field;
-                    iprot.ReadStructBegin();
-                    while (true)
-                    {
-                        field = iprot.ReadFieldBegin();
-                        if (field.Type == TType.Stop)
-                        {
-                            break;
-                        }
-                        switch (field.ID)
-                        {
-                            case 0:
-                                if (field.Type == TType.String)
-                                {
-                                    Success = iprot.ReadString();
-                                }
-                                else
-                                {
-                                    TProtocolUtil.Skip(iprot, field.Type);
-                                }
-                                break;
-
-                            default:
-                                TProtocolUtil.Skip(iprot, field.Type);
-                                break;
-                        }
-                        iprot.ReadFieldEnd();
-                    }
-                    iprot.ReadStructEnd();
-                }
-                finally
-                {
-                    iprot.DecrementRecursionDepth();
-                }
-            }
-
-            public void Write(TProtocol oprot)
-            {
-                oprot.IncrementRecursionDepth();
-                try
-                {
-                    TStruct struc = new TStruct("Send_result");
-                    oprot.WriteStructBegin(struc);
-                    TField field = new TField();
-
-                    if (this.__isset.success)
-                    {
-                        if (Success != null)
-                        {
-                            field.Name = "Success";
-                            field.Type = TType.String;
-                            field.ID = 0;
-                            oprot.WriteFieldBegin(field);
-                            oprot.WriteString(Success);
-                            oprot.WriteFieldEnd();
-                        }
-                    }
-                    oprot.WriteFieldStop();
-                    oprot.WriteStructEnd();
-                }
-                finally
-                {
-                    oprot.DecrementRecursionDepth();
-                }
-            }
-
-            public override string ToString()
-            {
-                StringBuilder __sb = new StringBuilder("Send_result(");
-                bool __first = true;
-                if (Success != null && __isset.success)
-                {
-                    if (!__first) { __sb.Append(", "); }
-                    __first = false;
-                    __sb.Append("Success: ");
-                    __sb.Append(Success);
-                }
-                __sb.Append(")");
-                return __sb.ToString();
-            }
-        }
     }
 }
 
