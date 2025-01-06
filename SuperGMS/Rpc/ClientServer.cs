@@ -17,6 +17,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using SuperGMS.Log;
+using SuperGMS.Protocol.RpcProtocol;
 using SuperGMS.Router;
 
 namespace SuperGMS.Rpc
@@ -29,6 +30,7 @@ namespace SuperGMS.Rpc
         private ReaderWriterLock readerWriterLock = new ReaderWriterLock();
         private Dictionary<string, ClientItem> clients = new Dictionary<string, ClientItem>();
         private readonly static ILogger logger = LogFactory.CreateLogger<ClientServer>();
+        private int nextIndex = 0;
         /// <summary>
         /// Gets or sets logic ServerName
         /// </summary>
@@ -63,6 +65,48 @@ namespace SuperGMS.Rpc
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// 根据路由规则获取一个客户端
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public ClientItem GetOne(Args<object> args)
+        {
+            try
+            {
+                readerWriterLock.AcquireReaderLock(80);
+                var cls = clients.Values.ToArray();
+                int idx = 0;
+                switch (this.RouterType)
+                {
+                    case RouterType.Hash:
+                        idx = RouterManager.GetPool(args.uri);
+                        break;
+                    default:
+                    case RouterType.Polling:
+                        Interlocked.Increment(ref nextIndex);
+                        Interlocked.CompareExchange(ref nextIndex, 0, cls.Length);
+                        idx = nextIndex;
+                        break;
+                    case RouterType.Random:
+                        idx = RouterManager.GetRandom(0, cls.Length);
+                        break;
+                }
+                return cls[idx];
+            }
+            catch {
+                throw;
+            }
+            finally
+            {
+                if (readerWriterLock.IsReaderLockHeld)
+                {
+                    readerWriterLock.ReleaseReaderLock();
+                }
+            }
+
         }
 
         /// <summary>

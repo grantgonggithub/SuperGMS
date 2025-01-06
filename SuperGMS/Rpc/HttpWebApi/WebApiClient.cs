@@ -11,9 +11,7 @@
 
 ----------------------------------------------------------------*/
 using SuperGMS.Tools;
-using System;
-using System.Collections.Generic;
-using System.Net;
+
 using System.Text;
 
 namespace SuperGMS.Rpc.HttpWebApi
@@ -40,6 +38,8 @@ namespace SuperGMS.Rpc.HttpWebApi
         {
             return;
         }
+
+        public bool IsConnected => true;
 
         public WebApiClient(ClientItem server)
         {

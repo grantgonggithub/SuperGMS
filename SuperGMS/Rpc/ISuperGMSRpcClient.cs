@@ -32,5 +32,10 @@ namespace SuperGMS.Rpc
         /// 所以另外起了个关闭的名字，不清楚不要随便用
         /// </summary>
         void Close();
+
+        /// <summary>
+        /// 是否连接状态
+        /// </summary>
+        bool IsConnected { get; }
     }
 }

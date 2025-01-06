@@ -34,7 +34,7 @@ namespace SuperGMS.Rpc.Client
         /// 根据服务器的ip和端口来保存当前客户端到这台服务器的所有连接, DataTime 是最后连接时间
         /// </summary>
         /// <example> <![CDATA[ Dictionary<ip, List<一个连接>> ]]></example>
-        private static readonly Dictionary<string, List<ComboxClass<DateTime, ISuperGMSRpcClient>>> ConnectionPools = new Dictionary<string, List<ComboxClass<DateTime, ISuperGMSRpcClient>>>();
+        private static readonly Dictionary<string,Queue<ComboxClass<DateTime, ISuperGMSRpcClient>>> ConnectionPools = new Dictionary<string, Queue<ComboxClass<DateTime, ISuperGMSRpcClient>>>();
         private readonly static ILogger logger = LogFactory.CreateLogger<ClientConnectionManager>();
         private static object root = new object();
         private static bool runing = false;
@@ -46,7 +46,7 @@ namespace SuperGMS.Rpc.Client
         /// <returns>rpc连接</returns>
         public static ISuperGMSRpcClient GetClient(ClientItem item)
         {
-            if (item.Pool > 0) return Register(item);// 0,表示开启连接池（默认），1，表示关闭连接池
+            // if (item.Pool > 0) return Register(item);// 0,表示开启连接池（默认），1，表示关闭连接池
             string key = GetConnectionPoolKey(item.Ip, item.Port);
             lock (root)
             {
@@ -58,13 +58,16 @@ namespace SuperGMS.Rpc.Client
 
                 if (ConnectionPools.ContainsKey(key))
                 {
-                    List<ComboxClass<DateTime, ISuperGMSRpcClient>> cls = ConnectionPools[key];
-                    if (cls.Count > 0)
+                    var cls = ConnectionPools[key];
+                    tryOne:
+                    if (cls.TryDequeue(out var c))
                     {
                         // 从队列中取一个连接，并移除掉，防止二次分配
-                        ISuperGMSRpcClient c = cls[0].V2;
-                        cls.Remove(cls[0]);
-                        return c;
+                        //ISuperGMSRpcClient c = cls.Dequeue().V2;
+                        if (c == null || c.V2 == null||!c.V2.IsConnected)
+                            goto tryOne;
+                        else
+                          return c.V2;
                     }
                 }
             }
@@ -80,24 +83,30 @@ namespace SuperGMS.Rpc.Client
         /// <param name="client"> 客户端</param>
         public static void ReleaseClient(ISuperGMSRpcClient client)
         {
-            if (client.Item.Pool > 0){
+            //if (client.Item.Pool > 0){
+            //    client.Close();
+            //    return;// 关闭连接池，连接不在放回,直接释放掉
+            //}
+
+            if (client == null || !client.IsConnected) // 如果连接不正常就不放回去了
+            {
                 client.Close();
-                return;// 关闭连接池，连接不在放回,直接释放掉
+                client = null;
             }
+
             string key = GetConnectionPoolKey(client.Item.Ip, client.Item.Port);
             lock (root)
             {
+                var newOne = new ComboxClass<DateTime, ISuperGMSRpcClient> { V1 = DateTime.Now, V2 = client };
                 if (ConnectionPools.ContainsKey(key))
                 {
                     ConnectionPools[key]
-                        .Add(new ComboxClass<DateTime, ISuperGMSRpcClient> { V1 = DateTime.Now, V2 = client });
+                        .Enqueue(newOne);
                 }
                 else
                 {
-                    List<ComboxClass<DateTime, ISuperGMSRpcClient>> cls = new List<ComboxClass<DateTime, ISuperGMSRpcClient>>(1)
-                    {
-                        new ComboxClass<DateTime, ISuperGMSRpcClient> { V1 = DateTime.Now, V2 = client },
-                    };
+                    var cls = new Queue<ComboxClass<DateTime, ISuperGMSRpcClient>>();
+                    cls.Enqueue(newOne);
                     ConnectionPools.Add(key, cls);
                 }
             }
@@ -185,22 +194,17 @@ namespace SuperGMS.Rpc.Client
                             if (ConnectionPools.ContainsKey(key[idx]))
                             {
                                 var lst = ConnectionPools[key[idx]];
-
-                                // 连接池里面里连接大于1的时候才会清理，防止清空了就起不到连接池的作用了
-                                if (lst.Count > 1)
+                                // 2分钟不被使用，就清理掉
+                                var timeOut = lst.Where(a => DateTime.Now.Subtract(a.V1).TotalSeconds > 60 * 2 && a.V2 != null)
+                                    .ToArray();
+                                foreach (var item in timeOut)
                                 {
-                                    // 2分钟不被使用，就清理掉
-                                    var timeOut = lst.Where(a => DateTime.Now.Subtract(a.V1).TotalSeconds > 60 * 2)
-                                        .ToArray();
-                                    foreach (var item in timeOut)
+                                    if (item != null && item.V2 != null)
                                     {
-                                        // 始终保持有1个，超时也不能清空
-                                        if (lst.Count > 1)
-                                        {
-                                            // 把超时的移除掉 , 释放掉连接
-                                            lst.Remove(item);
-                                            item.V2.Close();
-                                        }
+                                        // 把超时的移除掉 , 释放掉连接
+                                        //lst.Remove(item);
+                                        item.V2.Close();
+                                        item.V2 = null;
                                     }
                                 }
                             }
