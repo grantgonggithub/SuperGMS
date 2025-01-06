@@ -22,7 +22,7 @@ namespace SuperGMS.Router
             return 0;
         }
 
-        private static int next = 0;
+        private static int next = -1;
 
         /// <summary>
         /// 顺序轮询
@@ -32,7 +32,7 @@ namespace SuperGMS.Router
         /// <returns></returns>
         public static int GetPolling(int min, int max)
         {
-            int newValue = 0;
+            int newValue = -1;
             do
             {
                 newValue = next + 1;

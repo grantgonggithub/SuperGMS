@@ -13,12 +13,13 @@
 
 using System;
 using System.Threading;
+
 using Microsoft.Extensions.Logging;
+
 using SuperGMS.Log;
 using SuperGMS.Rpc.Client;
 using SuperGMS.Rpc.Thrift.Server;
 
-using Thrift;
 using Thrift.Protocol;
 using Thrift.Transport;
 using Thrift.Transport.Client;
@@ -42,6 +43,12 @@ namespace SuperGMS.Rpc.Thrift.Client
         {
             get { return clientItem; }
         }
+
+        /// <summary>
+        /// 是否已连接
+        /// </summary>
+        public bool IsConnected => transport.IsOpen;
+
         /// <summary>
         /// 打开一个Thrift 连接
         /// </summary>

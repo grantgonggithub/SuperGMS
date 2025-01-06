@@ -149,7 +149,7 @@ namespace SuperGMS.Rpc.Client
         /// <returns>RR</returns>
         public static R Send<A, R>(string server, string m, A args, RpcContext context, out StatusCode code)
         {
-            Args<A> a = new Args<A>()
+            Args<object> a = new Args<object>()
             {
                 ct = ClientType.InnerRpc.ToString(), // 只有内部的rpc请求才能如此标记
                 cv = string.Empty,
@@ -198,23 +198,7 @@ namespace SuperGMS.Rpc.Client
                     if (cls.ContainsKey(s))
                     {
                         cServer = cls[s];
-                        var clients = cServer.Client;
-                        int idx = 0;
-                        switch (cServer.RouterType)
-                        {
-                            case RouterType.Hash:
-                                idx = RouterManager.GetPool(a.uri);
-                                break;
-                            case RouterType.Polling:
-                                idx = RouterManager.GetPolling(0, clients.Length);
-                                break;
-                            default:
-                            case RouterType.Random:
-                                idx = RouterManager.GetRandom(0, clients.Length);
-                                break;
-                        }
-
-                        cItem = clients[idx];
+                        cItem = cServer.GetOne(a);
                     }
                     else
                     {
@@ -373,22 +357,7 @@ namespace SuperGMS.Rpc.Client
                         if (cls.ContainsKey(s))
                         {
                             cServer = cls[s];
-                            var clients = cServer.Client;
-                            int idx = 0;
-                            switch (cServer.RouterType)
-                            {
-                                case RouterType.Hash:
-                                    idx = RouterManager.GetPool(args.uri);
-                                    break;
-                                case RouterType.Polling:
-                                    idx = RouterManager.GetPolling(0, clients.Length);
-                                    break;
-                                default:
-                                case RouterType.Random:
-                                    idx = RouterManager.GetRandom(0, clients.Length);
-                                    break;
-                            }
-                            cItem = clients[idx];
+                            cItem = cServer.GetOne(args);
                         }
                         else
                         {
