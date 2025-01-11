@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option csharp_namespace = "SuperGMS.Rpc.Grpc.Server";
+
+package GrpcService;
+
+	service GrpcService{
+		rpc Send(GRpcRequest) returns (GrpcResponse);
+	}
+	
+	message GRpcRequest
+	{
+		string my_args=1;
+	}
+
+	message GrpcResponse
+	{
+		 string my_result=1;
+	}
