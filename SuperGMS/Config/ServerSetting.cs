@@ -663,7 +663,7 @@ namespace SuperGMS.Config
         /// 这里还没有设置config,只有经过Initlize才设置
         /// </summary>
         /// <returns>XElement</returns>
-        public static RpcService GetRpcServer(string servserName = "")
+        public static RpcService GetRpcServer(string servserName = "", string[] args=null)
         {
             checkInitlize();
             if (string.IsNullOrEmpty(servserName))

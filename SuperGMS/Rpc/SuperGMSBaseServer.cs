@@ -38,7 +38,7 @@ namespace SuperGMS.Rpc
         /// 注册服务
         /// </summary>
         /// <param name="server">服务配置</param>
-        public void RpcServerRegister(SuperGMSServerConfig server)
+        public void RpcServerRegister(SuperGMSServerConfig server, string[] args)
         {
             try
             {
@@ -68,7 +68,7 @@ namespace SuperGMS.Rpc
                         }
                         ServerSetting.RegisterRouter(server.ServerName, server.Ip, server.Port,
                             ServerSetting.GetRpcServer().Enable, server.TimeOut);
-                        logger.LogInformation($"\r\n服务名：{server.ServerName}，开始监听Ip是:{server.Ip}，端口是：{server.Port}\r\n*******************▄︻┻┳══━一zookeeper路由注册成功，系统启动成功！▄︻┻┳══━一*******************");
+                        logger.LogInformation($"\r\n服务名：{server.ServerName}，服务提供方式:{server.ServerType}，开始监听Ip是:{server.Ip}，端口是：{server.Port}\r\n*******************▄︻┻┳══━一zookeeper路由注册成功，系统启动成功！▄︻┻┳══━一*******************");
                     });
                 }
                 else
@@ -80,10 +80,10 @@ namespace SuperGMS.Rpc
                         {
                             return;
                         }
-                        logger.LogInformation($"\r\n服务名：{server.ServerName}，开始监听Ip是:{server.Ip}，端口是：{server.Port}\r\n*******************▄︻┻┳══━一启用本地配置，系统启动成功！▄︻┻┳══━一*******************");
+                        logger.LogInformation($"\r\n服务名：{server.ServerName}，服务提供方式:{server.ServerType}，开始监听Ip是:{server.Ip}，端口是：{server.Port}\r\n*******************▄︻┻┳══━一启用本地配置，系统启动成功！▄︻┻┳══━一*******************");
                     });
                 }
-                ServerRegister(server); // 底层通讯和业务进行绑定
+                ServerRegister(server,args); // 底层通讯和业务进行绑定
                 // 只有socket才会阻塞
                 if (server.ServerType == ServerType.Thrift || server.ServerType == ServerType.Grpc)
                 {
@@ -138,22 +138,22 @@ namespace SuperGMS.Rpc
             Environment.Exit(0);
         }
 
-        /// <summary>
-        /// 发送消息
-        /// </summary>
-        /// <param name="my_args">消息参数</param>
-        /// <param name="appContext">上下文</param>
-        /// <returns>发送结果</returns>
-        public string Send(string my_args, object appContext)
-        {
-           return OnReceive(my_args, appContext);
-        }
+        ///// <summary>
+        ///// 发送消息
+        ///// </summary>
+        ///// <param name="my_args">消息参数</param>
+        ///// <param name="appContext">上下文</param>
+        ///// <returns>发送结果</returns>
+        //public string Send(string my_args, object appContext)
+        //{
+        //   return OnReceive(my_args, appContext);
+        //}
 
         /// <summary>
         /// 注册服务
         /// </summary>
         /// <param name="server">服务配置</param>
-        protected abstract void ServerRegister(SuperGMSServerConfig server);
+        protected abstract void ServerRegister(SuperGMSServerConfig server, string[] args);
 
         /// <summary>
         /// 抽象方法,重写后释放服务

@@ -19,6 +19,7 @@ using System.Threading;
 using Microsoft.Extensions.Logging;
 using SuperGMS.Config;
 using SuperGMS.Log;
+using SuperGMS.Rpc.Grpc.Client;
 using SuperGMS.Rpc.HttpWebApi;
 using SuperGMS.Rpc.Thrift.Client;
 using SuperGMS.Tools;
@@ -158,6 +159,9 @@ namespace SuperGMS.Rpc.Client
                 {
                     case ServerType.Thrift:
                         client = new ThriftClient(item);
+                        break;
+                    case ServerType.Grpc:
+                        client=new GrpcClient(item);
                         break;
                     case ServerType.HttpWebApi:
                         client=new WebApiClient(item);

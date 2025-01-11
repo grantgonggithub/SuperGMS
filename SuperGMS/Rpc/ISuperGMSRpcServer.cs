@@ -30,7 +30,7 @@ namespace SuperGMS.Rpc
         /// 注册一个本地的服务
         /// </summary>
         /// <param name="server">服务配置</param>
-        void RpcServerRegister(SuperGMSServerConfig server);
+        void RpcServerRegister(SuperGMSServerConfig server, string[] args);
     }
 
     /// <summary>

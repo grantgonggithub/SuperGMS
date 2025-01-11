@@ -27,7 +27,7 @@ namespace SuperGMS.Rpc.HttpWebApi
            return;
         }
 
-        protected override void ServerRegister(SuperGMSServerConfig server)
+        protected override void ServerRegister(SuperGMSServerConfig server, string[] args)
         {
         }
     }
