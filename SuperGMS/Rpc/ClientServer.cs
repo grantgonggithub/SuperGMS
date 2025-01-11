@@ -15,7 +15,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+
 using Microsoft.Extensions.Logging;
+
 using SuperGMS.Log;
 using SuperGMS.Protocol.RpcProtocol;
 using SuperGMS.Router;
@@ -31,6 +33,7 @@ namespace SuperGMS.Rpc
         private Dictionary<string, ClientItem> clients = new Dictionary<string, ClientItem>();
         private readonly static ILogger logger = LogFactory.CreateLogger<ClientServer>();
         private int nextIndex = 0;
+        private Random random = new Random(DateTime.Now.Millisecond);
         /// <summary>
         /// Gets or sets logic ServerName
         /// </summary>
@@ -74,39 +77,26 @@ namespace SuperGMS.Rpc
         /// <returns></returns>
         public ClientItem GetOne(Args<object> args)
         {
-            try
+            var cls = clients.Values.ToArray();
+            int currentIndex = 0;
+            switch (this.RouterType)
             {
-                readerWriterLock.AcquireReaderLock(80);
-                var cls = clients.Values.ToArray();
-                int idx = 0;
-                switch (this.RouterType)
-                {
-                    case RouterType.Hash:
-                        idx = RouterManager.GetPool(args.uri);
-                        break;
-                    default:
-                    case RouterType.Polling:
-                        Interlocked.Increment(ref nextIndex);
-                        Interlocked.CompareExchange(ref nextIndex, 0, cls.Length);
-                        idx = nextIndex;
-                        break;
-                    case RouterType.Random:
-                        idx = RouterManager.GetRandom(0, cls.Length);
-                        break;
-                }
-                return cls[idx];
+                case RouterType.Hash:
+                    nextIndex = RouterManager.GetPool(args.uri);
+                    break;
+                default:
+                case RouterType.Polling:
+                    currentIndex = Interlocked.Increment(ref nextIndex);
+                    while (currentIndex >= cls.Length)
+                    {
+                        currentIndex = Interlocked.CompareExchange(ref nextIndex, 0, currentIndex);
+                    }
+                    return cls[currentIndex];
+                case RouterType.Random:
+                    currentIndex = random.Next(0, cls.Length);
+                    return cls[currentIndex];
             }
-            catch {
-                throw;
-            }
-            finally
-            {
-                if (readerWriterLock.IsReaderLockHeld)
-                {
-                    readerWriterLock.ReleaseReaderLock();
-                }
-            }
-
+            return cls[nextIndex];
         }
 
         /// <summary>
