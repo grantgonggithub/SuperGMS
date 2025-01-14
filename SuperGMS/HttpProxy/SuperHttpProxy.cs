@@ -14,6 +14,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using NPOI.SS.Formula.Functions;
+
 using SuperGMS.Config;
 using SuperGMS.Log;
 using SuperGMS.Protocol.ApiProtocol;
@@ -25,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Policy;
 
 namespace SuperGMS.HttpProxy
 {
@@ -86,32 +89,7 @@ namespace SuperGMS.HttpProxy
             Args<object> a = null;
             try
             {
-                content = GetRequestValue(context.Request);
-                string rid= Guid.NewGuid().ToString("N");
-                logger.LogInformation($"收到请求：rid:{rid},{content},上下文信息：{mainLog.ToString()}");
-                var isUdf = IsController(context);
-                if (isUdf)
-                {
-                    ApiArgs apiArgs = new ApiArgs { Headers = new Dictionary<string, string>(), Params = new Dictionary<string, string>() };
-                    foreach (var h in context.Request.Headers)
-                        apiArgs.Headers.Add(h.Key, h.Value);
-                    foreach (var p in context.Request.Query)
-                        apiArgs.Params[p.Key] = p.Value;
-                    apiArgs.Body = content;
-                    a = new Args<object> { v = apiArgs, ct = ClientType.ThirdPart.ToString() };
-                }
-                else
-                {
-                    a = JsonConvert.DeserializeObject<Args<object>>(content, jsonSerializerSettings);
-                    a=a==null? new Args<object>() : a;
-                }
-
-                a.Headers = GetRequestIp(context);
-                if (string.IsNullOrEmpty(a.rid))
-                {
-                    // 提前端产生一个rid
-                    a.rid = rid;
-                }
+                a = PaserProto(context, out var isUdf,out var serviceName);
 
                 var rtn = RpcClientManager.Send(a, context.Request.Path);
                 string body = rtn.c;
@@ -181,6 +159,72 @@ namespace SuperGMS.HttpProxy
                 logger.LogInformation(new EventId(0, rr.rid), mainLog.ToString());
                 return rr;
             }
+        }
+
+        public static Args<object> PaserProto(HttpContext context,out bool isUdf,out string serviceName)
+        {
+            Args<object> a = null;
+            var content = GetRequestValue(context.Request);
+            string rid = Guid.NewGuid().ToString("N");
+            logger.LogInformation($"收到请求：rid:{rid},{content}");
+            isUdf = IsController(context);
+            if (isUdf)
+            {
+                ApiArgs apiArgs = new ApiArgs { Headers = new Dictionary<string, string>(), Params = new Dictionary<string, string>() };
+                foreach (var h in context.Request.Headers)
+                    apiArgs.Headers.Add(h.Key, h.Value);
+                foreach (var p in context.Request.Query)
+                    apiArgs.Params[p.Key] = p.Value;
+                apiArgs.Body = content;
+                a = new Args<object> { v = apiArgs, ct = ClientType.ThirdPart.ToString() };
+            }
+            else
+            {
+                a = JsonConvert.DeserializeObject<Args<object>>(content, jsonSerializerSettings);
+                a = a == null ? new Args<object>() : a;
+            }
+            var url = context.Request.Path.HasValue?context.Request.Path.Value:null;
+            string[] motheds = url?.Split("/".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            if (motheds == null || motheds.Length < 2)
+            {
+                throw new Exception("Url not content Path");
+            }
+            serviceName = motheds[motheds.Length - 2];
+            a.m = motheds[motheds.Length - 1];
+
+            a.Headers = GetRequestIp(context);
+            if (string.IsNullOrEmpty(a.rid))
+            {
+                // 提前端产生一个rid
+                a.rid = rid;
+            }
+            return a;
+        }
+
+        public static Result<object> PaserResult(HttpContext context,Result<object> result,string origon,bool isUdf)
+        {
+            string body = origon;
+            if (isUdf)
+            {
+                if (result.v != null && !string.IsNullOrEmpty(result.v.ToString()))
+                {
+                    var apiRst = JsonConvert.DeserializeObject<ApiResult>(result.v.ToString());
+                    if (apiRst != null)
+                    {
+                        body = apiRst.Body;
+                        context.Response.StatusCode = (int)apiRst.Code;
+                        if (context.Response.StatusCode < 1) context.Response.StatusCode = 200;
+                        if (!string.IsNullOrEmpty(apiRst.ContentType)) context.Response.ContentType = apiRst.ContentType;
+                    }
+                }
+            }
+            using (var strStream = new StreamWriter(context.Response.Body))
+            {
+                strStream.Write(body);
+                strStream.Flush();
+                strStream.Close();
+            }
+            return result;
         }
 
         /// <summary>

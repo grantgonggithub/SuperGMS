@@ -83,7 +83,9 @@ namespace SuperGMS.Rpc.Server
             Args<object> a = null;
             try
             {
-                a = JsonConvert.DeserializeObject<Args<object>>(args, resultJsonSetting);
+                if (context is Args<object> b) a = b; // webApi上来的数据不做二次反序列化
+                else
+                 a = JsonConvert.DeserializeObject<Args<object>>(args, resultJsonSetting);
             }
             catch (Exception ex)
             {
