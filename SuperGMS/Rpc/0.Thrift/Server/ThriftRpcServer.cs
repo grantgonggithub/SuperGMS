@@ -39,7 +39,7 @@ namespace SuperGMS.Rpc.Thrift.Server
             serverTransport.Close();
         }
 
-        protected override void ServerRegister(SuperGMSServerConfig server)
+        protected override void ServerRegister(SuperGMSServerConfig server, string[] args=null)
         {
             try
             {

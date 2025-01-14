@@ -27,6 +27,11 @@
 		<DocumentationFile></DocumentationFile>
 		<IsAotCompatible>False</IsAotCompatible>
 	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Remove="Rpc\0.Thrift\IGrantRpc\**" />
+	  <EmbeddedResource Remove="Rpc\0.Thrift\IGrantRpc\**" />
+	  <None Remove="Rpc\0.Thrift\IGrantRpc\**" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<None Include="UserSession\UserLoginInfo\Role.cs" />
@@ -34,13 +39,16 @@
 
 	<ItemGroup>
 		<Folder Include="Properties\PublishProfiles\" />
-		<Folder Include="Rpc\Thrift\IGrantRpc\" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="ApacheThrift" Version="0.21.0" />
 		<PackageReference Include="AutoMapper" Version="13.0.1" />
 		<PackageReference Include="Dapper" Version="2.1.35" />
+		<PackageReference Include="Google.Protobuf" Version="3.29.3" />
+		<PackageReference Include="Grpc.AspNetCore.Server" Version="2.67.0" />
+		<PackageReference Include="Grpc.Core" Version="2.46.6" />
+		<PackageReference Include="Grpc.Net.Client" Version="2.67.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="6.2.14" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.0" />

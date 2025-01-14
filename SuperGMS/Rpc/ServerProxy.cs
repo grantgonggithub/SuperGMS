@@ -13,6 +13,7 @@
 using Microsoft.Extensions.Logging;
 using SuperGMS.Config;
 using SuperGMS.Log;
+using SuperGMS.Rpc.Grpc.Server;
 using SuperGMS.Rpc.HttpWebApi;
 using SuperGMS.Rpc.Thrift.Server;
 using System;
@@ -34,7 +35,7 @@ namespace SuperGMS.Rpc
         /// </summary>
         /// <param name="programNamespace"></param>
        // [Obsolete("建议用更简单的构造：Register(Type typeOfClass)")]
-        public static void Register(string programNamespace)
+        public static void Register(string programNamespace, string[] args=null)
         {
             if (string.IsNullOrEmpty(programNamespace))
                 throw new Exception("argument programNamespace is Null");
@@ -65,7 +66,7 @@ namespace SuperGMS.Rpc
                     Enable = rpcServer.Enable,
                     PortList = rpcServer.PortList,
                 };
-                Register(s);
+                Register(s,args);
             }
             logger.LogInformation($"ThreadPool.GetMinThreads: worker-{Math.Max(wt, 1000)}; io-{Math.Max(ct, 1000)}");
 
@@ -78,11 +79,11 @@ namespace SuperGMS.Rpc
         /// 注意这一句是Program最后一句代码，任何放到这句后的代码都不会被执行
         /// </summary>
         /// <param name="typeOfClass">TypeOf(Program)</param>
-        public static void Register(Type typeOfClass)
+        public static void Register(Type typeOfClass, string[] args=null)
         {
             if (typeOfClass == null)
                 throw new Exception("argument typeOfClass is Null");
-            Register(typeOfClass.Module.Name);
+            Register(typeOfClass.Module.Name,args);
         }
         private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
         {
@@ -95,7 +96,7 @@ namespace SuperGMS.Rpc
         /// 通过配置直接注册使用
         /// </summary>
         /// <param name="config">配置文件</param>
-        internal static void Register(SuperGMSServerConfig config)
+        internal static void Register(SuperGMSServerConfig config, string[] args)
         {
             switch (config.ServerType)
             {
@@ -104,6 +105,7 @@ namespace SuperGMS.Rpc
                     server = new ThriftRpcServer();
                     break;
                 case ServerType.Grpc:
+                    server=new GrpcServer();
                     break;
                 case ServerType.WCF:
                     break;
@@ -123,7 +125,7 @@ namespace SuperGMS.Rpc
                 // 开启线程去监听，要不当前主线程会被hang住
                 Thread th = new Thread(new ThreadStart(() =>
                 {
-                    server.RpcServerRegister(config);
+                    server.RpcServerRegister(config,args);
                 }));
                 th.IsBackground = true;
                 th.Name = string.Format("rpc_thread_{0}", config.AssemblyPath);
@@ -144,7 +146,7 @@ namespace SuperGMS.Rpc
             {
                 throw new Exception("请先Register服务");
             }
-            return server.Send(args, appContext);
+            return server.Send(args, appContext).Result;
         }
     }
 }
