@@ -35,16 +35,14 @@ namespace SuperGMS.Rpc.Server
         private List<ComboxClass<Type, MethodInfo>> disposeLink = null;
         private readonly static ILogger logger = LogFactory.CreateLogger<RpcDistributer>();
         private object root = new object();
-        private static JsonSerializerSettings requestJsonSetting = new JsonSerializerSettings
-        {
-            DefaultValueHandling = DefaultValueHandling.Populate,
-            FloatParseHandling = FloatParseHandling.Decimal
-        };
+
         private static JsonSerializerSettings resultJsonSetting = new JsonSerializerSettings
         {
             NullValueHandling = NullValueHandling.Ignore,
             DateFormatString = "yyyy-MM-dd HH:mm:ss",
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            DefaultValueHandling = DefaultValueHandling.Populate,
+            FloatParseHandling = FloatParseHandling.Decimal
         };
         private string assShortName;
         /// <summary>
@@ -73,7 +71,7 @@ namespace SuperGMS.Rpc.Server
         /// <returns>string</returns>
         public string Distributer(string args, object context)
         {
-            var msg = $"收到请求：  args={args}  |  context={JsonConvert.SerializeObject(context)}";
+            var msg = $"收到请求：  args={args}  |  context={JsonConvert.SerializeObject(context, resultJsonSetting)}";
             logger.LogInformation(msg);
             // 构造一个请求日志
             var requestLog = new LogRequest()
@@ -85,7 +83,7 @@ namespace SuperGMS.Rpc.Server
             Args<object> a = null;
             try
             {
-                a = JsonConvert.DeserializeObject<Args<object>>(args, requestJsonSetting);
+                a = JsonConvert.DeserializeObject<Args<object>>(args, resultJsonSetting);
             }
             catch (Exception ex)
             {
