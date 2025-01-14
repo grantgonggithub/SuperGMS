@@ -10,6 +10,7 @@
  功能描述：
 
 ----------------------------------------------------------------*/
+using SuperGMS.Rpc.Client;
 using SuperGMS.Tools;
 
 using System.Text;
@@ -22,6 +23,8 @@ namespace SuperGMS.Rpc.HttpWebApi
     public class WebApiClient : ISuperGMSRpcClient
     {
         private ClientItem clientItem;
+        private WebClientEx webClient;
+        private bool isConnected = false;
 
         /// <inheritdoc />
         public ClientItem Item
@@ -31,36 +34,64 @@ namespace SuperGMS.Rpc.HttpWebApi
 
         public void Close()
         {
-            return;
+            if (webClient != null)
+            {
+                isConnected = false;
+                webClient.Dispose();
+                webClient = null;
+            }
         }
 
+
+        /// <summary>
+        /// 连接可用时,把用完的连接放入连接池
+        /// 否则释放掉
+        /// </summary>
         public void Dispose()
         {
-            return;
+            if (isConnected)
+            {
+                //客户端连接可用时,释放回连接池
+                ClientConnectionManager.ReleaseClient(this);
+            }
+            else
+            {
+                // 释放掉
+                Close();
+            }
         }
 
-        public bool IsConnected => true;
+        public bool IsConnected => isConnected;
 
         public WebApiClient(ClientItem server)
         {
             clientItem = server;
+            webClient = new WebClientEx { Encoding = Encoding.UTF8, TimeOut = clientItem.TimeOut <= 0 ? 15 * 1000 : clientItem.TimeOut };
+            webClient.Headers.Add("Content-Type", "application/json;charset=utf-8");
+            isConnected = true;
         }
 
-        public bool Send(string args,string m, out string result)
+        public bool Send(string args, string m, out string result)
         {
-            string url =$"http://{clientItem.Ip}:{clientItem.Port}/{clientItem.Server.ServerName}";
-            if (!string.IsNullOrEmpty(clientItem.Url))
+            result = string.Empty;
+            try
             {
-                url = clientItem.Url.StartsWith("http://") ? clientItem.Url:$"http://{clientItem.Url}";
-            }
-            url = url.EndsWith("/") ? $"{url}{m}" : $"{url}/{m}";
-            using (var webClient = new WebClientEx { Encoding = Encoding.UTF8, TimeOut = clientItem.TimeOut })
-            {         
-                webClient.Headers.Add("Content-Type", "application/json;charset=utf-8");
+                string url = $"http://{clientItem.Ip}:{clientItem.Port}/{clientItem.Server.ServerName}";
+                if (!string.IsNullOrEmpty(clientItem.Url))
+                {
+                    url = clientItem.Url.StartsWith("http://") ? clientItem.Url : $"http://{clientItem.Url}";
+                }
+                url = url.EndsWith("/") ? $"{url}{m}" : $"{url}/{m}";
+
                 var postData = Encoding.UTF8.GetBytes(args);
                 byte[] responseData = webClient.UploadData(url, "POST", postData);
                 result = Encoding.UTF8.GetString(responseData);
+                isConnected = true;
                 return true;
+            }
+            catch {
+                isConnected = false;
+                throw;
             }
         }
     }
