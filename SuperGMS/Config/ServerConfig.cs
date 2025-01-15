@@ -23,5 +23,24 @@ namespace SuperGMS.Config
         public RpcService RpcService { get; set; }
 
         public ConfigCenter ConfigCenter { get; set; }
+
+        //public static ServerConfig Default { get { return Newtonsoft.Json.JsonConvert.DeserializeObject<ServerConfig>(DefaultJson); } }
+        public static string DefaultJson(string appName) => string.Concat(@"{
+    ""ServerConfig"": {
+        ""RpcService"": {
+            ""Pool"": 0,
+            ""Ip"": ""192.168.7.*"",
+            ""Port"": 0,
+            ""PortList"": {
+                """+appName+ @""": 19999
+            },
+            ""ServerType"": 7,
+            ""RouterType"": 2,
+            ""AssemblyPath"": null,
+            ""TimeOut"": 0,
+            ""Enable"": true
+        }
+    }
+}");
     }
 }

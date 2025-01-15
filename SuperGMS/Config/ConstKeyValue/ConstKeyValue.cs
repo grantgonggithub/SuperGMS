@@ -26,5 +26,27 @@ namespace SuperGMS.Config
         /// 
         /// </summary>
         public List<ConstItem> Items { get; set; }
+
+        //public static ConstKeyValue Default
+        //{
+        //    get { return Newtonsoft.Json.JsonConvert.DeserializeObject<ConstKeyValue>(DefaultJson); }
+        //}
+
+        public const string DefaultJson = @"{""ConstKeyValue"": {
+        ""Items"": [
+            {
+                ""Key"": ""MaxHttpBody"",
+                ""Value"": ""104857600""
+            },
+            {
+                ""Key"": ""TrackSql"",
+                ""Value"": ""true""
+            },
+            {
+                ""Key"": ""HttpProxy"",
+                ""Value"": ""http://192.168.100.2/v2_api/""
+            }
+        ]
+    }}";
     }
 }

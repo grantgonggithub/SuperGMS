@@ -25,5 +25,23 @@ namespace SuperGMS.Config
         /// 
         /// </summary>
         public List<HostItem> Host { get; set; }
+
+        //public static RabbitMQ Default
+        //{
+        //    get { return Newtonsoft.Json.JsonConvert.DeserializeObject<RabbitMQ>(DefaultJson); }
+        //}
+
+        public const string DefaultJson = @"{    ""RabbitMQ"": {
+        ""Host"": [
+            {
+                ""Name"": ""Default"",
+                ""Ip"": ""192.168.7.201"",
+                ""Port"": 5672,
+                ""UserName"": ""admin"",
+                ""PassWord"": ""admin"",
+                ""NoAckMsgCount"": 3
+            }
+        ]
+    }}";
     }
 }

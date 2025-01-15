@@ -38,15 +38,15 @@ namespace SuperGMS.HttpProxy
             }
 
             // app.UseResponseCompression();
-            var server = ServerSetting.GetRpcServer(SuperGMS.HttpProxy.SuperHttpProxy.HttpProxyName);
-            if (server.ServerType == ServerType.HttpWebApi)
-            {
-                ServerProxy.Register(typeof(Program));
-            }
-            else
-            {
+            //var server = ServerSetting.GetRpcServer(SuperGMS.HttpProxy.SuperHttpProxy.HttpProxyName);
+            //if (server.ServerType == ServerType.HttpWebApi)
+            //{
+            //    ServerProxy.Register(typeof(Program));
+            //}
+            //else
+            //{
                 SuperGMS.HttpProxy.SuperHttpProxy.Register();
-            }
+            //}
             app.UseCors("AllowAll");
             //WebSocketOptions socketOptions = new WebSocketOptions
             //{

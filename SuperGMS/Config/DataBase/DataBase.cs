@@ -27,5 +27,18 @@ namespace SuperGMS.Config
         /// 数据库文件引用路径
         /// </summary>
         public string DbFile { get; set; }
+
+        public string SqlFile { get; set; }
+
+        //public static DataBase Default
+        //{
+        //    get { return Newtonsoft.Json.JsonConvert.DeserializeObject<DataBase>(DefaultJson); }
+        //}
+
+        public const string DefaultJson = @"{    ""DataBase"": {
+        ""RefFile"": ""true"",
+        ""DbFile"": ""database.config"",
+        ""SqlFile"": ""sqlmap.config""
+    }}";
     }
 }

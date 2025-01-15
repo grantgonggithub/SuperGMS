@@ -13,6 +13,8 @@
 
 using System;
 using System.Collections.Generic;
+
+using SuperGMS.Router;
 using SuperGMS.Rpc;
 
 namespace SuperGMS.Config
@@ -43,6 +45,11 @@ namespace SuperGMS.Config
         /// 
         /// </summary>
         public ServerType ServerType { get; set; }
+
+        /// <summary>
+        /// 路由方式
+        /// </summary>
+        public RouterType RouterType { get; set; } = RouterType.Random;
 
         /// <summary>
         /// 

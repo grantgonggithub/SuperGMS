@@ -55,7 +55,7 @@ namespace SuperGMS.Rpc
                 bool IsExit = false;
                 // 要先初始化系统相关组件之后才能注册Rpc端口，要不请·求上来了，还没有初始化其他的，会有问题
                 // 去zk注册自己
-                if (ServerSetting.ConfigCenter.ConfigType == ConfigType.Zookeeper)
+                if (ServerSetting.ConfigCenter.ConfigType == ConfigType.Zookeeper||ServerSetting.ConfigCenter.ConfigType==ConfigType.Nacos)
                 {
                     Task.Run(() =>
                     {
@@ -66,8 +66,8 @@ namespace SuperGMS.Rpc
                         {
                             return;
                         }
-                        ServerSetting.RegisterRouter(server.ServerName, server.Ip, server.Port,
-                            ServerSetting.GetRpcServer().Enable, server.TimeOut);
+                        ServerSetting.RegisterRouter(server.ServerName,server.ServerType, server.Ip, server.Port,
+                            ServerSetting.GetRpcServer(server.ServerName).Enable, server.TimeOut);
                         logger.LogInformation($"\r\n服务名：{server.ServerName}，服务提供方式:{server.ServerType}，开始监听Ip是:{server.Ip}，端口是：{server.Port}\r\n*******************▄︻┻┳══━一zookeeper路由注册成功，系统启动成功！▄︻┻┳══━一*******************");
                     });
                 }
