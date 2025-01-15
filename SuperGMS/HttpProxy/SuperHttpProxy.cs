@@ -46,14 +46,16 @@ namespace SuperGMS.HttpProxy
             string[] server = GetAllServer();
             Reg(server);
             ServerSetting.RegisterRouter(SuperGMS.HttpProxy.SuperHttpProxy.HttpProxyName,
+                ServerSetting.Config.ServerConfig.RpcService.ServerType,
                 ServerSetting.Config.ServerConfig.RpcService.Ip,
                 ServerSetting.Config.ServerConfig.RpcService.Port,
                 ServerSetting.Config.ServerConfig.RpcService.Enable,
                 ServerSetting.Config.ServerConfig.RpcService.TimeOut);
         }
 
-        private static void Reg(string[] servers)
+        public static void Reg(string[] servers)
         {
+            RpcClientManager.ClearAll();
             foreach (string app in servers)
             {
                 RpcClientManager.Register(app);
@@ -289,7 +291,7 @@ namespace SuperGMS.HttpProxy
         /// zk 反向更新
         /// </summary>
         /// <param name="proxy">代理层配置</param>
-        private static void UpdateHttpProxy(Config.Configuration proxy)
+        private static void UpdateHttpProxy(Config.Configuration proxy,string appName)
         {
             var items = proxy.HttpProxy.Items.Select(x => x.Name)?.ToArray();
             if (items == null || items.Length < 1)

@@ -80,6 +80,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\..\..\Project-Poc\nacos-sdk-csharp-dev\src\Nacos\Nacos.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Update="Rpc\AssemblyTools\ClassBodyTemplate.txt">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</None>

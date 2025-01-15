@@ -32,9 +32,19 @@ namespace SuperGMS.Config
         public string Ip { get; set; }
 
         /// <summary>
-        /// 如果配置是zk  这个表示的zk连接的超时时间
+        /// 如果配置是zk/nacos  这个表示的zk/nacos连接的超时时间
         /// </summary>
         public int SessionTimeout { get; set; }
+
+        /// <summary>
+        /// Nacos的用户名
+        /// </summary>
+        public string UserName { get; set; }
+
+        /// <summary>
+        /// Nacos的密码
+        /// </summary>
+        public string Password { get; set; }
     }
 
     /// <summary>
@@ -56,5 +66,10 @@ namespace SuperGMS.Config
         /// 文件配置中心
         /// </summary>
         HttpFile=3,
+
+        /// <summary>
+        /// Nacos配置
+        /// </summary>
+        Nacos=4,
     }
 }
