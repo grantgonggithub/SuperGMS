@@ -79,7 +79,7 @@ namespace SuperGMS.Rpc.HttpWebApi
                 string url = $"http://{clientItem.Ip}:{clientItem.Port}/{clientItem.Server.ServerName}";
                 if (!string.IsNullOrEmpty(clientItem.Url))
                 {
-                    url = clientItem.Url.StartsWith("http://") ? clientItem.Url : $"http://{clientItem.Url}";
+                    url = (clientItem.Url.StartsWith("http://")||clientItem.Url.StartsWith("https://")) ? clientItem.Url : $"http://{clientItem.Url}";
                 }
                 url = url.EndsWith("/") ? $"{url}{m}" : $"{url}/{m}";
 
