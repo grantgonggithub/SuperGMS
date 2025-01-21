@@ -12,11 +12,12 @@
 ----------------------------------------------------------------*/
 
 using Microsoft.Extensions.Logging;
+
 using SuperGMS.Log;
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Xml.Linq;
 
 namespace SuperGMS.Config
 {

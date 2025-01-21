@@ -10,10 +10,12 @@
  功能描述：实现一个事件源
 
 ----------------------------------------------------------------*/
+using Microsoft.Extensions.Logging;
+
+using RabbitMQ.Client;
+
 using System;
 using System.Text;
-using Microsoft.Extensions.Logging;
-using RabbitMQ.Client;
 
 namespace SuperGMS.MQ.RabbitMQ
 {

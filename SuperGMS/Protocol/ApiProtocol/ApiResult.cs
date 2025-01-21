@@ -10,7 +10,6 @@ CLR版本：4.0.30319.42000
 功能描述：
 
 ----------------------------------------------------------------*/
-using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
@@ -21,7 +20,7 @@ namespace SuperGMS.Protocol.ApiProtocol
     ///
     /// <see cref="ApiResult" langword="" />
     /// </summary>
-   public class ApiResult
+    public class ApiResult
     {
         /// <summary>
         /// 返回的Body内容

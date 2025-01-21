@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+
 using SuperGMS.Cache;
 using SuperGMS.Log;
+
+using System;
+using System.Diagnostics;
+using System.Threading;
 
 namespace SuperGMS.GrantLock
 {

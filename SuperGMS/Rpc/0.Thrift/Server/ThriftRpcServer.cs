@@ -12,16 +12,16 @@
 ----------------------------------------------------------------*/
 
 using Microsoft.Extensions.Logging;
+
 using System;
-using Thrift;
+using System.Threading;
+
 using Thrift.Protocol;
 using Thrift.Server;
-using Thrift.Processor;
 using Thrift.Transport;
 using Thrift.Transport.Server;
 
 using static SuperGMS.Rpc.Thrift.Server.ThriftService;
-using System.Threading;
 
 namespace SuperGMS.Rpc.Thrift.Server
 {

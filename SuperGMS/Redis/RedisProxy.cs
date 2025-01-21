@@ -11,22 +11,24 @@
            不用关心底层的负载模式，会根据配置自动实现负载
 
 ----------------------------------------------------------------*/
+using Microsoft.Extensions.Logging;
+
+using Newtonsoft.Json;
+
+using StackExchange.Redis;
+
+using SuperGMS.Log;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-using StackExchange.Redis;
-using Newtonsoft.Json;
-using SuperGMS.Log;
-using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace SuperGMS.Redis
 {
     /// <summary>
     /// 访问redis的一个本地代理
     /// </summary>
-   public partial class RedisProxy
+    public partial class RedisProxy
     {
         private readonly static ILogger logger = LogFactory.CreateLogger<RedisProxy>();
         /// <summary>

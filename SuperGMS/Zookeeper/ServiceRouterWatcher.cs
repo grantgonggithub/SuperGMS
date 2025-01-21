@@ -10,11 +10,9 @@
  功能描述：监听微服务状态，包括注册，离线
 
 ----------------------------------------------------------------*/
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using org.apache.zookeeper;
+
+using System.Threading.Tasks;
 
 namespace SuperGMS.Zookeeper
 {

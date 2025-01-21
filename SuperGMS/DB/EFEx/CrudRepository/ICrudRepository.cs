@@ -11,13 +11,13 @@
 
 ----------------------------------------------------------------*/
 
+using SuperGMS.DB.EFEx.DynamicSearch;
+using SuperGMS.DB.EFEx.DynamicSearch.Model;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using SuperGMS.DB.EFEx.CrudRepository;
-using SuperGMS.DB.EFEx.DynamicSearch;
-using SuperGMS.DB.EFEx.DynamicSearch.Model;
 
 namespace SuperGMS.DB.EFEx
 {

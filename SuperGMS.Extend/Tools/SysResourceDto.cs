@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SuperGMS.Extend.Tools
+﻿namespace SuperGMS.Extend.Tools
 {
     /// <summary>
     /// 系统资源文件，兼顾其他系统

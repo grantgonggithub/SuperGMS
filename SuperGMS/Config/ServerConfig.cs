@@ -11,8 +11,6 @@
 
 ----------------------------------------------------------------*/
 
-using System;
-
 namespace SuperGMS.Config
 {
     public class ServerConfig

@@ -11,11 +11,13 @@
 
 ----------------------------------------------------------------*/
 using Microsoft.Extensions.Logging;
+
 using SuperGMS.Config;
 using SuperGMS.Log;
 using SuperGMS.Rpc.Grpc.Server;
 using SuperGMS.Rpc.HttpWebApi;
 using SuperGMS.Rpc.Thrift.Server;
+
 using System;
 using System.Net;
 using System.Threading;
@@ -108,11 +110,6 @@ namespace SuperGMS.Rpc
                     break;
                 case ServerType.Grpc:
                     server=new GrpcServer();
-                    break;
-                case ServerType.WCF:
-                    break;
-                case ServerType.TaskWorker:
-                    server = new TaskWorker.TaskWorker();
                     break;
                 case ServerType.HttpWebApi:
                     server=new WebApiServer();

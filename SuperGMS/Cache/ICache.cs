@@ -12,14 +12,13 @@
 ----------------------------------------------------------------*/
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace SuperGMS.Cache
 {
     /// <summary>
     /// ICache
     /// </summary>
-   public interface ICache
+    public interface ICache
     {
         /// <summary>
         /// 是否存在Redis配置

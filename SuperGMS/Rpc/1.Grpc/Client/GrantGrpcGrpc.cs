@@ -9,7 +9,7 @@ using grpc = global::Grpc.Core;
 
 namespace SuperGMS.Rpc.Grpc.Client
 {
-  public static partial class GrpcService
+    public static partial class GrpcService
   {
     static readonly string __ServiceName = "GrpcService.GrpcService";
 

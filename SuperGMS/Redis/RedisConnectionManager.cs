@@ -10,12 +10,15 @@
  功能描述：redis服务器连接管理器，根据模型和服务器节点作为key管理
 
 ----------------------------------------------------------------*/
+using Microsoft.Extensions.Logging;
+
+using StackExchange.Redis;
+
+using SuperGMS.Log;
+
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Microsoft.Extensions.Logging;
-using SuperGMS.Log;
-using StackExchange.Redis;
 
 namespace SuperGMS.Redis
 {
