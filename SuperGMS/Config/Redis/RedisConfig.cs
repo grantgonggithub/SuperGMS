@@ -25,5 +25,49 @@ namespace SuperGMS.Config
         /// 
         /// </summary>
         public List<RedisNode> Nodes { get; set; }
+
+        //public static RedisConfig Default
+        //{
+        //    get { return Newtonsoft.Json.JsonConvert.DeserializeObject<RedisConfig>(DefaultJson); }
+        //}
+
+        public const string DefaultJson = @"{    ""RedisConfig"": {
+        ""Nodes"": [
+            {
+                ""NodeName"": ""default"",
+                ""IsMasterSlave"": false,
+                ""Items"": [
+                    {
+                        ""Pool"": 1,
+                        ""IsMaster"": false,
+                        ""Server"": ""192.168.100.205"",
+                        ""Port"": 6379,
+                        ""AllowAdmin"": true,
+                        ""ConnectTimeout"": 4000,
+                        ""SyncTimeout"": 3000,
+                        ""Ssl"": true,
+                        ""Pwd"": ""123456""
+                    }
+                ]
+            },
+            {
+                ""NodeName"": ""resource"",
+                ""IsMasterSlave"": false,
+                ""Items"": [
+                    {
+                        ""Pool"": 1,
+                        ""IsMaster"": false,
+                        ""Server"": ""192.168.100.204"",
+                        ""Port"": 6379,
+                        ""AllowAdmin"": true,
+                        ""ConnectTimeout"": 4000,
+                        ""SyncTimeout"": 3000,
+                        ""Ssl"": true,
+                        ""Pwd"": ""123456""
+                    }
+                ]
+            }
+        ]
+    }}";
     }
 }

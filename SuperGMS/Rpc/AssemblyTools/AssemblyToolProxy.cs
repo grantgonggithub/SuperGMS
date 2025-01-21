@@ -73,7 +73,12 @@ namespace SuperGMS.Rpc.AssemblyTools
         /// <returns>短名称</returns>
         public static string GetCurrentAppName(Assembly asLoad)
         {
-            return asLoad.FullName.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", string.Empty);
+            return GetCurrentAppName(asLoad.FullName);
+        }
+
+        public static string GetCurrentAppName(string fullName)
+        {
+            return fullName.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[0].Replace(".", string.Empty);
         }
 
         /// <summary>

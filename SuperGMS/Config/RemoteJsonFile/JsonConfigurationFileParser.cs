@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+
 using Microsoft.Extensions.Configuration;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -11,16 +13,13 @@ namespace SuperGMS.Config.RemoteJsonFile
 {
     internal class JsonConfigurationFileParser : object
     {
-        public JsonConfigurationFileParser()
+        private JsonConfigurationFileParser()
         {
         }
 
-        public JObject jObject { get { return _jObject; } }
-        private JObject _jObject;
-
-        public IDictionary<string, string> Parse(Stream input)
+        public static IDictionary<string, string> Parse(Stream input)
         {
-            return ParseStream(input);
+            return new JsonConfigurationFileParser().ParseStream(input);
         }
 
         private IDictionary<string, string> ParseStream(Stream input)
@@ -28,8 +27,8 @@ namespace SuperGMS.Config.RemoteJsonFile
             this._data.Clear();
             this._reader = new JsonTextReader(new StreamReader(input));
             this._reader.DateParseHandling = 0;
-            _jObject = JObject.Load(this._reader);
-            this.VisitJObject(_jObject);
+            JObject jObject = JObject.Load(this._reader);
+            this.VisitJObject(jObject);
             return this._data;
         }
 

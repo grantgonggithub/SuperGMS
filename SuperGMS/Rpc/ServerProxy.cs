@@ -47,7 +47,8 @@ namespace SuperGMS.Rpc
             {
                 ThreadPool.SetMinThreads(Math.Max(wt, 1000), Math.Max(ct, 1000));
             }
-            var rpcServer = ServerSetting.GetRpcServer();
+            var serviceName = AssemblyTools.AssemblyToolProxy.GetCurrentAppName(programNamespace.TrimEnd(".dll".ToCharArray()));
+            var rpcServer = ServerSetting.GetRpcServer(serviceName);
             string assPath = string.IsNullOrEmpty(programNamespace)
                 ? rpcServer.AssemblyPath
                 : programNamespace.EndsWith(".dll")
@@ -65,6 +66,7 @@ namespace SuperGMS.Rpc
                     TimeOut = rpcServer.TimeOut,
                     Enable = rpcServer.Enable,
                     PortList = rpcServer.PortList,
+                    ServerName=serviceName
                 };
                 Register(s,args);
             }

@@ -45,6 +45,10 @@ namespace SuperGMS.Config
     public class ClientItem
     {
         /// <summary>
+        /// 这里冗余一个字段
+        /// </summary>
+        public RouterType RouterType { get; set; }
+        /// <summary>
         /// 
         /// </summary>
         public int Pool { get; set; }

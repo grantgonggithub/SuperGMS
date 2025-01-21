@@ -11,6 +11,8 @@
 
 ----------------------------------------------------------------*/
 
+using SuperGMS.Router;
+
 namespace SuperGMS.Rpc
 {
     /// <summary>
@@ -32,6 +34,11 @@ namespace SuperGMS.Rpc
         /// Gets or sets 服务器发布类型
         /// </summary>
         public ServerType ServerType { get; set; }
+
+        /// <summary>
+        /// 负载的方式
+        /// </summary>
+        public RouterType RouterType { get; set; }
 
         /// <summary>
         /// Gets or sets 如果是Wcf配置到根路径

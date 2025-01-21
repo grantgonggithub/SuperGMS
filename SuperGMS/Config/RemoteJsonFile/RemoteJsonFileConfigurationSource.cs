@@ -1,12 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-using Newtonsoft.Json.Linq;
-
 namespace SuperGMS.Config.RemoteJsonFile
 {
     public class RemoteJsonFileConfigurationSource : object, IConfigurationSource
     {
-        public RemoteJsonFileConfigurationProvider remoteJsonFileConfigurationProvider { get; set; }
         /// <summary>
         /// The Uri for download file.
         /// </summary>
@@ -23,8 +20,7 @@ namespace SuperGMS.Config.RemoteJsonFile
         /// <returns>A <see cref="T:Grant.NetCore.Superman.Configuration.RemoteJsonFileConfigurationProvider" /></returns>
         public IConfigurationProvider Build(IConfigurationBuilder builder)
         {
-            remoteJsonFileConfigurationProvider = new RemoteJsonFileConfigurationProvider(this);
-            return remoteJsonFileConfigurationProvider;
+            return new RemoteJsonFileConfigurationProvider(this);
         }
     }
 }
