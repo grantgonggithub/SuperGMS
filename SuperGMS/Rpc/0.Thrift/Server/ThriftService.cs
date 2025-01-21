@@ -8,23 +8,24 @@
  *  这个文件是thrift工具生成的csharp代理，不要改动
  */
 
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
+
+using SuperGMS.Log;
+
 using System;
 using System.Collections.Generic;
-
-using System.Text;
-
 using System.IO;
-using Thrift;
-using Thrift.Protocol;
-using Thrift.Transport;
-using SuperGMS.Log;
-using Microsoft.Extensions.Logging;
-using Thrift.Protocol.Entities;
-using Thrift.Protocol.Utilities;
-using Microsoft.Extensions.Primitives;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Thrift;
 using Thrift.Processor;
+using Thrift.Protocol;
+using Thrift.Protocol.Entities;
+using Thrift.Protocol.Utilities;
+using Thrift.Transport;
 
 namespace SuperGMS.Rpc.Thrift.Server
 {

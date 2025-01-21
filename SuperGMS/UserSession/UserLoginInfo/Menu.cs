@@ -10,17 +10,13 @@
  功能描述：
 
 ----------------------------------------------------------------*/
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace SuperGMS.UserSession
 {
     /// <summary>
     ///
     /// <see cref="Menu" langword="" />
     /// </summary>
-   public class Menu
+    public class Menu
     {
         /// <summary>
         /// 系统Id

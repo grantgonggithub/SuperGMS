@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SuperGMS.Extend.FileServer
+﻿namespace SuperGMS.Extend.FileServer
 {
     /// <summary>
     /// 检查结果

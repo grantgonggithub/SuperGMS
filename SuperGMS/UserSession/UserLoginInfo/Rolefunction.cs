@@ -10,17 +10,13 @@
  功能描述：
 
 ----------------------------------------------------------------*/
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace SuperGMS.UserSession.UserLoginInfo
 {
     /// <summary>
     ///
     /// <see cref="Rolefunction" langword="" />
     /// </summary>
-   public class Rolefunction
+    public class Rolefunction
     {
         /// <summary>
         /// 角色Id

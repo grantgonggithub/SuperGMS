@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
+
 using SuperGMS.Config;
 using SuperGMS.Log;
+
 using System;
 using System.Data.Common;
 

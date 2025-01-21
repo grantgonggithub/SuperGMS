@@ -1,7 +1,7 @@
-﻿using System;
+﻿using SuperGMS.Redis;
+
+using System;
 using System.Collections.Generic;
-using System.Text;
-using SuperGMS.Redis;
 
 namespace SuperGMS.Cache
 {

@@ -11,7 +11,6 @@
 
 ----------------------------------------------------------------*/
 using System;
-using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -20,7 +19,7 @@ namespace SuperGMS.Tools
     /// <summary>
     /// 加密工具集
     /// </summary>
-  public class EncryptionTools
+    public class EncryptionTools
     {
         /// <summary>
         /// 字符串转换为32位MD5大写或者小写

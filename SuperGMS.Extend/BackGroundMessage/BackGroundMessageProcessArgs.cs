@@ -11,7 +11,6 @@
 
 ----------------------------------------------------------------*/
 
-using System;
 using SuperGMS.Protocol.RpcProtocol;
 
 namespace SuperGMS.Extend.BackGroundMessage

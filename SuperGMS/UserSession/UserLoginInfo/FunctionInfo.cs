@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SuperGMS.UserSession
+﻿namespace SuperGMS.UserSession
 {
     /// <summary>
     /// 功能列表信息

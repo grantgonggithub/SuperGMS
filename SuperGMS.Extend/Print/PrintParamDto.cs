@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SuperGMS.Extend.Print
+﻿namespace SuperGMS.Extend.Print
 {
     /// <summary>
     /// 打印参数

@@ -10,12 +10,14 @@
  功能描述：
 
 ----------------------------------------------------------------*/
+using Microsoft.Extensions.Logging;
+
+using SuperGMS.Log;
+using SuperGMS.MQ.RabbitMQ;
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Microsoft.Extensions.Logging;
-using SuperGMS.Log;
-using SuperGMS.MQ.RabbitMQ;
 
 namespace SuperGMS.MQ
 {

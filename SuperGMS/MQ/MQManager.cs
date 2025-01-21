@@ -10,13 +10,12 @@
  功能描述：一个提供给上层的业务MQ消息管理类
 
 ----------------------------------------------------------------*/
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SuperGMS.MQ.Consumer;
 using SuperGMS.MQ.RabbitMQ;
 using SuperGMS.Protocol.MQProtocol;
+
+using System;
+using System.Collections.Generic;
 
 namespace SuperGMS.MQ
 {

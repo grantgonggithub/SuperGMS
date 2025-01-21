@@ -11,8 +11,6 @@
 
 ----------------------------------------------------------------*/
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SuperGMS.UserSession
 {
@@ -20,7 +18,7 @@ namespace SuperGMS.UserSession
     ///
     /// <see cref="TenantInfo" langword="" />
     /// </summary>
-   public class TenantInfo
+    public class TenantInfo
     {
         /// <summary>
         ///  Gets or sets   租户ID
