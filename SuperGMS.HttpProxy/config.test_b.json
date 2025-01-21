@@ -1,8 +1,9 @@
 {
   "ServerConfig": {
     "ConfigCenter": {
-      "ConfigType": 3,
-      "Ip": "http://192.168.7.201/config/config.test_b.json"
+      "ConfigType": 4,
+      "Ip": "192.168.7.172:8848",
+      "SessionTimeout": 5000
     }
   }
 }
