@@ -14,6 +14,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using NLog.Extensions.Logging;
+
 using SuperGMS.Config;
 
 namespace SuperGMS.Config
@@ -71,6 +73,8 @@ namespace SuperGMS.Config
         /// FileServer
         /// </summary>
         public FileServer FileServer { get; set; }
+
+       // public string NLog { get; set; }
 
         //非拷贝，屏蔽敏感字符串
         public Configuration SimpleClone()
@@ -130,5 +134,63 @@ namespace SuperGMS.Config
 
             return cfg;
         }
+
+
+        public const string NLogDefault = @"{
+        ""NLog"": {
+        ""autoReload"": false,
+        ""throwConfigExceptions"": true,
+        ""internalLogLevel"": ""info"",
+        ""internalLogFile"": ""${basedir}/txtLog/internal-nlog.txt"",
+        ""extensions"": [
+            {
+                ""assembly"": ""NLog.Extensions.Logging""
+            }
+        ],
+        ""default-wrapper"": {
+            ""type"": ""AsyncWrapper"",
+            ""overflowAction"": ""Block""
+        },
+        ""targets"": {
+            ""all-file"": {
+                ""type"": ""File"",
+                ""layout"": ""${longdate}\r${uppercase:${level}}\r\n${event-properties:item=EventId_Name:whenEmpty=}\r\n${logger}|${callsite}\r\n${message}\r\n ${exception:format=tostring}\r\n-------------------------------------------------------------------\r\n"",
+                ""fileName"": ""${basedir}/txtLog/${shortdate}/${shortdate}.txt"",
+                ""archiveFileName"": ""${basedir}/txtLog/${shortdate}/{#}.txt"",
+                ""archiveAboveSize"": ""31457280"",
+                ""archiveNumbering"": ""DateAndSequence"",
+                ""archiveDateFormat"": ""yyyyMMddHH"",
+                ""encoding"": ""UTF-8""
+            },
+            ""own-console"": {
+                ""type"": ""LimitingWrapper"",
+                ""interval"": ""00:00:01"",
+                ""messageLimit"": 100,
+                ""target"": {
+                    ""type"": ""ColoredConsole"",
+                    ""layout"": ""${longdate}\r${event-properties:item=EventId_Id:whenEmpty=}\r\n${uppercase:${level}}\r\n${logger}\r\n${message}\r\n${exception:format=tostring}${callsite}\r\n-------------------------------------------------------------------\r\n"",
+                    ""rowHighlightingRules"": [
+                        {
+                            ""condition"": ""level == LogLevel.Error"",
+                            ""foregroundColor"": ""Red""
+                        },
+                        {
+                            ""condition"": ""level == LogLevel.Fatal"",
+                            ""foregroundColor"": ""Red"",
+                            ""backgroundColor"": ""White""
+                        }
+                    ]
+                }
+            }
+        },
+        ""rules"": [
+            {
+                ""logger"": ""*"",
+                ""minLevel"": ""Debug"",
+                ""writeTo"": ""all-file,own-console""
+            }
+        ]
+    }
+}";
     }
 }

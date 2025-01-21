@@ -23,6 +23,8 @@ using org.apache.zookeeper;
 using org.apache.zookeeper.data;
 using SuperGMS.Config;
 using SuperGMS.Log;
+using SuperGMS.Router;
+using SuperGMS.Rpc;
 
 namespace SuperGMS.Zookeeper
 {
@@ -336,10 +338,10 @@ namespace SuperGMS.Zookeeper
 
        // private const string routerData = "{ \"Pool\": 0,\"Ip\": \"{0}\",\"Port\": {1},\"ServerType\": 2,\"Enable\": {2}}";
 
-        private static string getRouterData(string ip, int port, bool enable,int timeout)
+        public static string getRouterData(ServerType serverType,RouterType routerType, string ip, int port, bool enable,int timeout)
         {
             // json内容中包含"{"和"}" string.format 中的占位符 也包含"{"和"}"所以异常了，只能用+拼字符串
-            return "{ \"Pool\": 0,\"Ip\": \"" + ip + "\",\"Port\": " + port + ",\"ServerType\": 2,\"Enable\":\""+ enable + "\",\"TimeOut\":" + timeout + "}";
+            return "{ \"Pool\": 0,\"Ip\": \"" + ip + "\",\"Port\": " + port + ",\"ServerType\": "+(int)serverType+ ",\"RouterType\":"+(int)routerType + ",\"Enable\":\""+ enable + "\",\"TimeOut\":" + timeout + "}";
         }
 
         // "<Item Pool=\"0\" Ip=\"{0}\" Port=\"{1}\" ServerType=\"thrift\" Enable=\"{2}\"/>";
@@ -349,7 +351,7 @@ namespace SuperGMS.Zookeeper
         /// </summary>
         /// <param name="serverName">服务名称</param>
         /// <param name="data">数据</param>
-        public static string SetRouter(string serverName, string ip, int port, bool enable,int timeout=0)
+        public static string SetRouter(string serverName,ServerType serverType,RouterType routerType, string ip, int port, bool enable,int timeout=0)
         {
             string path = getRouterPath(serverName);
 
@@ -364,7 +366,7 @@ namespace SuperGMS.Zookeeper
             existPath.Wait();
             if (existPath.Result == null)
             {
-                CreateEphemeral(path, getRouterData(ip, port, enable,timeout));
+                CreateEphemeral(path, getRouterData(serverType,routerType,ip, port, enable,timeout));
             }
             return path;
         }

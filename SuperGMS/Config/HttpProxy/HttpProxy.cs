@@ -25,5 +25,21 @@ namespace SuperGMS.Config
         /// 
         /// </summary>
         public List<HttpProxyItem> Items { get; set; }
+
+        //public static HttpProxy Default
+        //{
+        //    get { return Newtonsoft.Json.JsonConvert.DeserializeObject<HttpProxy>(DefaultJson); }
+        //}
+
+        public const string DefaultJson = @"{    ""HttpProxy"": {
+        ""Items"": [
+            {
+                ""Name"": ""ExpService1""
+            },
+            {
+                ""Name"": ""ExpService2""
+            }
+        ]
+    }}";
     }
 }

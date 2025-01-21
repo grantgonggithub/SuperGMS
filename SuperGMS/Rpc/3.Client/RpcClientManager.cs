@@ -11,14 +11,8 @@
 
 ----------------------------------------------------------------*/
 
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
+
 using Newtonsoft.Json;
 
 using SuperGMS.Config;
@@ -27,6 +21,12 @@ using SuperGMS.Protocol.RpcProtocol;
 using SuperGMS.Router;
 using SuperGMS.Rpc.Server;
 using SuperGMS.Tools;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SuperGMS.Rpc.Client
 {
@@ -57,14 +57,41 @@ namespace SuperGMS.Rpc.Client
                 return;
             }
 
-            Parser(rpcClients.RpcClients);
+            Parser(rpcClients.RpcClients,appName);
+        }
+
+        /// <summary>
+        /// 在更新所有服务配置之前，先清掉之前所有的，因为通知只会通知存在的
+        /// </summary>
+        public static void ClearAll()
+        {
+            try
+            {
+                readerWriterLock.AcquireWriterLock(100);
+                foreach (var item in cls.Values)
+                {
+                    item.UpdateClient(new ClientItem[0], false);
+                }
+                cls.Clear();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "SuperGMS.GrantRpc.Client.ClearAll.Error");
+            }
+            finally
+            {
+                if (readerWriterLock.IsWriterLockHeld)
+                {
+                    readerWriterLock.ReleaseWriterLock();
+                }
+            }
         }
 
 
-        private static void updateAppClinet(Configuration rpcClients)
+        private static void updateAppClinet(Configuration rpcClients,string appName)
         {
-            logger.LogWarning($"收到路由变化推送:{JsonConvert.SerializeObject(rpcClients)}");
-            Parser(rpcClients.RpcClients);
+            logger.LogWarning($"收到路由变化（{appName}）推送:{JsonConvert.SerializeObject(rpcClients)}");
+            Parser(rpcClients.RpcClients,appName);
         }
 
         /// <summary>
@@ -99,42 +126,48 @@ namespace SuperGMS.Rpc.Client
             }
         }
 
-        private static void Parser(RpcClients rpcClients)
+        public static void Parser(RpcClients rpcClients,string appName)
         {
-            if (rpcClients != null && rpcClients.Clients != null && rpcClients.Clients.Count > 0)
-            {
-                foreach (var cl in rpcClients.Clients)
+            var cItems = rpcClients?.Clients?.First(x=>x.ServerName == appName).Items;
+            ClientServer s = null;
+            List<ClientItem> cs = null;
+            foreach (var cl in cItems) {
+                if (s == null)
                 {
-                    ClientServer s = new ClientServer()
+                    s = new ClientServer()
                     {
+                        ServerName = appName,
                         RouterType = cl.RouterType,
-                        ServerName = cl.ServerName,
                     };
-                    List<ClientItem> cs = new List<ClientItem>();
-                    foreach (var it in cl.Items)
-                    {
-                        if (!it.Enable)
-                        {
-                            logger.LogInformation($"服务{s.ServerName}的Ip={it.Ip},Port={it.Port}的服务被下线，路由将被忽略....");
-                            continue;
-                        }
-                        cs.Add(new ClientItem
-                        {
-                            Ip = it.Ip,
-                            Port = it.Port,
-                            Server = s,
-                            ServerType =it.ServerType,
-                            Pool = it.Pool,
-                            Enable = it.Enable,
-                            TimeOut = it.TimeOut,
-                        });
-                    }
-
-                    s.UpdateClient(cs.ToArray(), true);
-                    Register(s);
+                    cs = new List<ClientItem>();
                 }
-            }
 
+                if (!cl.Enable)
+                {
+                    logger.LogInformation($"服务{s.ServerName}的Ip={cl.Ip},Port={cl.Port}的服务被下线，路由将被忽略....");
+                    continue;
+                }
+                cs.Add(new ClientItem
+                {
+                    Ip = cl.Ip,
+                    Port = cl.Port,
+                    Server = s,
+                    ServerType = cl.ServerType,
+                    RouterType = cl.RouterType,
+                    Pool = cl.Pool,
+                    Enable = cl.Enable,
+                    TimeOut = cl.TimeOut,
+                });
+            }
+            if (s == null) // 说明没有可以服务的实例在线了
+            {
+                s = new ClientServer() {
+                    ServerName = appName,
+                    RouterType =RouterType.Random,
+                }; cs = new List<ClientItem>();
+            }
+            s.UpdateClient(cs.ToArray(), true);
+            Register(s);
         }
 
         /// <summary>

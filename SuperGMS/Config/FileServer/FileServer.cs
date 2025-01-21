@@ -26,5 +26,19 @@ namespace SuperGMS.Config
         /// 
         /// </summary>
         public List<FileServerItem> Items { get; set; }
+
+
+        //public static FileServer Default
+        //{
+        //    get { return Newtonsoft.Json.JsonConvert.DeserializeObject<FileServer>(DefaultJson); }
+        //}
+
+        public const string DefaultJson = @"{    ""FileServer"": {
+        ""Items"": [
+            {
+                ""Url"": ""http://192.168.100.214/file_server""
+            }
+        ]
+    }}";
     }
 }
