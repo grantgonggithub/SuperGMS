@@ -4,7 +4,7 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<LangVersion>12</LangVersion>
 		<PackageReleaseNotes>grantgongjianchun(nnn987@126.com)</PackageReleaseNotes>
-		<Version>6.1.1</Version>
+		<Version>6.1.2</Version>
 		<Authors>grantgongjianchun</Authors>
 		<Company>SuperGMS</Company>
 		<Description></Description>
@@ -26,6 +26,7 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<DocumentationFile></DocumentationFile>
 		<IsAotCompatible>False</IsAotCompatible>
+		<Optimize>False</Optimize>
 	</PropertyGroup>
 	<ItemGroup>
 	  <Compile Remove="Rpc\0.Thrift\IGrantRpc\**" />
