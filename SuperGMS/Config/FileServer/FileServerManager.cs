@@ -10,18 +10,14 @@
  功能描述：
 
 ----------------------------------------------------------------*/
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Linq;
 
 namespace SuperGMS.Config
 {
     /// <summary>
     /// FileServerManager
     /// </summary>
-  internal class FileServerManager
+    internal class FileServerManager
     {
         public const string FileServerName = "FileServer";
         private static List<FileServerItem> fileServers;

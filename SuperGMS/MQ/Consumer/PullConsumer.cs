@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+
 using SuperGMS.MQ.RabbitMQ;
+
+using System;
 
 namespace SuperGMS.MQ.Consumer
 {

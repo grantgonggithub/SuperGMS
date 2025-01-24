@@ -10,10 +10,9 @@
  功能描述：
 
 ----------------------------------------------------------------*/
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.EntityFrameworkCore;
+
+using System;
 
 namespace SuperGMS.DB.EFEx
 {

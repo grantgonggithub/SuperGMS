@@ -10,16 +10,13 @@
  功能描述：一个获取当前程序运行环境的辅助类
 
 ----------------------------------------------------------------*/
+using SuperGMS.Config;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.Text;
-using SuperGMS.Config;
-using SuperGMS.Log;
 
 namespace SuperGMS.Tools
 {

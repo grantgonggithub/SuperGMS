@@ -15,15 +15,15 @@ using System.Threading.Tasks;
 
 namespace SuperGMS.Extend.BackGroundMessage
 {
-    using System;
-    using System.Linq;
-
     using Microsoft.Extensions.Logging;
 
     using SuperGMS.Log;
     using SuperGMS.MQ;
     using SuperGMS.Protocol.MQProtocol;
     using SuperGMS.Tools;
+
+    using System;
+    using System.Linq;
 
     /// <summary>
     /// 接到消息的时间

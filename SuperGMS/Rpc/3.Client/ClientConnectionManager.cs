@@ -11,18 +11,19 @@
 
 ----------------------------------------------------------------*/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using Microsoft.Extensions.Logging;
+
 using SuperGMS.Config;
 using SuperGMS.Log;
 using SuperGMS.Rpc.Grpc.Client;
 using SuperGMS.Rpc.HttpWebApi;
 using SuperGMS.Rpc.Thrift.Client;
 using SuperGMS.Tools;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 
 namespace SuperGMS.Rpc.Client
 {

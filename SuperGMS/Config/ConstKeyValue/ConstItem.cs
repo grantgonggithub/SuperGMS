@@ -10,16 +10,12 @@
  功能描述：
 
 ----------------------------------------------------------------*/
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace SuperGMS.Config
-{ 
+{
     /// <summary>
     /// ConstItem
     /// </summary>
-    
+
     public class ConstItem
     {
         /// <summary>

@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using SuperGMS.Extensions.Enum;
+﻿using SuperGMS.Extensions.Enum;
+
+using System;
 
 namespace SuperGMS.Cache
 {

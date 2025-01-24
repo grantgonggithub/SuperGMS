@@ -11,14 +11,14 @@
 
 ----------------------------------------------------------------*/
 
-using System;
-using System.Threading;
-
 using Microsoft.Extensions.Logging;
 
 using SuperGMS.Log;
 using SuperGMS.Rpc.Client;
 using SuperGMS.Rpc.Thrift.Server;
+
+using System;
+using System.Threading;
 
 using Thrift.Protocol;
 using Thrift.Transport;

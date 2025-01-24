@@ -11,10 +11,13 @@
            会根据模型的特点，实现主从，或者单主，或者同质节点
 
 ----------------------------------------------------------------*/
-using System;
 using Microsoft.Extensions.Logging;
-using SuperGMS.Log;
+
 using StackExchange.Redis;
+
+using SuperGMS.Log;
+
+using System;
 
 namespace SuperGMS.Redis
 {
@@ -22,7 +25,7 @@ namespace SuperGMS.Redis
     /// 业务模型节点，在此模型下可能会存在多个redis服务器，共同实现当前业务Node的功能
     /// 会根据模型的特点，实现主从，或者单主，或者同质节点
     /// </summary>
-   public class RedisNode
+    public class RedisNode
     {
         private readonly static ILogger logger = LogFactory.CreateLogger<RedisNode>();
         /// <summary>

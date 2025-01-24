@@ -11,14 +11,12 @@
 
 ----------------------------------------------------------------*/
 
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Text;
-
 using Dapper;
 
 using SuperGMS.DB.EFEx.DynamicSearch;
+
+using System.Collections.Generic;
+using System.Data;
 
 namespace SuperGMS.DB.EFEx.CrudRepository
 {

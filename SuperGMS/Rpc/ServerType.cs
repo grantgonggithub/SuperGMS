@@ -17,12 +17,17 @@ namespace SuperGMS.Rpc
     /// <summary>
     /// 服务器发布类型
     /// </summary>
-   public enum ServerType
+    public enum ServerType
     {
         /// <summary>
-        /// 服务器接口发布为
+        /// 做为WebApi直接处理业务
         /// </summary>
-        WCF=1,
+        HttpWebApi = 1,
+
+        ///// <summary>
+        ///// 服务器接口发布为
+        ///// </summary>
+        //WCF =1,
         /// <summary>
         /// 服务器接口发布为ThriftRpc
         /// </summary>
@@ -33,25 +38,19 @@ namespace SuperGMS.Rpc
         Grpc=3,
 
         /// <summary>
-        /// 不用发布接口，只执行定时任务
-        /// </summary>
-        TaskWorker=4,
-
-        /// <summary>
         /// 代理层
         /// </summary>
-        HttpProxy = 5,
+        HttpProxy = 4,
 
-        /// <summary>
-        /// 跨网关http
-        /// </summary>
-        Http =6,
+        ///// <summary>
+        ///// 不用发布接口，只执行定时任务
+        ///// </summary>
+        //TaskWorker =4,
 
-        /// <summary>
-        /// 做为WebApi直接处理业务
-        /// </summary>
-        HttpWebApi=7,
-
+        ///// <summary>
+        ///// 跨网关http
+        ///// </summary>
+        //Http =6,
     }
 
     /// <summary>
@@ -63,7 +62,7 @@ namespace SuperGMS.Rpc
         {
             ServerType r =ServerType.Thrift;
             if (!Enum.TryParse<ServerType>(serverType,true, out r))
-                r = ServerType.WCF;
+                r = ServerType.Thrift;
             return r;
         }
     }

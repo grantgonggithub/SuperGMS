@@ -11,16 +11,14 @@
 
 ----------------------------------------------------------------*/
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace SuperGMS.Tools
 {
     /// <summary>
     /// FileHelper
     /// </summary>
-  public class FileHelper
+    public class FileHelper
     {
         /// <summary>
         /// 按路径读取文件

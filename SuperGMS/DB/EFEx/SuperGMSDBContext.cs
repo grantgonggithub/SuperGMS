@@ -11,19 +11,18 @@
 
 ----------------------------------------------------------------*/
 
-using System;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
+
 using SuperGMS.Config;
 using SuperGMS.DB.EFEx.GrantDbContext;
-using SuperGMS.DB.EFEx.GrantDbFactory;
 using SuperGMS.ExceptionEx;
 using SuperGMS.Log;
 using SuperGMS.Protocol.RpcProtocol;
-using Z.EntityFramework.Plus;
 using SuperGMS.Rpc.Server;
+
+using System;
+using System.Linq;
 
 namespace SuperGMS.DB.EFEx
 {

@@ -10,12 +10,6 @@
  功能描述：
 
 ----------------------------------------------------------------*/
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -25,9 +19,11 @@ using Newtonsoft.Json;
 
 using SuperGMS.Config;
 using SuperGMS.HttpProxy;
-using SuperGMS.Log;
 using SuperGMS.Protocol.RpcProtocol;
-using SuperGMS.Rpc.Grpc.Server;
+
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SuperGMS.Rpc.HttpWebApi
 {
