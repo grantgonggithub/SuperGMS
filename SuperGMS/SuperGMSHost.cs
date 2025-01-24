@@ -12,11 +12,6 @@
  dev
 ----------------------------------------------------------------*/
 
-using SuperGMS.Rpc;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace SuperGMS
 {
     /// <summary>

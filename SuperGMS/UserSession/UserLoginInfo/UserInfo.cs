@@ -10,9 +10,7 @@
  功能描述：
 
 ----------------------------------------------------------------*/
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace SuperGMS.UserSession
 {
@@ -20,7 +18,7 @@ namespace SuperGMS.UserSession
     ///
     /// <see cref="UserInfo" langword="" />
     /// </summary>
-   public class UserInfo
+    public class UserInfo
     {
         /// <summary>
         /// 登录用户Id

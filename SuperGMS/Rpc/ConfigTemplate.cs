@@ -10,16 +10,12 @@
  功能描述：
 
 ----------------------------------------------------------------*/
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace SuperGMS.Rpc
 {
     /// <summary>
     /// ConfigTemplate
     /// </summary>
-   public class ConfigTemplate
+    public class ConfigTemplate
     {
         public const string RPC_CLIENT= "<RpcClients>< Client ServerName=\"{0}\" RouterType=\"random\"><Item pool = \"{1}\" Ip=\"{2}\" Port=\"{3}\" Url=\"\" ServerType=\"thrift\" /></Client></RpcClients>";
     }

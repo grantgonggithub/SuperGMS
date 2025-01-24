@@ -7,10 +7,13 @@
 #region
 
 using Microsoft.Extensions.Logging;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+
 using SuperGMS.ExceptionEx;
 using SuperGMS.Log;
+
 using System;
 using System.Text.RegularExpressions;
 

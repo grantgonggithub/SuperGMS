@@ -3,11 +3,6 @@
 // </copyright>
 namespace SuperGMS.Extend.FileServer
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
-
     /// <summary>
     /// 下载文件参数
     /// </summary>

@@ -11,11 +11,6 @@
 
 ----------------------------------------------------------------*/
 
-using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using SuperGMS.DB.EFEx.CrudRepository;
-
 namespace SuperGMS.DB.EFEx
 {
     // 已经被ISqlRepository的实现类替代，如Mysql,

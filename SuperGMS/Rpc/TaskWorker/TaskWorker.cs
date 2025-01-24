@@ -1,6 +1,4 @@
-﻿using SuperGMS.Log;
-
-namespace SuperGMS.Rpc.TaskWorker
+﻿namespace SuperGMS.Rpc.TaskWorker
 {
     /// <summary>
     /// 长轮询的一个Base服务

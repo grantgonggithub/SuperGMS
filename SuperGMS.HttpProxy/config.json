@@ -1,8 +1,9 @@
 {
   "ServerConfig": {
     "ConfigCenter": {
-      "ConfigType": 3,
-      "Ip": "http://localhost/config.json"
+      "ConfigType": 4,
+      "Ip": "192.168.7.172:8848",
+      "SessionTimeout": 5000
     }
   }
 }

@@ -6,14 +6,12 @@
 #region Designer generated code
 
 using pb = global::Google.Protobuf;
-using pbc = global::Google.Protobuf.Collections;
 using pbr = global::Google.Protobuf.Reflection;
-using scg = global::System.Collections.Generic;
 namespace SuperGMS.Rpc.Grpc.Client
 {
 
-  /// <summary>Holder for reflection information generated from Protos/GrantGrpc.proto</summary>
-  public static partial class GrantGrpcReflection {
+    /// <summary>Holder for reflection information generated from Protos/GrantGrpc.proto</summary>
+    public static partial class GrantGrpcReflection {
 
     #region Descriptor
     /// <summary>File descriptor for Protos/GrantGrpc.proto</summary>

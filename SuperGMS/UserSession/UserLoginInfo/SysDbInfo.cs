@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SuperGMS.UserSession
+﻿namespace SuperGMS.UserSession
 {
     /// <summary>
     /// 租户数据库信息

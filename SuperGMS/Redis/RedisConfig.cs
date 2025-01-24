@@ -11,14 +11,13 @@
 
 ----------------------------------------------------------------*/
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
-using System.Threading;
-using SuperGMS.Log;
 using Microsoft.Extensions.Logging;
+
+using SuperGMS.Log;
+
+using System;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace SuperGMS.Redis
 {

@@ -10,9 +10,7 @@ CLR版本：4.0.30319.42000
 功能描述：
 
 ----------------------------------------------------------------*/
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace SuperGMS.Protocol.ApiProtocol
 {

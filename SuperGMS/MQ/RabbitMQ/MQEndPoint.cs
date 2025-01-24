@@ -11,9 +11,12 @@
 
 ----------------------------------------------------------------*/
 using Microsoft.Extensions.Logging;
-using SuperGMS.Log;
+
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+
+using SuperGMS.Log;
+
 using System;
 
 namespace SuperGMS.MQ.RabbitMQ

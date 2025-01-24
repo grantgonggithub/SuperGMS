@@ -11,15 +11,13 @@
 
 ----------------------------------------------------------------*/
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SuperGMS.Protocol.RpcProtocol
 {
     /// <summary>
     /// Header
     /// </summary>
-   public class HeaderValue
+    public class HeaderValue
     {
         /// <summary>
         /// 请求客户端ip，这个主要由httpProxy获取前端请求的ip地址，

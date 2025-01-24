@@ -3,13 +3,13 @@
 // 作者：Grant
 // 最后更新日期：2014-09-04 00:00
 using System;
-using System.Linq;
 using System.Globalization;
 using System.Reflection;
 
 namespace SuperGMS.Tools
 {
     using SuperGMS.DB.AttributeEx;
+
     using System.Collections.Generic;
 
     /// <summary>
