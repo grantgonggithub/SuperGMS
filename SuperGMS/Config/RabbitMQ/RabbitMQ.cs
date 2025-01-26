@@ -33,7 +33,7 @@ namespace SuperGMS.Config
         ""Host"": [
             {
                 ""Name"": ""Default"",
-                ""Ip"": ""192.168.7.201"",
+                ""Ip"": ""192.168.0.11"",
                 ""Port"": 5672,
                 ""UserName"": ""admin"",
                 ""PassWord"": ""admin"",

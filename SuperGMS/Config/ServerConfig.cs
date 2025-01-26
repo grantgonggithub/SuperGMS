@@ -32,7 +32,7 @@ namespace SuperGMS.Config
             ""PortList"": {
                 """+appName+ @""": 19999
             },
-            ""ServerType"": 7,
+            ""ServerType"": 1,
             ""RouterType"": 2,
             ""AssemblyPath"": null,
             ""TimeOut"": 0,
