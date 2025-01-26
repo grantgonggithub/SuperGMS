@@ -31,9 +31,9 @@ namespace SuperGMS.Config
         //    get { return Newtonsoft.Json.JsonConvert.DeserializeObject<DataBase>(DefaultJson); }
         //}
 
-        public const string DefaultJson = @"{    ""DataBase"": {
+        public static string DefaultJson(string env) => @"{    ""DataBase"": {
         ""RefFile"": ""true"",
-        ""DbFile"": ""database.config"",
+        ""DbFile"": ""database." + env + @".config"",
         ""SqlFile"": ""sqlmap.config""
     }}";
     }

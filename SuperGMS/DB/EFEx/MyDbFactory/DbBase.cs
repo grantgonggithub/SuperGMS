@@ -502,6 +502,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
 
                 try
                 {
+                    PrintSql(countSql, parameters);
                     using (var connection = GetConnection())
                     {
                         pageInfo.TotalCount = connection.Connection.Query<int>(countSql, parameters, null, false, DbInfo.CommandTimeout, CommandType.Text)?.FirstOrDefault()??0;
@@ -783,6 +784,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                         try
                         {
                             DynamicParameters ps = PrepareCommand(paramsList, valuesList);
+                            PrintSql(sql, ps);
                             T v = connection.Connection.ExecuteScalar<T>(sql, ps, tran, DbInfo.CommandTimeout, commandType);
                             //OnDbCommit?.Invoke(connection, new SqlPara { sql = sql, parameters = ps, dbTransaction = tran });
                             tran.Commit();

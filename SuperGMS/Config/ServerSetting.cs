@@ -623,7 +623,7 @@ namespace SuperGMS.Config
                     //    dbStr = $"<DataBase>\r\n{db?.ToString()}\r\n{map?.ToString()}\r\n</DataBase>";
                     //}
 
-                    standConfig.Add(DbModelContextManager.DATABASE, config.DataBase == null ? DataBase.DefaultJson : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration() { DataBase = config.DataBase }, jsonSerializerSettings));
+                    standConfig.Add(DbModelContextManager.DATABASE, config.DataBase == null ? DataBase.DefaultJson(_environmentVariable) : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration() { DataBase = config.DataBase }, jsonSerializerSettings));
                     standConfig.Add(ConfigManager.CONSTKEYVALUE, config.ConstKeyValue == null ? ConstKeyValue.DefaultJson : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration() { ConstKeyValue = config.ConstKeyValue }, jsonSerializerSettings));
                     standConfig.Add(CacheManager.RedisConfig, config.RedisConfig == null ? RedisConfig.DefaultJson : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration() { RedisConfig = config.RedisConfig }, jsonSerializerSettings));
                     standConfig.Add(MQHostConfigManager.RabbitMQ, config.RabbitMQ == null ? RabbitMQ.DefaultJson : Newtonsoft.Json.JsonConvert.SerializeObject(new Configuration() { RabbitMQ = config.RabbitMQ }, jsonSerializerSettings));
