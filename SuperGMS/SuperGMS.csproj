@@ -68,7 +68,7 @@
 		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.0" />
 		<PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
 		<PackageReference Include="StackExchange.Redis" Version="2.8.24" />
-		<PackageReference Include="System.Linq.Dynamic.Core" Version="1.5.1" />
+		<PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.0" />
 		<PackageReference Include="System.Net.Http" Version="4.3.4" />
 		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
 		<PackageReference Include="ZooKeeperNetEx" Version="3.4.12.4" />
