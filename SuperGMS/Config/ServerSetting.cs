@@ -949,7 +949,7 @@ namespace SuperGMS.Config
                     }
                     break;
                 case ConfigType.HttpFile:
-                   var remoteJsonFileConfigurationSource = new RemoteJsonFileConfigurationSource() { Uri = ServerSetting.config.ServerConfig.ConfigCenter.Ip, Optional = false };
+                   var remoteJsonFileConfigurationSource = new RemoteJsonFileConfigurationSource() { Uri = configCenter.Ip, Optional = false };
                     settingConfigBuilder.Sources.Add(remoteJsonFileConfigurationSource);
                     configPath = configCenter.Ip;
                     break;
