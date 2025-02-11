@@ -93,7 +93,7 @@ namespace SuperGMS.Rpc
 
                     if (ServerSetting.ConfigCenter.ConfigType == ConfigType.Zookeeper)
                     {
-                        ZookeeperManager.ClearRouter(server.ServerName, server.Ip);
+                        ZookeeperManager.ClearRouter(server.ServerName, server.Ip,server.Port);
                     }
 
                     // rpc监听是hold住当前线程的，因为底层吞掉异常了，跑到这里来就说明异常了，要彻底释放

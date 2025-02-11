@@ -70,7 +70,6 @@ namespace SuperGMS.Config
 
         private static ILogger logger = NullLogger.Instance;
 
-        private static string nlogConf = string.Empty;
         /// <summary>
         /// 取当前的环境变量
         /// </summary>
@@ -170,34 +169,17 @@ namespace SuperGMS.Config
             switch (config.ServerConfig.ConfigCenter.ConfigType)
             {
                 case ConfigType.Zookeeper:
-                    string path = ZookeeperManager.SetRouter(serverName, serverType, config.ServerConfig.RpcService.RouterType, ip, port, enable, timeout);
+                    ZookeeperManager.SetRouter(serverName, serverType, config.ServerConfig.RpcService.RouterType, ip, port, enable, timeout);
                     var cfgWatcher = new ConfigWatcher();
-                    cfgWatcher.OnChange += (string p) =>
+                    var ipAndPort = $"[{ip}:{port}]";
+                    cfgWatcher.OnChange += (string p,Watcher watcher,string state) =>
                     {
-                        var changeData = ZookeeperManager.GetNodeData(path, cfgWatcher);
+                        var changeData = ZookeeperManager.GetOneRouter(serverName,ipAndPort, cfgWatcher);
                         try
                         {
-                            upDownMsg(changeData);
-                            //var clientItem = Newtonsoft.Json.JsonConvert.DeserializeObject<ClientItem>(changeData);
-                            //logger.LogWarning($"我的配置被修改为：{changeData}");
-                            //if (clientItem != null && !clientItem.Enable)
-                            //{
-                            //    // 我被下线了，更新本地配置"Enable": false，下一次重启需要带上这个状态
-                            //    logger.LogInformation($"我被管理员下线了，哼。。。。serverName={serverName},ip={ip},port = {port}");
-                            //}
-                            //else
-                            //{
-                            //    logger.LogInformation($"我被管理员上线了,哈哈哈哈。。。。serverName={serverName},ip={ip},port = {port}");
-                            //}
-                            //// 在这里修改本地配置快照
-                            //if (clientItem == null || string.IsNullOrEmpty(clientItem.Ip) || clientItem.Port < 1) return;
-                            //config.ServerConfig.RpcService.ServerType = serverType;
-                            //config.ServerConfig.RpcService.Ip = clientItem.Ip;
-                            //config.ServerConfig.RpcService.Port = clientItem.Port;
-                            //config.ServerConfig.RpcService.Pool = clientItem.Pool;
-                            //config.ServerConfig.RpcService.Enable = clientItem.Enable;
-                            //config.ServerConfig.RpcService.TimeOut = clientItem.TimeOut;
-                            ////copyConfig(); 暂时注掉，这里还没思考好
+                            // 如果为空说明自己的节点不在了，有可能zk删除了，所以把自己设置为下线，不为空，以实际结果为准
+                            string myself = string.IsNullOrWhiteSpace(changeData) ? Configuration.GetRouterData(serverType, ServerSetting.config.ServerConfig.RpcService.RouterType, ip, port, false, timeout) : changeData;
+                            upDownMsg(myself);
                         }
                         catch (Exception e)
                         {
@@ -205,7 +187,8 @@ namespace SuperGMS.Config
                         }
 
                     };
-                    ZookeeperManager.GetNodeData(path, cfgWatcher); // 监控自己router节点的内容，有可能被置为下线；
+                    // 监控自己router节点的内容，有可能被置为下线；还有可能第一次自己节点为空，Set无法设置watcher，只能重新get一次
+                    ZookeeperManager.GetOneRouter(serverName,ipAndPort, cfgWatcher);
                     break;
                 case ConfigType.Nacos:
                     var instance = new Instance()
@@ -218,7 +201,7 @@ namespace SuperGMS.Config
                         Ip = ip,
                         Port = port,
                         ServiceName = serverName,
-                        Metadata = new Dictionary<string, string> { { NACOS_SERVICE_INFO, ZookeeperManager.getRouterData(serverType, config.ServerConfig.RpcService.RouterType, ip, port, true, ServerSetting.config.ServerConfig.ConfigCenter.SessionTimeout) } }
+                        Metadata = new Dictionary<string, string> { { NACOS_SERVICE_INFO, Configuration.GetRouterData(serverType, config.ServerConfig.RpcService.RouterType, ip, port, true, ServerSetting.config.ServerConfig.ConfigCenter.SessionTimeout) } }
                     };
                     NacosManager.RegisterInstance(serverName, serverName, instance);
                     var listener = new EventListener((string listenKey, InstancesChangeEvent nacosEvent) => {
@@ -269,7 +252,7 @@ namespace SuperGMS.Config
             var callBack = (Configuration cfgValue, string appName) =>
             {
                 // GetHttpProxy(proxyName, updateAction); // 调用一次方法，挂载回调
-                updateAction(cfgValue,proxyName); // 重连之后要执行回调，做变更
+               if(updateAction!=null) updateAction(cfgValue,proxyName); // 重连之后要执行回调，做变更
             };
             callBackList[proxyName] = callBack; // 断线重连之后，要把当前方法封装起来，作为回调
             string httpCft=string.Empty;
@@ -280,9 +263,9 @@ namespace SuperGMS.Config
                     return config; // 直接返回本地配置
                 case ConfigType.Zookeeper:
                     var router = new ConfigWatcher();
-                    router.OnChange += (string path) =>
+                    router.OnChange += (string path, Watcher watcher, string state) =>
                     {
-                        if (updateAction != null && !string.IsNullOrEmpty(path))
+                        if (!string.IsNullOrEmpty(path))
                         {
                             var proxyStr = ZookeeperManager.GetNodeData(path, router);
                             if (string.IsNullOrEmpty(proxyStr))
@@ -291,11 +274,10 @@ namespace SuperGMS.Config
                             }
                             var httpProxy = Newtonsoft.Json.JsonConvert.DeserializeObject<Configuration>(proxyStr);
                             config.HttpProxy = httpProxy.HttpProxy;
-                            updateAction(config,proxyName);
+                           if(updateAction!=null) updateAction(config,proxyName);
                         }
                     };
-                    string p = ZookeeperManager.getConfigPath(proxyName);
-                    httpCft = ZookeeperManager.GetNodeData(p + "/" + SuperHttpProxy.HttpProxy, router);
+                    httpCft = ZookeeperManager.GetConfig(proxyName, SuperHttpProxy.HttpProxy, router);
 
                     break;
                 case ConfigType.Nacos:
@@ -326,7 +308,7 @@ namespace SuperGMS.Config
             var callBack = (Configuration cfgValue,string appName) =>
             {
                 // GetAppClient(appName, updateAction); // 调用一次方法，挂载回调
-                updateAction(config,appName); // 重连之后要执行回调，做变更
+                if (updateAction != null) updateAction(config,appName); // 重连之后要执行回调，做变更
             };
 
             callBackList[appName] = callBack; // 断线重连之后，要把当前方法封装起来，作为回调
@@ -341,12 +323,13 @@ namespace SuperGMS.Config
                     // 引用客户端的配置需要分别拉取
                     // 因为zk没有提供拉节点数据和子节点的接口，只能先拉到Node然后在依次拉子节点的数据
                     var serviceRouterWatcher = new ServiceRouterWatcher();
-                    serviceRouterWatcher.OnChange += (string path) =>
+                    serviceRouterWatcher.OnChange += (string path, Watcher watcher, string state) =>
                     {
-                        if (updateAction != null && !string.IsNullOrEmpty(path))
+                        if (!string.IsNullOrEmpty(path))
                         {
+                            logger.LogWarning($"收到路由变化推送（{path}）");
                             getRouters(appName, serviceRouterWatcher);
-                            updateAction(config, appName);
+                            if (updateAction != null) updateAction(config, appName);
                         }
                     };
 
@@ -416,7 +399,7 @@ namespace SuperGMS.Config
 
         private static RpcClients getRouters(string appName, Watcher serviceRouterWatcher)
         {
-            List<string> nodeList = ZookeeperManager.GetRouterChildren(appName, serviceRouterWatcher); // 路由是整个获取节点整个跟节点监控，因为子节点是虚拟的
+            List<string> nodeList = ZookeeperManager.GetRouterList(appName, serviceRouterWatcher); // 路由是整个获取节点整个跟节点监控，因为子节点是虚拟的
             if (nodeList == null || nodeList.Count < 1)
             {
                 string msg = $"你代码里面调用了 {appName} ,但是从zookeeper中取不到这个服务的路由信息，GetAppClient.appName={appName}.GetChildrenNode==null";
@@ -426,20 +409,10 @@ namespace SuperGMS.Config
             if (config.RpcClients == null) config.RpcClients = new RpcClients() {  Clients=new List<Client>()};
             if (!config.RpcClients.Clients.Any(x => x.ServerName == appName)) config.RpcClients.Clients.Add(new Client { Items = new List<ClientItem>(), RouterType = RouterType.Random, ServerName = appName });
             var client=config.RpcClients.Clients.Where(x=>x.ServerName == appName).FirstOrDefault();
-            //RpcClients rpcClients = new RpcClients();
-            //rpcClients.Clients = new List<Client>();
-            //Client client = new Client() { RouterType = RouterType.Random, ServerName = appName };
-            //client.Items = new List<ClientItem>();
-            //rpcClients.Clients.Add(client);
-            string p = ZookeeperManager.getRouterPath(appName);
-            if (string.IsNullOrEmpty(p))
-            {
-                return null;
-            }
             client.Items.Clear(); // zk是取的全量节点，所以这里要把前面的清掉，重新构造
             foreach (var item in nodeList)
             {
-                string nodeData = ZookeeperManager.GetNodeData(p + "/" + item, serviceRouterWatcher);
+                string nodeData = ZookeeperManager.GetOneRouter(appName,item);
                 if (string.IsNullOrEmpty(nodeData))
                 {
                     continue;
@@ -448,7 +421,6 @@ namespace SuperGMS.Config
                client.Items.Add(clientItem);
             }
             client.RouterType=client.Items?.First()?.RouterType??RouterType.Random;
-            //config.RpcClients = rpcClients;
             return config.RpcClients;
         }
 
@@ -507,99 +479,119 @@ namespace SuperGMS.Config
             }
         }
 
-        private static void initlizeZookeeper(string appName,int pool)
-        {
-            // 根据appName拉取信息，注册zk，这里需要注意热更新的问题
-            // 初始化连接，并注册对连接的监听
-            ZKConnectionWatcher connectionWatcher = new ZKConnectionWatcher();
-            connectionWatcher.OnChange += (string path) =>
-            {
-                ZookeeperManager.reConnection(new KeeperException.SessionExpiredException(),
-                    () =>
-                    {
-                        try
-                        {
-                            // Initlize(appName, pool); // 更新了config 
-                            initlizeZookeeperData(appName);
-                        }
-                        catch (Exception e) // 重连的就不能抛异常了
-                        {
-                            logger.LogError(e, $"reConnection.Initlize.Error");
-                        }
 
-                        var list = callBackList.Values.ToArray();
-                        for (int i = 0; i < list.Length; i++)
-                        {
-                            try
-                            {
-                                list[i]?.Invoke(config, appName);
-                                // callBackList[callBackList.Keys[i]]?.Invoke(config); // 依次执行回调链，保证更新及时
-                            }
-                            catch (Exception e)
-                            {
-                                logger.LogError(e, $"reConnection.callBack.Error");
-                            }
-                        }
-
-
-                        // 断线重连，注册自己
-                        RegisterRouter(ServerSetting.AppName,ServerSetting.config.ServerConfig.RpcService.ServerType,
-                            ServerSetting.config.ServerConfig.RpcService.Ip,
-                            ServerSetting.config.ServerConfig.RpcService.Port,
-                            ServerSetting.config.ServerConfig.RpcService.Enable,
-                            ServerSetting.config.ServerConfig.RpcService.TimeOut);
-
-                    });
-            };
-            ZookeeperManager.Initlize(
-                config.ServerConfig.ConfigCenter.Ip,
-                config.ServerConfig.ConfigCenter.SessionTimeout, connectionWatcher);
-
-            initlizeZookeeperData(appName);
-            // 是ZK时数据库还是走本地配置文件
-            updateDataBase(config);
-        }
-
-        private static void initlizeZookeeperData(string appName)
+        private static void initlizeZookeeper(string appName, int pool)
         {
             // 检查标准配置，第一次可能zk是空
             // 检查标准配置节点，帮助初始化
             var standConfig = getStandConfig();
-            ZookeeperManager.CheckConfig(appName, standConfig);
-
-
-            // 拉取当前AppName的配置，需要注册watcher
-            var dataWatcher = new ConfigWatcher();
-
-            dataWatcher.OnChange += (string path) =>
-            {
-                string configData = ZookeeperManager.GetNodeData(path, dataWatcher);
-                if (string.IsNullOrEmpty(configData))
+            ConfigWatcher configWatcher = new ConfigWatcher();
+            configWatcher.OnChange += ConfigWatcher_OnChange;
+            foreach (var kvp in standConfig)
+            { 
+                string cfg=ZookeeperManager.GetConfig(appName,kvp.Key, configWatcher);
+                if (string.IsNullOrEmpty(cfg)) // 没有就初始化
                 {
-                    return;
+                    ZookeeperManager.SetConfig(appName, kvp.Key, kvp.Value);
+                    ZookeeperManager.GetConfig(appName, kvp.Key, configWatcher);
                 }
-                UpdateConfigByPush(path, configData);
-            };
-
-            List<string>
-                childrens = ZookeeperManager.GetConfigChildren(appName,
-                    null); // 配置是整个获取节点，分别获取配置和分别增加watcher
-            if (childrens != null && childrens.Count > 0)
-            {
-                string root = ZookeeperManager.getConfigPath(appName);
-                if (string.IsNullOrEmpty(root))
-                {
-                    return;
-                }
-                foreach (var item in childrens)
-                {
-                    // 需要根据节点路径来判断是哪个节点变化了
-                    string path = root + "/" + item;
-                    string configData = ZookeeperManager.GetNodeData(path, dataWatcher);
-                    UpdateConfigByPush(path, configData);
-                }
+                UpdateConfigByPush(kvp.Key, string.IsNullOrEmpty(cfg) ? kvp.Value : cfg);
             }
         }
+
+        //private static void initlizeZookeeper(string appName,int pool)
+        //{
+        //    // 根据appName拉取信息，注册zk，这里需要注意热更新的问题
+        //    // 初始化连接，并注册对连接的监听
+        //    ZKConnectionWatcher connectionWatcher = new ZKConnectionWatcher();
+        //    connectionWatcher.OnChange += (string path) =>
+        //    {
+        //        ZookeeperManager.reConnection(new KeeperException.SessionExpiredException(),
+        //            () =>
+        //            {
+        //                try
+        //                {
+        //                    // Initlize(appName, pool); // 更新了config 
+        //                    initlizeZookeeperData(appName);
+        //                }
+        //                catch (Exception e) // 重连的就不能抛异常了
+        //                {
+        //                    logger.LogError(e, $"reConnection.Initlize.Error");
+        //                }
+
+        //                var list = callBackList.Values.ToArray();
+        //                for (int i = 0; i < list.Length; i++)
+        //                {
+        //                    try
+        //                    {
+        //                        list[i]?.Invoke(config, appName);
+        //                        // callBackList[callBackList.Keys[i]]?.Invoke(config); // 依次执行回调链，保证更新及时
+        //                    }
+        //                    catch (Exception e)
+        //                    {
+        //                        logger.LogError(e, $"reConnection.callBack.Error");
+        //                    }
+        //                }
+
+
+        //                // 断线重连，注册自己
+        //                RegisterRouter(ServerSetting.AppName,ServerSetting.config.ServerConfig.RpcService.ServerType,
+        //                    ServerSetting.config.ServerConfig.RpcService.Ip,
+        //                    ServerSetting.config.ServerConfig.RpcService.Port,
+        //                    ServerSetting.config.ServerConfig.RpcService.Enable,
+        //                    ServerSetting.config.ServerConfig.RpcService.TimeOut);
+
+        //            });
+        //    };
+        //    ZookeeperManager.Initlize(
+        //        config.ServerConfig.ConfigCenter.Ip,
+        //        config.ServerConfig.ConfigCenter.SessionTimeout, connectionWatcher);
+
+        //    initlizeZookeeperData(appName);
+        //    // 是ZK时数据库还是走本地配置文件
+        //    updateDataBase(config);
+        //}
+
+        //private static void initlizeZookeeperData(string appName)
+        //{
+        //    // 检查标准配置，第一次可能zk是空
+        //    // 检查标准配置节点，帮助初始化
+        //    var standConfig = getStandConfig();
+        //    ZookeeperManager.CheckConfig(appName, standConfig);
+
+
+        //    // 拉取当前AppName的配置，需要注册watcher
+        //    var dataWatcher = new ConfigWatcher();
+
+        //    dataWatcher.OnChange += (string path) =>
+        //    {
+        //        string configData = ZookeeperManager.GetNodeData(path, dataWatcher);
+        //        if (string.IsNullOrEmpty(configData))
+        //        {
+        //            return;
+        //        }
+        //        UpdateConfigByPush(path, configData);
+        //    };
+
+        //    List<string>
+        //        childrens = ZookeeperManager.GetConfigChildren(appName,
+        //            null); // 配置是整个获取节点，分别获取配置和分别增加watcher
+        //    if (childrens != null && childrens.Count > 0)
+        //    {
+        //        string root = ZookeeperManager.getConfigPath(appName);
+        //        if (string.IsNullOrEmpty(root))
+        //        {
+        //            return;
+        //        }
+        //        foreach (var item in childrens)
+        //        {
+        //            // 需要根据节点路径来判断是哪个节点变化了
+        //            string path = root + "/" + item;
+        //            string configData = ZookeeperManager.GetNodeData(path, dataWatcher);
+        //            UpdateConfigByPush(path, configData);
+        //        }
+        //    }
+        //}
 
         private static Dictionary<string, string> getStandConfig()
         {
@@ -949,7 +941,7 @@ namespace SuperGMS.Config
                     }
                     break;
                 case ConfigType.HttpFile:
-                   var remoteJsonFileConfigurationSource = new RemoteJsonFileConfigurationSource() { Uri = ServerSetting.config.ServerConfig.ConfigCenter.Ip, Optional = false };
+                   var remoteJsonFileConfigurationSource = new RemoteJsonFileConfigurationSource() { Uri = configCenter.Ip, Optional = false };
                     settingConfigBuilder.Sources.Add(remoteJsonFileConfigurationSource);
                     configPath = configCenter.Ip;
                     break;
@@ -973,7 +965,31 @@ namespace SuperGMS.Config
                     configPath = configCenter.Ip;
                     break;
                 case ConfigType.Zookeeper:// 如果是zk配置，第一次需要根据配置文件来初始化，简化配置难度
-                    //settingConfigBuilder.SetBasePath(RemoteJsonFileConfigurationProvider.GetRootPath()).AddJsonFile(RemoteJsonFileConfigurationProvider.ConfigFileName, optional: false, reloadOnChange: false);
+                    ZKConnectionWatcher connWatcher = new ZKConnectionWatcher();
+                    connWatcher.OnChange += ConnWatcher_OnChange;
+                    // 初始化zk
+                    ZookeeperManager.Initlize(ServerSetting._appName,configCenter,_environmentVariable,connWatcher);
+
+                    ConfigWatcher configWatcher = new ConfigWatcher();
+                    configWatcher.OnChange += ConfigWatcher_OnChange;
+                    string zkConfig = ZookeeperManager.GetConfig(ServerSetting._appName, nameof(Configuration.ServerConfig), configWatcher);
+                    if (string.IsNullOrEmpty(zkConfig))
+                    {
+                        zkConfig = ServerConfig.DefaultJson(ServerSetting._appName);
+                        ZookeeperManager.SetConfig(ServerSetting._appName, nameof(Configuration.ServerConfig), zkConfig);
+                        ZookeeperManager.GetConfig(ServerSetting._appName, nameof(Configuration.ServerConfig), configWatcher);
+                    }
+
+                    string zkNLog = ZookeeperManager.GetConfig(ServerSetting._appName, "NLog", configWatcher);
+                    if (string.IsNullOrEmpty(zkNLog))
+                    {
+                        zkNLog = Configuration.NLogDefault;
+                        ZookeeperManager.SetConfig(ServerSetting._appName,"NLog",zkNLog);
+                        ZookeeperManager.GetConfig(ServerSetting._appName, "NLog", configWatcher);
+                    }
+                    string cfgNLog = ServerSetting.Concat(zkConfig, zkNLog);
+                    settingConfigBuilder.AddJsonStream(Configuration.GetStream(cfgNLog));
+
                     configPath = configCenter.Ip;
                     break;
                 default:
@@ -998,6 +1014,44 @@ namespace SuperGMS.Config
             }
             config.ConfigPath = ServerSetting.config.ServerConfig.ConfigCenter.Ip;
             getLocalIp();
+        }
+
+
+        private static void ConfigWatcher_OnChange(string path, Watcher watcher, string state)
+        {
+            string configData = ZookeeperManager.GetNodeData(path, watcher);
+            if (!string.IsNullOrEmpty(configData))
+            {
+                ServerSetting.UpdateConfigByPush(path, configData);
+            }
+        }
+
+        private static void ConnWatcher_OnChange(string path, Watcher watcher, string state)
+        {
+            ZookeeperManager.reConnection(new KeeperException.SessionExpiredException(), () =>
+            {
+                try
+                {
+                    initlizeZookeeper(ServerSetting._appName, 0);
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, "reConnection.Initlize.Error");
+                }
+                var list = callBackList.Values.ToArray();
+                for (int i = 0; i < list.Length; i++)
+                {
+                    try
+                    {
+                        list[i]?.Invoke(ServerSetting.config, ServerSetting._appName);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.LogError(e, $"reConnection.callBack.Error");
+                    }
+                }
+                ServerSetting.RegisterRouter(ServerSetting.AppName, ServerSetting.config.ServerConfig.RpcService.ServerType, ServerSetting.config.ServerConfig.RpcService.Ip, ServerSetting.config.ServerConfig.RpcService.Port, ServerSetting.config.ServerConfig.RpcService.Enable, ServerSetting.config.ServerConfig.RpcService.TimeOut);
+            });
         }
 
         /// <summary>

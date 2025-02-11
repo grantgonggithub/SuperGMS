@@ -31,7 +31,7 @@ namespace SuperGMS.Zookeeper
                 case Event.KeeperState.Disconnected:
                 case Event.KeeperState.Expired:
                 //case Event.KeeperState.SyncConnected:
-                    var task = new Task(() => { Thread.Sleep(1000); this.CallBack(null); });
+                    var task = new Task(() => { Thread.Sleep(1000); this.CallBack(null,this,state.ToString()); });
                     task.Start();
                     return task;
             }

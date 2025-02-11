@@ -33,7 +33,7 @@ namespace SuperGMS.Config
 
         public static string DefaultJson(string env) => @"{    ""DataBase"": {
         ""RefFile"": ""true"",
-        ""DbFile"": ""database." + env + @".config"",
+        ""DbFile"": ""database." + (string.IsNullOrEmpty(env)?"":env+".") + @"config"",
         ""SqlFile"": ""sqlmap.config""
     }}";
     }

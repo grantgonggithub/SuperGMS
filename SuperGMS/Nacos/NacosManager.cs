@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
+using Nacos.OpenApi;
 using Nacos.V2;
 using Nacos.V2.Config;
 using Nacos.V2.Naming;
@@ -29,6 +30,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace SuperGMS.Nacos
 {
@@ -47,6 +49,7 @@ namespace SuperGMS.Nacos
         /// <param name="environmentName">在nacos页面配置的Namespace值，对应的系统的环境变量名</param>
         public static void Initlize(LoggerFactory loggerFactory, ConfigCenter configCenter,string environmentName)
         {
+            environmentName = (string.IsNullOrEmpty(environmentName) ? "dev" : environmentName);// 如果取不到环境变量就默认dev
             NacosSdkOptions sdkOptions = new NacosSdkOptions()
             {
                 ConfigUseRpc = true,
@@ -59,9 +62,18 @@ namespace SuperGMS.Nacos
                 NamingCacheRegistryDir = AppDomain.CurrentDomain.BaseDirectory
             };
             var options = Options.Create(sdkOptions);
+            var httpClientFactory = new ServiceCollection().AddHttpClient().BuildServiceProvider().GetRequiredService<IHttpClientFactory>();
+            DefaultNacosOpenApi defaultNacosOpenApi=new DefaultNacosOpenApi(httpClientFactory, options);
+
+            // 自动创建NameSpaces
+            var nameSpaces = defaultNacosOpenApi.GetNamespacesAsync().Result;
+            if (!nameSpaces?.Any((NacosNamespace x) => x.Namespace == environmentName)??true)
+            {
+                bool isOk = defaultNacosOpenApi.CreateNamespaceAsync(environmentName, environmentName, environmentName).Result;
+            }
+
             _configService = new NacosConfigService(loggerFactory, options);
             
-            var httpClientFactory = new ServiceCollection().AddHttpClient().BuildServiceProvider().GetRequiredService<IHttpClientFactory>();
             _namingService = new NacosNamingService(loggerFactory, options, httpClientFactory);
         }
 

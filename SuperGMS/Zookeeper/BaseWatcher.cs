@@ -14,7 +14,7 @@ using org.apache.zookeeper;
 
 namespace SuperGMS.Zookeeper
 {
-    public delegate void WatcherCallBack(string path);
+    public delegate void WatcherCallBack(string path,Watcher watcher,string state);
 
     /// <summary>
     /// BaseWatcher
@@ -23,11 +23,11 @@ namespace SuperGMS.Zookeeper
     {
         public event WatcherCallBack OnChange;
 
-        public void CallBack(string path)
+        public void CallBack(string path, Watcher watcher, string state)
         {
             if (OnChange != null)
             {
-                OnChange(path);
+                OnChange(path,watcher,state);
             }
         }
     }
