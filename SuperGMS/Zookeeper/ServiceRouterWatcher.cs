@@ -12,6 +12,7 @@
 ----------------------------------------------------------------*/
 using org.apache.zookeeper;
 
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SuperGMS.Zookeeper
@@ -34,7 +35,7 @@ namespace SuperGMS.Zookeeper
                     case Event.EventType.NodeDataChanged:
                     case Event.EventType.NodeDeleted:
 
-                        var tsk = new Task(() => { this.CallBack(path); });
+                        var tsk = new Task(() => { Thread.Sleep(1000); this.CallBack(path,this,eventType.ToString()); });
                         tsk.Start();
                         return tsk;
                 }

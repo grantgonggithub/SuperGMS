@@ -10,8 +10,13 @@
  功能描述：
 
 ----------------------------------------------------------------*/
+using SuperGMS.Router;
+using SuperGMS.Rpc;
+
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace SuperGMS.Config
 {
@@ -130,6 +135,17 @@ namespace SuperGMS.Config
             return cfg;
         }
 
+        public static Stream GetStream(string jsonConfig)
+        {
+            byte[] byteValue = Encoding.UTF8.GetBytes(jsonConfig);
+            return new MemoryStream(byteValue, 0, byteValue.Length);
+        }
+
+        public static string GetRouterData(ServerType serverType, RouterType routerType, string ip, int port, bool enable, int timeout)
+        {
+            // json内容中包含"{"和"}" string.format 中的占位符 也包含"{"和"}"所以异常了，只能用+拼字符串
+            return "{ \"Pool\": 0,\"Ip\": \"" + ip + "\",\"Port\": " + port + ",\"ServerType\": " + (int)serverType + ",\"RouterType\":" + (int)routerType + ",\"Enable\":\"" + enable + "\",\"TimeOut\":" + timeout + "}";
+        }
 
         public const string NLogDefault = @"{
         ""NLog"": {

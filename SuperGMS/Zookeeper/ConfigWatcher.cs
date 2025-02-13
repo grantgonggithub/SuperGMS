@@ -13,6 +13,7 @@
 
 using org.apache.zookeeper;
 
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SuperGMS.Zookeeper
@@ -40,10 +41,11 @@ namespace SuperGMS.Zookeeper
                     case Event.EventType.NodeChildrenChanged:
                     case Event.EventType.NodeCreated:
                     case Event.EventType.NodeDataChanged:
-                        var tsk = new Task(() => { this.CallBack(path); });
+                    case Event.EventType.NodeDeleted:
+                        var tsk = new Task(() => { Thread.Sleep(1000); this.CallBack(path,this,eventType.ToString()); });
                         tsk.Start();
                         return tsk;
-                    case Event.EventType.NodeDeleted:
+                    default:
                         // 写日志忽略变更
                         break;
                 }

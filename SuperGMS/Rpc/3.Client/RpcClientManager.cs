@@ -51,7 +51,7 @@ namespace SuperGMS.Rpc.Client
                 //未获取到依赖路由客户端配置， 因为集群中的机器状况不同步，程序里面注册了依赖但是没有找到配置，有可能是服务启动有滞后，需要一直重试，直到服务上线
                 Task.Run(() =>
                 {
-                    Thread.Sleep(3 * 1000);
+                    Thread.Sleep(6 * 1000);
                     Register(appName);
                 });
                 return;
@@ -90,7 +90,6 @@ namespace SuperGMS.Rpc.Client
 
         private static void updateAppClinet(Configuration rpcClients,string appName)
         {
-            logger.LogWarning($"收到路由变化（{appName}）推送:{JsonConvert.SerializeObject(rpcClients)}");
             Parser(rpcClients.RpcClients,appName);
         }
 
@@ -128,7 +127,8 @@ namespace SuperGMS.Rpc.Client
 
         public static void Parser(RpcClients rpcClients,string appName)
         {
-            var cItems = rpcClients?.Clients?.First(x=>x.ServerName == appName).Items;
+            var cItems = rpcClients?.Clients?.First(x=>x.ServerName == appName)?.Items;
+            if (cItems?.Any() ?? true) return;
             ClientServer s = null;
             List<ClientItem> cs = null;
             foreach (var cl in cItems) {
