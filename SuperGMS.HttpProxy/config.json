@@ -1,19 +1,19 @@
-//{
-//  "ServerConfig": {
-//    "ConfigCenter": {
-//      "ConfigType": 4,
-//      "Ip": "http://192.168.7.172:8848",
-//      "SessionTimeout": 5000
-//    }
-//  }
-//}
-
 {
   "ServerConfig": {
     "ConfigCenter": {
-      "ConfigType": 2,
-      "Ip": "192.168.7.172:2181",
-      "SessionTimeout": 10000
+      "ConfigType": 4,
+      "Ip": "http://192.168.7.172:8848",
+      "SessionTimeout": 5000
     }
   }
 }
+
+//{
+//  "ServerConfig": {
+//    "ConfigCenter": {
+//      "ConfigType": 2,
+//      "Ip": "192.168.7.172:2181",
+//      "SessionTimeout": 10000
+//    }
+//  }
+//}
