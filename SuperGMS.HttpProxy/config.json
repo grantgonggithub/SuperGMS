@@ -1,12 +1,20 @@
 {
   "ServerConfig": {
     "ConfigCenter": {
-      "ConfigType": 4,
-      "Ip": "http://192.168.100.172:8848",
-      "SessionTimeout": 5000
+      "ConfigType": 3,
+      "Ip": "http://localhost/config.json"
     }
   }
 }
+//{
+//  "ServerConfig": {
+//    "ConfigCenter": {
+//      "ConfigType": 4,
+//      "Ip": "http://192.168.100.172:8848",
+//      "SessionTimeout": 5000
+//    }
+//  }
+//}
 
 //{
 //  "ServerConfig": {

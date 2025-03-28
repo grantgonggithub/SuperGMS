@@ -1,25 +1,24 @@
 {
-  // ����΢���񱾵ر������õĽڵ�
   "ServerConfig": {
     "RpcService": {
       "Pool": 1,
-      "Ip": "192.168.7.*",
+      "Ip": "192.168.100.*",
       "Port": 20001,
       "PortList": {
         "Service_A": 20001,
         "Service_B": 20002
       },
       "ServerType": 2, // Thrift=2,WCF=1,Grpc=3, TaskWorker=4,HttpProxy = 5
-      "TimeOut": 5000, // �ͻ��˵���rpc��ʱʱ��  
+      "TimeOut": 5000, 
       "Enable": true
     },
     "ConfigCenter": {
-      "ConfigType": 2, // Local = 1, zk=2 ���ص�����1,��Ⱥ��2
+      "ConfigType": 2, // Local = 1, zk=2
       "Ip": "192.168.100.121:2181",
       "SessionTimeout": 10000
     }
   },
-  // log����
+  // log
   "NLog": {
     "autoReload": false,
     "throwConfigExceptions": true,
@@ -72,7 +71,6 @@
       }
     ]
   },
-  // �û���Ҫ���õ�ֵ
   "ConstKeyValue": {
     "Items": [
       {
@@ -85,13 +83,12 @@
       }
     ]
   },
-  // DataBase�ڵ����ļ����ú�zk��������������ģ�һ��Ҫע��
+  // DataBase
   "DataBase": {
     "RefFile": "true",
     "DbFile": "F://database.config",
     "SqlFile": "F://sqlmap.config"
   },
-  // �ļ�������������
   "FileServer": {
     "Items": [
       {
@@ -104,7 +101,6 @@
       }
     ]
   },
-  // ����������
   "HttpProxy": {
     "Items": [
       {
@@ -136,7 +132,7 @@
       }
     ]
   },
-  // redis����
+  // redis
   "RedisConfig": {
     "Nodes": [
       {
@@ -169,12 +165,12 @@
       }
     ]
   },
-  // rpcclient�����ã����ֻ���ļ����ò���Ҫ��zk���ò���
+  // rpcclient
   "RpcClients": {
     "Clients": [
       {
         "ServerName": "Service_A",
-        "RouterType": 2, // Hash=1, Random=2 ��ǰֻ֧�� 2
+        "RouterType": 2, // Hash=1, Random=2
         "Items": [
           {
             "Pool": 1,

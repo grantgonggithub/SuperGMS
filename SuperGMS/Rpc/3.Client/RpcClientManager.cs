@@ -128,7 +128,7 @@ namespace SuperGMS.Rpc.Client
         public static void Parser(RpcClients rpcClients,string appName)
         {
             var cItems = rpcClients?.Clients?.First(x=>x.ServerName == appName)?.Items;
-            if (cItems?.Any() ?? true) return;
+            if (cItems == null || cItems.Count < 1) return;
             ClientServer s = null;
             List<ClientItem> cs = null;
             foreach (var cl in cItems) {
