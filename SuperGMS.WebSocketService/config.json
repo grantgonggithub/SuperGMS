@@ -1,0 +1,8 @@
+{
+  "ServerConfig": {
+    "ConfigCenter": {
+      "ConfigType": 3,
+      "Ip": "http://localhost/config.json"
+    }
+  }
+}

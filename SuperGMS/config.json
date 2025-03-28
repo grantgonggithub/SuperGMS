@@ -1,0 +1,221 @@
+{
+  // ����΢���񱾵ر������õĽڵ�
+  "ServerConfig": {
+    "RpcService": {
+      "Pool": 1,
+      "Ip": "192.168.7.*",
+      "Port": 20001,
+      "PortList": {
+        "Service_A": 20001,
+        "Service_B": 20002
+      },
+      "ServerType": 2, // Thrift=2,WCF=1,Grpc=3, TaskWorker=4,HttpProxy = 5
+      "TimeOut": 5000, // �ͻ��˵���rpc��ʱʱ��  
+      "Enable": true
+    },
+    "ConfigCenter": {
+      "ConfigType": 2, // Local = 1, zk=2 ���ص�����1,��Ⱥ��2
+      "Ip": "192.168.100.121:2181",
+      "SessionTimeout": 10000
+    }
+  },
+  // log����
+  "NLog": {
+    "autoReload": false,
+    "throwConfigExceptions": true,
+    "internalLogLevel": "info",
+    "internalLogFile": "${basedir}/txtLog/internal-nlog.txt",
+    "extensions": [
+      { "assembly": "NLog.Extensions.Logging" }
+    ],
+    "default-wrapper": {
+      "type": "AsyncWrapper",
+      "overflowAction": "Block"
+    },
+    "targets": {
+      "all-file": {
+        "type": "File",
+        "layout": "${longdate}\r${uppercase:${level}}\r\n${event-properties:item=EventId_Name:whenEmpty=}\r\n${logger}|${callsite}\r\n${message}\r\n ${exception:format=tostring}\r\n-------------------------------------------------------------------\r\n",
+        "fileName": "${basedir}/txtLog/${shortdate}/${shortdate}.txt",
+        "archiveFileName": "${basedir}/txtLog/${shortdate}/{#}.txt",
+        "archiveAboveSize": "31457280",
+        "archiveNumbering": "DateAndSequence",
+        "archiveDateFormat": "yyyyMMddHH",
+        "encoding": "UTF-8"
+      },
+      "own-console": {
+        "type": "LimitingWrapper",
+        "interval": "00:00:01",
+        "messageLimit": 100,
+        "target": {
+          "type": "ColoredConsole",
+          "layout": "${longdate}\r${event-properties:item=EventId_Id:whenEmpty=}\r\n${uppercase:${level}}\r\n${logger}\r\n${message}\r\n${exception:format=tostring}${callsite}\r\n-------------------------------------------------------------------\r\n",
+          "rowHighlightingRules": [
+            {
+              "condition": "level == LogLevel.Error",
+              "foregroundColor": "Red"
+            },
+            {
+              "condition": "level == LogLevel.Fatal",
+              "foregroundColor": "Red",
+              "backgroundColor": "White"
+            }
+          ]
+        }
+      }
+    },
+    "rules": [
+      {
+        "logger": "*",
+        "minLevel": "Debug",
+        "writeTo": "all-file,own-console"
+      }
+    ]
+  },
+  // �û���Ҫ���õ�ֵ
+  "ConstKeyValue": {
+    "Items": [
+      {
+        "Key": "Key1",
+        "Value": "Value1"
+      },
+      {
+        "Key": "Key1",
+        "Value": "Value1"
+      }
+    ]
+  },
+  // DataBase�ڵ����ļ����ú�zk��������������ģ�һ��Ҫע��
+  "DataBase": {
+    "RefFile": "true",
+    "DbFile": "F://database.config",
+    "SqlFile": "F://sqlmap.config"
+  },
+  // �ļ�������������
+  "FileServer": {
+    "Items": [
+      {
+        "Pool": 1,
+        "Url": "http://192.168.100.121:5002"
+      },
+      {
+        "Pool": 1,
+        "Url": "http://192.168.100.121:5002"
+      }
+    ]
+  },
+  // ����������
+  "HttpProxy": {
+    "Items": [
+      {
+        "Name": "Service_A"
+      },
+      {
+        "Name": "Service_B"
+      }
+    ]
+  },
+  // rabbitMQ
+  "RabbitMQ": {
+    "Host": [
+      {
+        "Name": "Default",
+        "Ip": "192.168.100.201",
+        "Port": 5673,
+        "UserName": "xxxx",
+        "PassWord": "xxxxxxxx",
+        "NoAckMsgCount": 3
+      },
+      {
+        "Name": "Log",
+        "Ip": "192.168.100.201",
+        "Port": 5673,
+        "UserName": "xxx",
+        "PassWord": "xxxxxxx",
+        "NoAckMsgCount": 3
+      }
+    ]
+  },
+  // redis����
+  "RedisConfig": {
+    "Nodes": [
+      {
+        "NodeName": "resource",
+        "IsMasterSlave": false,
+        "Items": [
+          {
+            "Pool": 1,
+            "IsMaster": false,
+            "Server": "192.168.100.201",
+            "Port": 6379,
+            "AllowAdmin": true,
+            "ConnectTimeout": 4000,
+			"SyncTimeout":3000,
+            "Ssl": true,
+            "Pwd": "xxxxxx"
+          },
+          {
+            "Pool": 1,
+            "IsMaster": false,
+            "Server": "192.168.100.201",
+            "Port": 6372,
+            "AllowAdmin": true,
+            "ConnectTimeout": 4000,
+			"SyncTimeout":3000,
+            "Ssl": true,
+            "Pwd": "xxxxxxxx"
+          }
+        ]
+      }
+    ]
+  },
+  // rpcclient�����ã����ֻ���ļ����ò���Ҫ��zk���ò���
+  "RpcClients": {
+    "Clients": [
+      {
+        "ServerName": "Service_A",
+        "RouterType": 2, // Hash=1, Random=2 ��ǰֻ֧�� 2
+        "Items": [
+          {
+            "Pool": 1,
+            "Ip": "192.168.100.121",
+            "Port": 20001,
+            "ServerType": 2,
+            "TimeOut": 4000,
+            "Enable": true
+          },
+          {
+            "Pool": 1,
+            "Ip": "192.168.100.122",
+            "Port": 20001,
+            "ServerType": 2,
+            "TimeOut": 4000,
+            "Enable": true
+          }
+        ]
+      },
+      {
+        "ServerName": "Service_B",
+        "RouterType": 2,
+        "Items": [
+          {
+            "Pool": 1,
+            "Ip": "192.168.100.121",
+            "Port": 20002,
+            "ServerType": 2,
+            "TimeOut": 4000,
+            "Enable": true
+          },
+          {
+            "Pool": 1,
+            "Ip": "192.168.100.122",
+            "Port": 20002,
+            "ServerType": 2,
+            "TimeOut": 4000,
+            "Enable": true
+          }
+        ]
+      }
+    ]
+  }
+}
