@@ -1,7 +1,7 @@
 ﻿            Initlize
             // 点对点消息
             //{
-            //    "ct": "SXCRM",
+            //    "ct": "youct",
             //    "tk": "ManagementSystems:fe5edd3ba7e0496e9cf8955029082aad",
             //    "cv": "1.0.0",
             //    "v": {
@@ -14,7 +14,7 @@
             // SuperDirectMessageHelper.Initlize(new MessageRouterMap { BussinessApiName=nameof(ReceiveDirectMessage), MQRouterName="mytest_direct_msg" });
             // 扇波消息 
             //{
-            //   "ct": "SXCRM",
+            //   "ct": "youct",
             //   "tk": "ManagementSystems:a98164ffe0734ff28cb6e51b62987230",
             //   "cv": "1.0.0",
             //   "v": {
