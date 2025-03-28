@@ -27,7 +27,7 @@ namespace SuperGMS.Config
     ""ServerConfig"": {
         ""RpcService"": {
             ""Pool"": 0,
-            ""Ip"": ""192.168.7.*"",
+            ""Ip"": ""192.168.100.*"",
             ""Port"": 0,
             ""PortList"": {
                 """+appName+ @""": 19999
