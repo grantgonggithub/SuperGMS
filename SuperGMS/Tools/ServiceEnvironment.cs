@@ -77,7 +77,7 @@ namespace SuperGMS.Tools
                 NetworkInterface[] interfaces = NetworkInterface.GetAllNetworkInterfaces();
                 foreach (var item in interfaces)
                 {
-                    if (item.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
+                    if (item.NetworkInterfaceType == NetworkInterfaceType.Ethernet ||item.NetworkInterfaceType==NetworkInterfaceType.Wireless80211)
                     {
                         IPInterfaceProperties ipInterfaceProperties = item.GetIPProperties();
                         UnicastIPAddressInformationCollection ipCollection = ipInterfaceProperties.UnicastAddresses;
