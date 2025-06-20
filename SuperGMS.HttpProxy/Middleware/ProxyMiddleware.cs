@@ -24,6 +24,12 @@ namespace Grant.HttpProxy.Middleware
 
         public Task Invoke(HttpContext context)
         {
+            // 放行 OPTIONS 请求，让 CORS 中间件处理
+            if (context.Request.Method?.ToUpper() == "OPTIONS")
+            {
+                return m_Next(context);
+            }
+
             try
             {
                 if (context.Request.Method?.ToUpper() == "GET")

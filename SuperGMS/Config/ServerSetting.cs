@@ -809,7 +809,7 @@ namespace SuperGMS.Config
                 }
             }
             if(config.ServerConfig.RpcService.Port<1)
-              throw new Exception("Server Port Not configured yet");
+              throw new Exception($"Check Config.Json {servserName} Server Port Not configured yet");
             return config.ServerConfig.RpcService;
         }
 
