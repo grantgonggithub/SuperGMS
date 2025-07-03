@@ -2,6 +2,8 @@
 
 namespace SuperGMS.DB.MapperEx
 {
+    using Microsoft.Extensions.Logging;
+    using SuperGMS.Log;
     using System;
     using System.Text.RegularExpressions;
 
@@ -31,7 +33,7 @@ namespace SuperGMS.DB.MapperEx
                         var configuration = new MapperConfiguration(cfg =>
                         {
                             cfg.AddProfile(profiles);
-                        });
+                        }, LogFactory.LoggerFactory);
                         mapper = new Mapper(configuration);
                     }
                 }
