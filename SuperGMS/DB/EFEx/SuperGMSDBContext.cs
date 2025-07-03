@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 
 using SuperGMS.Config;
 using SuperGMS.DB.EFEx.GrantDbContext;
+using SuperGMS.DB.EFEx.MyDbContext;
 using SuperGMS.ExceptionEx;
 using SuperGMS.Log;
 using SuperGMS.Protocol.RpcProtocol;
@@ -148,6 +149,13 @@ namespace SuperGMS.DB.EFEx
         public static IDapperDbContext GetDapperContext(DbInfo dbInfo)
         {
             return new DapperDBContext(dbInfo);
+        }
+
+        public static ISqlSugarDbContext GetSqlSugarDbContext(RpcContext rpcContext, string dbContextName)
+        {
+            var dbName = dbContextName.ToLower();
+            var info = GetDbInfo(rpcContext, dbName);
+            return new SqlSugarDBContext(info);
         }
     }
 }

@@ -31,6 +31,7 @@ namespace SuperGMS.DB.EFEx
         //public event DbDapperCommit OnDbCommit;
 
         private DbInfo dbInfo;
+        private ISqlRepository sqlRepository;
 
         /// <summary>
         /// 当前数据库信息
@@ -60,7 +61,8 @@ namespace SuperGMS.DB.EFEx
         /// <returns>ISqlRepository</returns>
         public ISqlRepository GetRepository()
         {
-            return SqlRepositoryManager.GetSqlRepository(dbInfo);
+            if (sqlRepository != null) throw new Exception("DapperDBContext.GetRepository(),在一个rpc上下文只能获取一次");
+            return sqlRepository=SqlRepositoryManager.GetSqlRepository(dbInfo);
         }
     }
 }

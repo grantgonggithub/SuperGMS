@@ -74,7 +74,7 @@ namespace SuperGMS.DB.EFEx
         /// <returns>string</returns>
         public override string ToString()
         {
-            return $"DbContextName：{DbContextName},DbName:{DbName},UserName:{UserName},Pwd:{Pwd},Ip:{Ip},Other:{Other}";
+            return $"DbContextName：{DbContextName},DbName:{DbName},DbType:{DbType},UserName:{UserName},Pwd:{Pwd},Ip:{Ip},Port:{Port},Other:{Other}";
         }
     }
 }
