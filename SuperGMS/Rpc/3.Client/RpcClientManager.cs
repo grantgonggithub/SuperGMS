@@ -407,7 +407,7 @@ namespace SuperGMS.Rpc.Client
                                 UseChain = JsonConvert.SerializeObject(args.Headers),
                                 CodeMsg = rr.msg,
                                 Code = rr.c,
-                                Desc = $"HttpProxy.Error:server :{server} not found rid={args.rid}",
+                                Desc = $"HttpProxy.Error:server :{server} not found rid={args.rid}，place check config.json httpProxy",
                             }.ToString());
                         }
                     }
