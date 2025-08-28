@@ -12,9 +12,12 @@ using System.Runtime.Serialization;
 
 namespace SuperGMS.DB.EFEx.DynamicSearch
 {
+    using Newtonsoft.Json.Linq;
     using SuperGMS.DB.EFEx.DynamicSearch.Model;
+    using SuperGMS.DB.EFEx.GrantDbContext;
     using SuperGMS.ExceptionEx;
     using System.Collections.Generic;
+    using System.Linq.Dynamic.Core;
     using System.Text;
 
     /// <summary>
@@ -116,11 +119,13 @@ namespace SuperGMS.DB.EFEx.DynamicSearch
         /// 根据QueryModel组织sqlWhere语句,如果有字段前缀的话,需要提前增加进来
         /// </summary>
         /// <returns></returns>
-        public string GetSqlWhere()
+        public string GetSqlWhere(IDapperDbContext dapperDbContext)
         {
             var sb = new StringBuilder();
             List<string> groups = new List<string>();
             QueryModel.Items.Sort((a, b) => { return a.Field.CompareTo(b.Field); });
+            var mapDic = DbColumnMaps.GetDbContextFiledMaps(dapperDbContext.DbInfo.DbContextName);
+            if (mapDic == null) throw new NotImplementedException($"请在项目的AppStart中初始化{dapperDbContext.DbInfo.DbContextName}");
             StringBuilder noOrGroup = new StringBuilder();
             foreach (var conditionItem in QueryModel.Items)
             {
@@ -140,6 +145,10 @@ namespace SuperGMS.DB.EFEx.DynamicSearch
                                     else
                                         sbChild.Append(" or ");
                                 }
+                                if (mapDic.ContainsKey(senItem.Field))
+                                {
+                                    senItem.Field = mapDic[senItem.Field];
+                                }
                                 sbChild.Append((string.IsNullOrEmpty(senItem.Prefix) ? "" : (senItem.Prefix + ".")) + senItem.Field + " " + ConvertMethodToSql(senItem.Method, senItem.Value));
                             }
                         }
@@ -156,6 +165,10 @@ namespace SuperGMS.DB.EFEx.DynamicSearch
                 }
                 else
                 {
+                    if (mapDic.ContainsKey(conditionItem.Field))
+                    {
+                        conditionItem.Field = mapDic[conditionItem.Field];
+                    }
                     if (noOrGroup.Length > 0)
                         noOrGroup.Append(" and ");
                     noOrGroup.Append((string.IsNullOrEmpty(conditionItem.Prefix) ? "" : (conditionItem.Prefix + ".")) + conditionItem.Field + " " + ConvertMethodToSql(conditionItem.Method, conditionItem.Value));
@@ -252,8 +265,9 @@ namespace SuperGMS.DB.EFEx.DynamicSearch
         /// <param name="method"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public string ConvertMethodToSql(QueryMethod method, object value)
+        public string ConvertMethodToSql(QueryMethod method, object objValue)
         {
+            var value = getValue(objValue);
             switch (method)
             {
                 ////字符串类型处理
@@ -261,7 +275,7 @@ namespace SuperGMS.DB.EFEx.DynamicSearch
                     return "like '%" + value + "%'";
 
                 case QueryMethod.StdIn:
-                    return "in ('" + string.Join("','", value as string[]) + "')";
+                    return "in ('" + value + "')";
 
                 case QueryMethod.NotLike:
                     return "not like '%" + value + "%'";
@@ -282,7 +296,7 @@ namespace SuperGMS.DB.EFEx.DynamicSearch
                     return "<= '" + value + "'";
 
                 case QueryMethod.StdNotIn:
-                    return "not in  ('" + string.Join("','", value as string[]) + "')";
+                    return "not in  ('" + value + "')";
 
                 case QueryMethod.NotEqual:
                     return "<> '" + value + "'";
@@ -296,6 +310,14 @@ namespace SuperGMS.DB.EFEx.DynamicSearch
                 default:
                     return "";
             }
+        }
+
+        private string getValue(object value)
+        {
+            if (value == null) return null;
+            if (value is Array) return string.Join("','", (value as Array).ToDynamicArray());
+            if (value is DateTime) return DateTime.Parse(value.ToString()).ToString("yyyy-MM-dd HH:mm:ss");
+            return value.ToString();
         }
         /// <summary>
         /// 处理空值查询，null值查询
