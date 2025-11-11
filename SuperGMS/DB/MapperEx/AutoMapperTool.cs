@@ -32,6 +32,7 @@ namespace SuperGMS.DB.MapperEx
                         {
                             cfg.AddProfile(profiles);
                         });
+                        
                         mapper = new Mapper(configuration);
                     }
                 }
