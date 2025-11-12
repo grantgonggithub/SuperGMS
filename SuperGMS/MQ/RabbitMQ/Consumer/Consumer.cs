@@ -115,7 +115,7 @@ namespace SuperGMS.MQ.RabbitMQ
                 }
             }
 
-            Random r = new Random(DateTime.Now.Millisecond);
+            Random r = new Random(DateTime.UtcNow.Millisecond);
             // 防止所有MQ的客户端同时重连服务器，通过随机数，错开时间，减少MQ服务器重启瞬间的并发
             int sleepTime = r.Next(2, 15);
             // 如果连接异常，会等待10s 重新连接

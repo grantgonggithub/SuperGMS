@@ -866,7 +866,7 @@ namespace SuperGMS.DB.EFEx.QueryFilterRule
                 return NeverTrue();
             }
 
-            var dateTimeValue = Expression.Constant(DateTime.Now.Date.AddDays(-numOfDays));
+            var dateTimeValue = Expression.Constant(DateTime.UtcNow.Date.AddDays(-numOfDays));
 
             var nullCheck = GetNullCheckExpression(propertyExp);
             Expression bodyExp = Expression.LessThan(propertyExp, Expression.Convert(dateTimeValue, propertyExp.Type));
@@ -887,7 +887,7 @@ namespace SuperGMS.DB.EFEx.QueryFilterRule
                 return NeverTrue();
             }
 
-            var dateTimeValue = Expression.Constant(DateTime.Now.Date.AddDays(numOfDays));
+            var dateTimeValue = Expression.Constant(DateTime.UtcNow.Date.AddDays(numOfDays));
 
             var nullCheck = GetNullCheckExpression(propertyExp);
             Expression bodyExp = Expression.GreaterThan(propertyExp, Expression.Convert(dateTimeValue, propertyExp.Type));

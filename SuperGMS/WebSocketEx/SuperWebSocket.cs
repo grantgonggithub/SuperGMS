@@ -115,7 +115,7 @@ namespace SuperGMS.WebSocketEx
             lock (_lock) {
                 if (isCheckTimeOut)
                 {
-                    if (DateTime.Now.Subtract(_lastActiveTime).TotalMilliseconds > SuperWebSocketManager.TimeOutSpan)
+                    if (DateTime.UtcNow.Subtract(_lastActiveTime).TotalMilliseconds > SuperWebSocketManager.TimeOutSpan)
                     {
                         close(closeStatus, "客户端连接被清理断开");
                         // 上面语句执行时为_isClear=false，上面语句执行完会执行会触发200行代码的逻辑，
@@ -173,7 +173,7 @@ namespace SuperGMS.WebSocketEx
 
                     lock (_lock)
                     {
-                        this._lastActiveTime = DateTime.Now;
+                        this._lastActiveTime = DateTime.UtcNow;
                     }
 
                     var msg = Encoding.UTF8.GetString(buffer);

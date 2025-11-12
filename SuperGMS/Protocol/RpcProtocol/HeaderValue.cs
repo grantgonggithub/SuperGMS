@@ -50,7 +50,7 @@ namespace SuperGMS.Protocol.RpcProtocol
             this.serverName = serverName;
             this.key = key;
             this._value = value;
-            ts = DateTime.Now;
+            ts = DateTime.UtcNow;
         }
 
         private string serverName;

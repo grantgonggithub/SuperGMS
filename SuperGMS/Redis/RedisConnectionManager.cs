@@ -35,7 +35,7 @@ namespace SuperGMS.Redis
         /// </summary>
         public static ConnectionMultiplexer GetConnection(RedisServer srvCfg)
         {
-            // var date = DateTime.Now;
+            // var date = DateTime.UtcNow;
             lock (_lockObj)
             {
                 // 业务模型节点+索引确定一个连接
@@ -53,7 +53,7 @@ namespace SuperGMS.Redis
                         conn.Dispose(); // 如果一个连接断了，必须释放掉，才能重新建
                     }
 
-                    // Console.Write(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:ffffff") + "---Wait---" + DateTime.Now.Subtract(date).TotalMilliseconds);
+                    // Console.Write(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss:ffffff") + "---Wait---" + DateTime.UtcNow.Subtract(date).TotalMilliseconds);
                     conn = getConnection(srvCfg);
                     ConnectionCache[key] = conn;
                 }

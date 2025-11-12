@@ -141,7 +141,7 @@ namespace SuperGMS.Config
         public static FileServerItem GetFileServers()
         {
             var servers = FileServerManager.GetFileServers();
-            Random r = new Random(DateTime.Now.Millisecond);
+            Random r = new Random(DateTime.UtcNow.Millisecond);
             int idx = r.Next(0, servers.Length);
             return servers[idx];
         }

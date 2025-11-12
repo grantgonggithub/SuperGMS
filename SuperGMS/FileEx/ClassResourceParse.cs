@@ -165,7 +165,7 @@ namespace SuperGMS.FileEx
                     { columnTypename = "字符"; }
                     break;
                 case "System.DateTime":
-                    columnTypename = "日期" + ":" + DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+                    columnTypename = "日期" + ":" + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm");
                     break;
                 case "System.Decimal":
                     columnTypename = "0";

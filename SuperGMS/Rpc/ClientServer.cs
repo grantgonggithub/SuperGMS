@@ -33,7 +33,7 @@ namespace SuperGMS.Rpc
         private Dictionary<string, ClientItem> clients = new Dictionary<string, ClientItem>();
         private readonly static ILogger logger = LogFactory.CreateLogger<ClientServer>();
         private int nextIndex = 0;
-        private Random random = new Random(DateTime.Now.Millisecond);
+        private Random random = new Random(DateTime.UtcNow.Millisecond);
         /// <summary>
         /// Gets or sets logic ServerName
         /// </summary>

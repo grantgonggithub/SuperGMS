@@ -56,7 +56,7 @@ namespace SuperGMS.GrantLock
         internal bool Acquire(TimeSpan? timeout = null)
         {
             bool bLock = false;
-            var dtStart = DateTime.Now.Ticks;
+            var dtStart = DateTime.UtcNow.Ticks;
             while (!bLock)
             {
                 bLock = TryAcquireOnce();
@@ -69,7 +69,7 @@ namespace SuperGMS.GrantLock
                     Thread.Sleep(this.checkTimeSpan);
                 }
 
-                var ts = new TimeSpan(DateTime.Now.Ticks - dtStart);
+                var ts = new TimeSpan(DateTime.UtcNow.Ticks - dtStart);
                 if (ts >= timeout)
                 {
                     break;
