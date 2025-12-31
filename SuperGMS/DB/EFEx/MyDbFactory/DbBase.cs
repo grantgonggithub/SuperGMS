@@ -463,7 +463,7 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
 
                 try
                 {
-                    PrintSql(sql, parameters);
+                    PrintSql(countParaSql, parameters);
                     using (var connection = GetConnection())
                     {
                         searchParameters.PageInfo.TotalCount = connection.Connection.Query<int>(countParaSql, parameters, null, false, DbInfo.CommandTimeout, CommandType.Text)?.FirstOrDefault()??0;

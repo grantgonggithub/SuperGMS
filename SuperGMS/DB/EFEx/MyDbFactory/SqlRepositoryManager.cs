@@ -19,7 +19,9 @@ using SqlSugar;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Reflection;
 using System.Reflection.Metadata.Ecma335;
+using System.Text;
 
 namespace SuperGMS.DB.EFEx.GrantDbFactory
 {
@@ -60,13 +62,64 @@ namespace SuperGMS.DB.EFEx.GrantDbFactory
                 ConnectionString = getDbConnectionString(dbInfo),
                 DbType = getSqlSugarDbType(dbInfo),
                 IsAutoCloseConnection = false,
-            }, sqlInfo => {
-                sqlInfo.Aop.OnLogExecuting = (sql, para) => {
+                ConfigureExternalServices = new ConfigureExternalServices
+                {
+                    // 实体名转换为表名（驼峰转下划线）
+                    EntityNameService = (type, entity) =>
+                    {
+                        // 如果实体有 SugarTable 特性，使用特性指定的表名
+                        var sugarTable = type.GetCustomAttribute<SugarTable>();
+                        if (sugarTable != null && !string.IsNullOrEmpty(sugarTable.TableName))
+                            return;
+
+                        // 否则使用规则转换：FormGoogleData -> form_google_data
+                        entity.DbTableName = ConvertToSnakeCase(type.Name);
+                    },
+
+                    // 修改 EntityService 委托，不返回值，只设置列名
+                    EntityService = (property, column) =>
+                    {
+                        // 如果属性有 SugarColumn 特性，使用特性指定的列名
+                        var sugarColumn = property.GetCustomAttribute<SugarColumn>();
+                        if (sugarColumn != null && !string.IsNullOrEmpty(sugarColumn.ColumnName))
+                            return;
+
+                        // 否则使用规则转换：CreatedDate -> created_date
+                        column.DbColumnName = ConvertToSnakeCase(property.Name);
+                    }
+                }
+            }, sqlInfo =>
+            {
+                sqlInfo.Aop.OnLogExecuting = (sql, para) =>
+                {
                     logger.LogInformation(UtilMethods.GetNativeSql(sql, para));
                 };
             });
             doSomePreProcess(client, dbInfo);
             return client;
+        }
+        private static string ConvertToSnakeCase(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            var result = new StringBuilder();
+            result.Append(char.ToLower(input[0]));
+
+            for (int i = 1; i < input.Length; i++)
+            {
+                if (char.IsUpper(input[i]))
+                {
+                    result.Append('_');
+                    result.Append(char.ToLower(input[i]));
+                }
+                else
+                {
+                    result.Append(input[i]);
+                }
+            }
+
+            return result.ToString();
         }
 
         private static SqlSugar.DbType getSqlSugarDbType(DbInfo dbInfo) {
