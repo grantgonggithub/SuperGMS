@@ -434,7 +434,8 @@ namespace SuperGMS.Config
         /// <param name="pool">pool</param>
         public static void Initlize(string appName, int pool)
         {
-            ServerSetting._appName = appName;
+            if(string.IsNullOrWhiteSpace(ServerSetting._appName))
+              ServerSetting._appName = appName;
             ServerSetting._pool = pool;
 
             try
@@ -791,7 +792,8 @@ namespace SuperGMS.Config
         /// <returns>XElement</returns>
         public static RpcService GetRpcServer(string servserName = "", string[] args=null)
         {
-            ServerSetting._appName = servserName;
+            if (string.IsNullOrWhiteSpace(ServerSetting._appName))
+                ServerSetting._appName = servserName;
             checkInitlize();
             if (string.IsNullOrEmpty(servserName))
             {

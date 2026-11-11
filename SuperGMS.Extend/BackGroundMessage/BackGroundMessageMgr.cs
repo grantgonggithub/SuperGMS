@@ -49,6 +49,11 @@ namespace SuperGMS.Extend.BackGroundMessage
         /// 如果自定义要考虑不重复的问题，重复了，最后定义的机器才能收到消息
         /// </summary>
         public string QueueName { get; set; } = null;
+
+        /// <summary>
+        /// 是否不等业务返回，直接ACK，有些场景业务调用时间比较长，而且是一次性通知消息，所以可以直接删除
+        /// </summary>
+        public bool ImmediateAck { get; set; } = false;
     }
     /// <summary>
     /// 点对点消息
@@ -78,7 +83,16 @@ namespace SuperGMS.Extend.BackGroundMessage
                         {
                             if (this.OnBackGroundMessageReceive != null)
                             {
-                                return this.OnBackGroundMessageReceive(m, ex,objCtx);
+                                if (!item.ImmediateAck)
+                                    return this.OnBackGroundMessageReceive(m, ex, objCtx);
+                                else
+                                {
+                                    Task.Run(() =>
+                                    {
+                                        this.OnBackGroundMessageReceive(m, ex, objCtx);
+                                    }).Wait(1*1000); // 等1s，让业务侧尽可能收到
+                                    return true;
+                                }
                             }
                             return false; // 如果没有回调，不能随意删除消息
                         },item.BussinessApi.Name);

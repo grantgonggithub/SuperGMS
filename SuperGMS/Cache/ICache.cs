@@ -10,6 +10,8 @@
  功能描述：
 
 ----------------------------------------------------------------*/
+using SuperGMS.Redis;
+
 using System;
 using System.Collections.Generic;
 
@@ -118,7 +120,8 @@ namespace SuperGMS.Cache
         /// <param name="key">key</param>
         /// <param name="filed">filed</param>
         /// <param name="value">value</param>
-        void HashIncrement(string key, string filed, long value);
+        /// <returns>递增后的值</returns>
+        long HashIncrement(string key, string filed, long value);
 
         /// <summary>
         /// 给Hash的某一个filed 减去 value 个计数
@@ -126,21 +129,24 @@ namespace SuperGMS.Cache
         /// <param name="key">key</param>
         /// <param name="filed">filed</param>
         /// <param name="value">value</param>
-        void HashDecrement(string key, string filed, long value);
+        /// <returns>递减后的值</returns>
+        long HashDecrement(string key, string filed, long value);
 
         /// <summary>
         /// 给一个字符串增加 value个计数
         /// </summary>
         /// <param name="key">key</param>
         /// <param name="value">value</param>
-        void StringIncrement(string key, long value);
+        /// <returns>递增后的值</returns>
+        long StringIncrement(string key, long value);
 
         /// <summary>
         /// 给一个字符串减去 value个计数
         /// </summary>
         /// <param name="key">key</param>
         /// <param name="value">value</param>
-        void StringDecrement(string key, long value);
+        /// <returns>递减后的值</returns>
+        long StringDecrement(string key, long value);
 
         /// <summary>
         /// Redis是单进程单线程，不存在并发问题，因此只要保证多条命令原则执行即可
@@ -202,5 +208,75 @@ namespace SuperGMS.Cache
         /// <param name="pageIndex">取页数</param>
         /// <returns></returns>
         IEnumerable<string> GetAllKeys(string matchPaten, int pageSize = 250, int pageIndex = 0);
+
+
+        /// <summary>
+        /// 消息队列生产者发布消息
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="QueueKey">消息分类key,根据这个key接收消息</param>
+        /// <param name="obj">消息对象</param>
+        /// <param name="MaxLength">队列最大长度，超过则丢弃最早的消息</param>
+        /// <param name="UseApproximateMaxLength"></param>
+        /// <returns>新增消息的messageId</returns>
+        string StreamAdd<T>(string QueueKey, T obj, int MaxLength, bool UseApproximateMaxLength = true);
+
+        /// <summary>
+        /// 注册一个消费者，消息组，防止不同客户端重复接收消息
+        /// </summary>
+        /// <param name="QueueKey">消息key</param>
+        /// <param name="GroupName">消息分组，注意：相同分组的多个客户端不会重复接收到同一个消息</param>
+        /// <returns></returns>
+        bool CreateConsumerGroup(string QueueKey, string GroupName);
+
+        /// <summary>
+        /// 消息获取
+        /// </summary>
+        /// <typeparam name="T">获取的对象，根据生产者来确定</typeparam>
+        /// <param name="QueueKey">消息key，根据这个来获取消息，根据生产者来确定</param>
+        /// <param name="GroupName">消息分组，防止重复</param>
+        /// <param name="ConsumerName"></param>
+        /// <param name="Count">获取消息数量</param>
+        /// <returns></returns>
+        List<T> StreamReadGroup<T>(string QueueKey, string GroupName, string ConsumerName, int Count) where T : RedisStreamEntriy;
+
+        /// <summary>
+        /// 消费完消息以后，ACK消息
+        /// </summary>
+        /// <param name="QueueKey"></param>
+        /// <param name="GroupName"></param>
+        /// <param name="ids"></param>
+        /// <returns>ACK消息的数量</returns>
+        long StreamAck(string QueueKey, string GroupName, string[] ids);
+
+        /// <summary>
+        /// 获取指定数量的消息，包括ACK和未ACK的，从最新的往后取指定数量
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="QueueKey"></param>
+        /// <param name="Count"></param>
+        /// <returns></returns>
+        List<T> StreamRange<T>(string QueueKey, int Count) where T : RedisStreamEntriy;
+
+        /// <summary>
+        /// 获取指定消费组的已经获取的消息，但是未ACK的消息（Padding队列的消息）到指定的消费客户端，注意：处理完业务需要ACK
+        /// 用于消息补偿（一个客户端获取了消息，但是崩溃了，未进行ACK的场景）
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="QueueKey"></param>
+        /// <param name="GroupName"></param>
+        /// <param name="ClaimConsumerName"></param>
+        /// <param name="MinIdleTime"></param>
+        /// <param name="Count"></param>
+        /// <returns></returns>
+        List<T> StreamAutoClaim<T>(string QueueKey, string GroupName, string ClaimConsumerName, long MinIdleTime, int Count) where T : RedisStreamEntriy;
+
+        /// <summary>
+        /// 按照消息Id删除消息
+        /// </summary>
+        /// <param name="QueueKey">rediskey</param>
+        /// <param name="msgIds">消息id列表</param>
+        /// <returns>删除成功数量</returns>
+        long StreamDelete(string QueueKey, string[] msgIds);
     }
 }

@@ -319,7 +319,8 @@ namespace SuperGMS.DB.EFEx.DynamicSearch
             int i = 0;
             do
             {
-                PropertyInfo property = typeOfProp.GetProperty(props[i]);
+                // 这里需要忽略一下大小写，因为数据库的列不区分大小写
+                PropertyInfo property = typeOfProp.GetProperty(props[i], BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                 if (property == null) return null;
                 typeOfProp = property.PropertyType;
                 propertyAccess = Expression.MakeMemberAccess(propertyAccess, property);
