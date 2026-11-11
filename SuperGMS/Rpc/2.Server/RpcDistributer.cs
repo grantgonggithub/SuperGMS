@@ -209,7 +209,11 @@ namespace SuperGMS.Rpc.Server
                                                 {
                                                     return null;
                                                 }
-                                                logger.LogInformation($"尝试加载：{args2.FullName}");
+                                                if (arg1.Name.IndexOf("Microsoft.WindowsAzure") > -1 || args2.Name.IndexOf("Microsoft.WindowsAzure") > -1)
+                                                {
+                                                    return null;
+                                                }
+                                                    logger.LogInformation($"尝试加载：{args2.FullName}");
                                                 string p = path.Substring(0,
                                                     path.LastIndexOf(Path.DirectorySeparatorChar));
                                                 return arg1.LoadFromAssemblyPath(string.Format("{0}{1}{2}.dll", p,

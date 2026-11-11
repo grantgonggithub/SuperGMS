@@ -220,7 +220,7 @@ namespace SuperGMS.Redis
             int error = 0;
         gotoHere:
             ConnectionMultiplexer conn = null;
-            int idx = DateTime.Now.Millisecond % SlaveServers.Length; // 如果读从库，随机取
+            int idx = DateTime.UtcNow.Millisecond % SlaveServers.Length; // 如果读从库，随机取
             try
             {
                 conn = RedisConnectionManager.GetConnection(SlaveServers[idx]);

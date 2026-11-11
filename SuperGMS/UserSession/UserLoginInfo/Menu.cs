@@ -38,7 +38,7 @@ namespace SuperGMS.UserSession
         /// <summary>
         /// 排序
         /// </summary>
-        public string SortNo { get; set; }
+        public int SortNo { get; set; }
 
         /// <summary>
         /// 是否展示，有时只为控制按钮，不展示在菜单上

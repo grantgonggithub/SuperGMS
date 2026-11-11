@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 
 using SuperGMS.DB.EFEx;
 using SuperGMS.DB.EFEx.GrantDbContext;
+using SuperGMS.DB.EFEx.MyDbContext;
 using SuperGMS.GrantLock;
 using SuperGMS.Protocol.RpcProtocol;
 using SuperGMS.Router;
@@ -34,6 +35,7 @@ namespace SuperGMS.Rpc.Server
         private Dictionary<string, HeaderValue> headers;
         private UserContext userContext;
         private Dictionary<string, IEFDbContext> dbContexts = new Dictionary<string, IEFDbContext>();
+        private List<ISqlSugarDbContext> sqlSugarDbContexts = new List<ISqlSugarDbContext>();
         private List<DistributedLock> locks=new List<DistributedLock>();
 
         /// <summary>
@@ -181,25 +183,44 @@ namespace SuperGMS.Rpc.Server
         }
 
         /// <summary>
+        /// 获取SqlSugar的DbContext,还是为了保持和EF在语法结构上的一致性，对上层开发人员不至于变化太大
+        /// 但是sqlsugar封装较为完善，这里直接将ISqlSugarClient暴露出来，直接使用
+        /// </summary>
+        /// <typeparam name="TContext"></typeparam>
+        /// <param name="dbModelName"></param>
+        /// <returns></returns>
+        public ISqlSugarDbContext GetSqlSugarDbContext<TContext>(string dbModelName = null)
+        {
+            lock (rootLock)
+            {
+                // SqlSugar的DbContext不需要换成，只是一个空壳引用，没有任何性能问题
+                var sqlsugarClinet = SuperGMSDBContext.GetSqlSugarDbContext(this, string.IsNullOrWhiteSpace(dbModelName) ? typeof(TContext).Name : dbModelName);
+                sqlSugarDbContexts.Add(sqlsugarClinet);
+                return sqlsugarClinet;
+            }
+
+        }
+
+        /// <summary>
         /// 释放的时候就不锁了，因为只有框架在释放，外部业务类看不到
         /// </summary>
         public void Dispose()
         {
-            locks.ForEach(x => { LockManager.ReleaseLock(x);});
-            if (dbContexts != null && dbContexts.Count > 0)
+            locks.ForEach(x => { LockManager.ReleaseLock(x); });
+            foreach (var db in dbContexts.Keys)
             {
-                foreach (var db in dbContexts.Keys)
+                var ctx = dbContexts[db];
+                if (ctx != null)
                 {
-                    var ctx = dbContexts[db];
-                    if (ctx != null)
-                    {
-                        ctx.Dispose();
-                    }
+                    ctx.Dispose();
                 }
-
-                dbContexts.Clear();
-                dbContexts = null;
             }
+            dbContexts.Clear();
+            dbContexts = null;
+
+            foreach (var sqlSugar in sqlSugarDbContexts) { sqlSugar?.Dispose(); }
+            sqlSugarDbContexts.Clear();
+            sqlSugarDbContexts = null;
         }
 
         /// <summary>

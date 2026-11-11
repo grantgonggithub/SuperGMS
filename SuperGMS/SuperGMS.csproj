@@ -4,7 +4,7 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<LangVersion>12</LangVersion>
 		<PackageReleaseNotes>grantgongjianchun(nnn987@126.com)</PackageReleaseNotes>
-		<Version>6.1.2</Version>
+		<Version>6.2.1</Version>
 		<Authors>grantgongjianchun</Authors>
 		<Company>SuperGMS</Company>
 		<Description></Description>
@@ -50,6 +50,7 @@
 		<PackageReference Include="Grpc.AspNetCore.Server" Version="2.67.0" />
 		<PackageReference Include="Grpc.Core" Version="2.46.6" />
 		<PackageReference Include="Grpc.Net.Client" Version="2.67.0" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="6.2.14" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.0" />
@@ -63,12 +64,13 @@
 		<PackageReference Include="nacos-sdk-csharp" Version="1.3.10" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="NLog.Extensions.Logging" Version="5.3.15" />
-		<PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.90" />
+		<PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.9.0" />
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.0" />
 		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.0" />
 		<PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
+		<PackageReference Include="SqlSugarCore" Version="5.1.4.197" />
 		<PackageReference Include="StackExchange.Redis" Version="2.8.24" />
-		<PackageReference Include="System.Linq.Dynamic.Core" Version="1.5.1" />
+		<PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.0" />
 		<PackageReference Include="System.Net.Http" Version="4.3.4" />
 		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
 		<PackageReference Include="ZooKeeperNetEx" Version="3.4.12.4" />

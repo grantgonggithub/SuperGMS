@@ -19,7 +19,7 @@ namespace SuperGMS.Log
         /// </summary>
         public LogStat()
         {
-            CreatedDate = DateTime.Now;
+            CreatedDate = DateTime.UtcNow;
             var rpc = ServerSetting.GetRpcServer();
             this.ComputerIp = $"{rpc.Ip}:{rpc.Port}";
         }
@@ -153,7 +153,7 @@ namespace SuperGMS.Log
                     return;
                 }
 
-                this.ExecuteTime = (int) (DateTime.Now - this.CreatedDate).TotalMilliseconds;
+                this.ExecuteTime = (int) (DateTime.UtcNow - this.CreatedDate).TotalMilliseconds;
                 this.TransactionId = result?.rid ?? args?.rid;
                 this.Code = result?.c ?? 0;
                 this.CodeMsg = result?.msg;

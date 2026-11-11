@@ -43,7 +43,7 @@ namespace SuperGMS.Router
         }
 
 
-        private static Random random = new Random(DateTime.Now.Millisecond);
+        private static Random random = new Random(DateTime.UtcNow.Millisecond);
         /// <summary>
         /// 随机获取服务器
         /// </summary>
@@ -64,7 +64,7 @@ namespace SuperGMS.Router
             //    }
             //    i += n;
             //}
-            //Random r = new Random(DateTime.Now.Millisecond);
+            //Random r = new Random(DateTime.UtcNow.Millisecond);
             //return idxs[r.Next(0, idxs.Length)];
 
             return random.Next(min, max);

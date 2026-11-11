@@ -135,13 +135,13 @@ namespace SuperGMS.Log
         goHere:
             try
             {
-                string temp = AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + "txtLog" + Path.DirectorySeparatorChar + ServiceEnvironment.ComputerAddress.Replace(".", "_").Replace(":", "_") + Path.DirectorySeparatorChar + DateTime.Now.ToString("yyyyMMdd");
+                string temp = AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + "txtLog" + Path.DirectorySeparatorChar + ServiceEnvironment.ComputerAddress.Replace(".", "_").Replace(":", "_") + Path.DirectorySeparatorChar + DateTime.UtcNow.ToString("yyyyMMdd");
                 if (!Directory.Exists(temp))
                 {
                     Directory.CreateDirectory(temp);
                 }
 
-                string fileName = "log" + DateTime.Now.ToString("yyyyMMddHH"); // 一个小时一个文件
+                string fileName = "log" + DateTime.UtcNow.ToString("yyyyMMddHH"); // 一个小时一个文件
 
                 // 第一次肯定不同,说明一个小时内没有切换文件，是同一个文件，就需要判断写入量
                 if (last.V1.ToLower() == fileName ||

@@ -56,7 +56,7 @@ namespace SuperGMS.WebSocketEx
         { 
             while (true)
             {
-                _loger.LogInformation($"开始执行清理线程{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}");
+                _loger.LogInformation($"开始执行清理线程{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")}");
                 try {
                     _sockets.Values.ToList().ForEach(s => {
                         s.V2.Close(true,WebSocketCloseStatus.EndpointUnavailable,"客户端超时被清理");// 超时清理：1001

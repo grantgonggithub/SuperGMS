@@ -77,27 +77,45 @@ namespace SuperGMS.Tools
                 NetworkInterface[] interfaces = NetworkInterface.GetAllNetworkInterfaces();
                 foreach (var item in interfaces)
                 {
-                    if (item.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
+                    // 1. 基础过滤：必须处于运行状态（UP），且不是回环网卡（排除 lo）
+                    if (item.OperationalStatus != OperationalStatus.Up ||
+                        item.NetworkInterfaceType == NetworkInterfaceType.Loopback)
                     {
-                        IPInterfaceProperties ipInterfaceProperties = item.GetIPProperties();
-                        UnicastIPAddressInformationCollection ipCollection = ipInterfaceProperties.UnicastAddresses;
-                        foreach (UnicastIPAddressInformation ipadd in ipCollection)
-                        {
-                            var ip = ipadd.Address;
-                            if (ip.AddressFamily == AddressFamily.InterNetwork)
-                            {
-                                if (ip.ToString() == "127.0.0.1" || string.IsNullOrEmpty(ip.ToString()))
-                                {
-                                    continue;
-                                }
+                        continue;
+                    }
 
-                                if (_ipList.Count == 0) // 第一个
-                                {
-                                    _computerAddress = ip.ToString();
-                                }
-                                _ipList.Add(ip.ToString());
-                            }
+                    IPInterfaceProperties ipInterfaceProperties = item.GetIPProperties();
+                    UnicastIPAddressInformationCollection ipCollection = ipInterfaceProperties.UnicastAddresses;
+                    foreach (UnicastIPAddressInformation ipadd in ipCollection)
+                    {
+                        var ip = ipadd.Address;
+
+                        // 2. 必须还是 IPv4
+                        if (ip.AddressFamily != AddressFamily.InterNetwork)
+                        {
+                            continue;
                         }
+
+                        string ipStr = ip.ToString();
+
+                        // 3. 过滤掉绝对无用的 IP：本机回环地址、自动分配地址(169.254.*)
+                        if (ipStr == "127.0.0.1" || ipStr.StartsWith("169.254."))
+                        {
+                            continue;
+                        }
+
+                        // 4. 过滤掉 Docker 的默认网桥网段
+                        // 172.17.x.x 或 172.18.x.x 通信
+                        if (ipStr.StartsWith("172.17.") || ipStr.StartsWith("172.18."))
+                        {
+                            continue;
+                        }
+
+                        if (_ipList.Count == 0) // 记录第一个有效的 IP 作为默认地址
+                        {
+                            _computerAddress = ipStr;
+                        }
+                        _ipList.Add(ipStr);
                     }
                 }
             }

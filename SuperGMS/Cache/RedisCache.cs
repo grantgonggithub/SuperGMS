@@ -175,9 +175,9 @@ namespace SuperGMS.Cache
         /// <param name="key">key</param>
         /// <param name="filed">filed</param>
         /// <param name="value">value</param>
-        public void HashIncrement(string key, string filed, long value)
+        public long HashIncrement(string key, string filed, long value)
         {
-            RedisProxy.HashIncrement(_redisName, _redisName, key, filed, value);
+           return RedisProxy.HashIncrement(_redisName, _redisName, key, filed, value);
         }
 
         /// <summary>
@@ -186,9 +186,9 @@ namespace SuperGMS.Cache
         /// <param name="key">key</param>
         /// <param name="filed">filed</param>
         /// <param name="value">value</param>
-        public void HashDecrement(string key, string filed, long value)
+        public long HashDecrement(string key, string filed, long value)
         {
-            RedisProxy.HashDecrement(_redisName, _redisName, key, filed, value);
+           return RedisProxy.HashDecrement(_redisName, _redisName, key, filed, value);
         }
 
         /// <summary>
@@ -196,9 +196,9 @@ namespace SuperGMS.Cache
         /// </summary>
         /// <param name="key">key</param>
         /// <param name="value">value</param>
-        public void StringIncrement(string key, long value)
+        public long StringIncrement(string key, long value)
         {
-            RedisProxy.StringIncrement(_redisName, _redisName, key, value);
+           return RedisProxy.StringIncrement(_redisName, _redisName, key, value);
         }
 
         /// <summary>
@@ -206,9 +206,9 @@ namespace SuperGMS.Cache
         /// </summary>
         /// <param name="key">key</param>
         /// <param name="value">value</param>
-        public void StringDecrement(string key, long value)
+        public long StringDecrement(string key, long value)
         {
-            RedisProxy.StringDecrement(_redisName, _redisName, key, value);
+           return RedisProxy.StringDecrement(_redisName, _redisName, key, value);
         }
 
         /// <summary>
@@ -280,5 +280,39 @@ namespace SuperGMS.Cache
             return RedisProxy.GetAllKeys(_redisName, _redisName, matchPaten, pageSize, pageIndex);
         }
 
+        public string StreamAdd<T>(string QueueKey, T obj, int MaxLength, bool UseApproximateMaxLength = true)
+        {
+            return RedisProxy.StreamAdd(_redisName,_redisName,QueueKey,obj,MaxLength,UseApproximateMaxLength);
+        }
+
+        public bool CreateConsumerGroup(string QueueKey, string GroupName)
+        {
+            return RedisProxy.CreateConsumerGroup(_redisName,_redisName,QueueKey,GroupName);
+        }
+
+        public List<T> StreamReadGroup<T>(string QueueKey, string GroupName, string ConsumerName, int Count) where T : RedisStreamEntriy
+        {
+            return RedisProxy.StreamReadGroup<T>(_redisName,_redisName,QueueKey,GroupName,ConsumerName,Count);
+        }
+
+        public List<T> StreamRange<T>(string QueueKey, int Count) where T : RedisStreamEntriy
+        {
+            return RedisProxy.StreamRange<T>(_redisName, _redisName, QueueKey,Count);
+        }
+
+        public List<T> StreamAutoClaim<T>(string QueueKey, string GroupName, string ClaimConsumerName, long MinIdleTime, int Count) where T : RedisStreamEntriy
+        {
+            return RedisProxy.StreamAutoClaim<T>(_redisName, _redisName,QueueKey,GroupName,ClaimConsumerName,MinIdleTime,Count);
+        }
+
+        public long StreamAck(string QueueKey, string GroupName, string[] ids)
+        {
+            return RedisProxy.StreamAck(_redisName, _redisName, QueueKey, GroupName, ids);
+        }
+
+        public long StreamDelete(string QueueKey, string[] msgIds)
+        {
+            return RedisProxy.StreamDelete(_redisName, _redisName, QueueKey, msgIds);
+        }
     }
 }

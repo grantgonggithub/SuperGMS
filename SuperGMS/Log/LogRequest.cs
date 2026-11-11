@@ -12,10 +12,10 @@ namespace SuperGMS.Log
     {
         public LogRequest()
         {
-            CreatedDate = DateTime.Now;
+            CreatedDate = DateTime.UtcNow;
             var rpc = ServerSetting.GetRpcServer();
             this.ComputerIp = $"{rpc.Ip}:{rpc.Port}";
-            this.CreatedDate = DateTime.Now;
+            this.CreatedDate = DateTime.UtcNow;
             this.ServiceName = ServerSetting.AppName;
         }
         /// <summary>
@@ -142,7 +142,7 @@ namespace SuperGMS.Log
                     return;
                 }
 
-                this.ExecuteTime = (int)(DateTime.Now - this.CreatedDate).TotalMilliseconds;
+                this.ExecuteTime = (int)(DateTime.UtcNow - this.CreatedDate).TotalMilliseconds;
                 this.TransactionId = result?.rid ?? args?.rid;
                 this.Code = result?.c ?? 0;
                 this.CodeMsg = result?.msg;
@@ -174,7 +174,7 @@ namespace SuperGMS.Log
         /// <returns>字符串</returns>
         public override string ToString()
         {
-            return $"Execute Time:{(int)(DateTime.Now - this.CreatedDate).TotalMilliseconds}ms, Url:/{this.ServiceName}/{this.ApiName}, Code:{this.Code}, CodeMsg:{this.CodeMsg}|" +
+            return $"Execute Time:{(int)(DateTime.UtcNow - this.CreatedDate).TotalMilliseconds}ms, Url:/{this.ServiceName}/{this.ApiName}, Code:{this.Code}, CodeMsg:{this.CodeMsg}|" +
                 $"User:{this.UserId}, Lang:{this.Lang}, Token:{this.Token}, ServerIp:{this.ComputerIp}, SrcUrl:{this.SourceUrl}|" +
                 $"Parameters:{this.Parameters}, Client:{this.ClientIp},cv:{this.ClientVersion},ct:{this.ClientType},client info:{this.ClientInfo},desc:{this.Desc}|" +
                 $"Result:{this.Result}";

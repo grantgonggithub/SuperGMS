@@ -128,7 +128,7 @@ namespace SuperGMS.Rpc.Client
         public static void Parser(RpcClients rpcClients,string appName)
         {
             var cItems = rpcClients?.Clients?.First(x=>x.ServerName == appName)?.Items;
-            if (cItems?.Any() ?? true) return;
+            if (cItems==null||cItems.Count<1) return;
             ClientServer s = null;
             List<ClientItem> cs = null;
             foreach (var cl in cItems) {
@@ -407,7 +407,7 @@ namespace SuperGMS.Rpc.Client
                                 UseChain = JsonConvert.SerializeObject(args.Headers),
                                 CodeMsg = rr.msg,
                                 Code = rr.c,
-                                Desc = $"HttpProxy.Error:server :{server} not found rid={args.rid}",
+                                Desc = $"HttpProxy.Error:server :{server} not found rid={args.rid}，place check config.json httpProxy",
                             }.ToString());
                         }
                     }

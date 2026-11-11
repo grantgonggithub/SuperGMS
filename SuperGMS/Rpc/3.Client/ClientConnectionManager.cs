@@ -99,7 +99,7 @@ namespace SuperGMS.Rpc.Client
             string key = GetConnectionPoolKey(client.Item.Ip, client.Item.Port);
             lock (root)
             {
-                var newOne = new ComboxClass<DateTime, ISuperGMSRpcClient> { V1 = DateTime.Now, V2 = client };
+                var newOne = new ComboxClass<DateTime, ISuperGMSRpcClient> { V1 = DateTime.UtcNow, V2 = client };
                 if (ConnectionPools.ContainsKey(key))
                 {
                     ConnectionPools[key]
@@ -192,7 +192,7 @@ namespace SuperGMS.Rpc.Client
                     if (key.Length > 0)
                     {
                         // 为了保证性能，随机检查，不做全量遍历
-                        Random random = new Random(DateTime.Now.Millisecond);
+                        Random random = new Random(DateTime.UtcNow.Millisecond);
                         int idx = random.Next(0, key.Length);
                         lock (root)
                         {
@@ -200,7 +200,7 @@ namespace SuperGMS.Rpc.Client
                             {
                                 var lst = ConnectionPools[key[idx]];
                                 // 2分钟不被使用，就清理掉
-                                var timeOut = lst.Where(a => DateTime.Now.Subtract(a.V1).TotalSeconds > 60 * 2 && a.V2 != null)
+                                var timeOut = lst.Where(a => DateTime.UtcNow.Subtract(a.V1).TotalSeconds > 60 * 2 && a.V2 != null)
                                     .ToArray();
                                 foreach (var item in timeOut)
                                 {

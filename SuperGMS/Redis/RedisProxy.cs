@@ -99,13 +99,15 @@ namespace SuperGMS.Redis
         /// <param name="logicName">logicName</param>
         /// <param name="key">key</param>
         /// <param name="value">value</param>
-        public static void StringIncrement(string nodeName, string logicName, string key, long value)
+        public static long StringIncrement(string nodeName, string logicName, string key, long value)
         {
             RedisNode cfg = RedisConfig.GetNode(nodeName);
             string k = getKey(logicName, key);
-            cfg.Set(db => { db.StringIncrement(k, value);
+            long rst = 0;
+            cfg.Set(db => { rst = db.StringIncrement(k, value);
                 return true;
             });
+            return rst;
         }
 
         /// <summary>
@@ -115,15 +117,17 @@ namespace SuperGMS.Redis
         /// <param name="logicName">logicName</param>
         /// <param name="key">key</param>
         /// <param name="value">value</param>
-        public static void StringDecrement(string nodeName, string logicName, string key, long value)
+        public static long StringDecrement(string nodeName, string logicName, string key, long value)
         {
             RedisNode cfg = RedisConfig.GetNode(nodeName);
             string k = getKey(logicName, key);
+            long rst = 0;
             cfg.Set(db =>
             {
-                db.StringDecrement(k, value);
+               rst = db.StringDecrement(k, value);
                 return true;
             });
+            return rst;
         }
 
         /// <summary>
@@ -134,15 +138,17 @@ namespace SuperGMS.Redis
         /// <param name="key">key</param>
         /// <param name="filed">filed</param>
         /// <param name="value">value</param>
-        public static void HashIncrement(string nodeName, string logicName, string key,string filed, long value)
+        public static long HashIncrement(string nodeName, string logicName, string key,string filed, long value)
         {
             RedisNode cfg = RedisConfig.GetNode(nodeName);
             string k = getKey(logicName, key);
+            long rst = 0;
             cfg.Set(db =>
             {
-                db.HashIncrement(k, filed, value);
+               rst = db.HashIncrement(k, filed, value);
                 return true;
             });
+            return rst;
         }
 
         /// <summary>
@@ -153,15 +159,17 @@ namespace SuperGMS.Redis
         /// <param name="key">key</param>
         /// <param name="filed">filed</param>
         /// <param name="value">value</param>
-        public static void HashDecrement(string nodeName, string logicName, string key, string filed, long value)
+        public static long HashDecrement(string nodeName, string logicName, string key, string filed, long value)
         {
             RedisNode cfg = RedisConfig.GetNode(nodeName);
             string k = getKey(logicName, key);
+            long rst = 0;
             cfg.Set(db =>
             {
-                db.HashDecrement(k, filed, value);
+               rst = db.HashDecrement(k, filed, value);
                 return true;
             });
+            return rst;
         }
 
 
@@ -379,6 +387,159 @@ namespace SuperGMS.Redis
             },true);
         }
 
+        /// <summary>
+        /// 实现一个消息队列的生产者,发布消息
+        /// </summary>
+        /// <param name="QueueKey">消息的key，用于标记一类消息</param>
+        /// <param name="ValuesEntries">消息内容</param>
+        /// <param name="MaxLenght">最大保留消息数量，超过则移除掉一部分最早的消息</param>
+        /// <param name="UseApproximateMaxLength"></param>
+        public static string StreamAdd<T>(string nodeName, string logicName, string QueueKey, T obj, int MaxLength, bool UseApproximateMaxLength = true)
+        {
+            RedisNode cfg = RedisConfig.GetNode(nodeName);
+            var redisKey = getKey(logicName, QueueKey);
+            string json = ConvertJson(obj);
+            var nameValueEntries =  new List<NameValueEntry>() { new NameValueEntry("value", json) }.ToArray();
+            string messageId = string.Empty;
+            cfg.Set(db => {
+                messageId = db.StreamAdd(redisKey, nameValueEntries, maxLength: MaxLength, useApproximateMaxLength: UseApproximateMaxLength);
+                return !string.IsNullOrWhiteSpace(messageId);
+            });
+            return messageId;
+        }
+
+        /// <summary>
+        /// 初始化一个消费者组，这里消费同一个QueueKey的客户端，必须使用同一个GroupName,否则所有客户端都会收到重复的消息
+        /// </summary>
+        /// <param name="nodeName"></param>
+        /// <param name="logicName"></param>
+        /// <param name="QueueKey"></param>
+        /// <param name="GroupName"></param>
+        /// <returns></returns>
+        public static bool CreateConsumerGroup(string nodeName, string logicName, string QueueKey, string GroupName)
+        {
+            RedisNode cfg = RedisConfig.GetNode(nodeName);
+            var redisKey = getKey(logicName, QueueKey);
+            return cfg.Set(db => {
+                return db.StreamCreateConsumerGroup(redisKey, GroupName);
+            });
+        }
+
+        /// <summary>
+        /// 消费端获取指定数量的消息,未被消费（未ACK）的最早的消息
+        /// </summary>
+        /// <typeparam name="T">获取对象类型</typeparam>
+        /// <param name="nodeName"></param>
+        /// <param name="logicName"></param>
+        /// <param name="QueueKey">消息标识，需要根据生产者的QueueKey对应StreamAdd中的QueueKey</param>
+        /// <param name="GroupName">消费分组id，跟CreateConsumerGroup的GroupName一致，否则消息会重复接收</param>
+        /// <param name="ConsumerName">消费者客户端名称，一般跟服务器实例一致</param>
+        /// <param name="Count">获取的数量，注意不要太大，否则有性能问题</param>
+        /// <returns></returns>
+        public static List<T> StreamReadGroup<T>(string nodeName, string logicName, string QueueKey, string GroupName, string ConsumerName,int Count) where T: RedisStreamEntriy
+        {
+            RedisNode cfg = RedisConfig.GetNode(nodeName);
+            var redisKey = getKey(logicName, QueueKey);
+            return cfg.Get<List<T>>(db => {
+                var streamEntries = db.StreamReadGroup(redisKey, GroupName, ConsumerName, ">", count: Count);
+                if (streamEntries == null || streamEntries.Length == 0) return null;
+                return ConvertToList<T>(streamEntries);
+            });
+        }
+
+        /// <summary>
+        /// ACK消息
+        /// </summary>
+        /// <param name="nodeName"></param>
+        /// <param name="logicName"></param>
+        /// <param name="QueueKey"></param>
+        /// <param name="GroupName"></param>
+        /// <param name="ConsumerName"></param>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public static long StreamAck(string nodeName, string logicName, string QueueKey, string GroupName, string[] ids)
+        {
+            RedisNode cfg = RedisConfig.GetNode(nodeName);
+            var redisKey = getKey(logicName, QueueKey);
+            var redisValues = ids.Select(x => new RedisValue(x)).ToArray();
+            long rst = 0;
+            cfg.Set(db => {
+                rst = db.StreamAcknowledge(redisKey, GroupName, redisValues);
+               return rst>=0;
+            });
+            return rst;
+        }
+
+        /// <summary>
+        /// 获取指定数量的消息，包括ACK和未ACK的，从最新的往后取指定数量
+        /// </summary>
+        /// <param name="nodeName"></param>
+        /// <param name="logicName"></param>
+        /// <param name="QueueKey"></param>
+        /// <param name="GroupName"></param>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public static List<T> StreamRange<T>(string nodeName, string logicName, string QueueKey, int Count) where T : RedisStreamEntriy
+        {
+            RedisNode cfg = RedisConfig.GetNode(nodeName);
+            var redisKey = getKey(logicName, QueueKey);
+            return cfg.Get(db => {
+                var streamEntries = db.StreamRange(redisKey,count:Count,messageOrder:Order.Descending);
+                return ConvertToList<T>(streamEntries);
+            });
+        }
+
+        /// <summary>
+        /// 获取指定消费组的已经获取的消息，但是未ACK的消息（Padding队列的消息）到指定的消费客户端，注意：处理完业务需要ACK
+        /// 用于消息补偿（一个客户端获取了消息，但是崩溃了，未进行ACK的场景）
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="nodeName"></param>
+        /// <param name="logicName"></param>
+        /// <param name="QueueKey"></param>
+        /// <param name="GroupName"></param>
+        /// <param name="ClaimConsumerName"></param>
+        /// <param name="MinIdleTime"></param>
+        /// <param name="Count"></param>
+        /// <returns></returns>
+        public static List<T> StreamAutoClaim<T>(string nodeName, string logicName, string QueueKey,string GroupName,string ClaimConsumerName, long MinIdleTime,int Count) where T : RedisStreamEntriy
+        {
+            RedisNode cfg = RedisConfig.GetNode(nodeName);
+            var redisKey = getKey(logicName, QueueKey);
+            return cfg.Get(db => {
+                var streamEntries = db.StreamAutoClaim(redisKey, GroupName, ClaimConsumerName, MinIdleTime, "0-0", count: Count);
+                if(!streamEntries.IsNull && streamEntries.ClaimedEntries.Length>0)
+                return ConvertToList<T>(streamEntries.ClaimedEntries);
+                return null;
+            });
+        }
+
+        public static long StreamDelete(string nodeName, string logicName, string QueueKey, string[] msgIds)
+        {
+            RedisNode cfg = RedisConfig.GetNode(nodeName);
+            var redisKey = getKey(logicName, QueueKey);
+            var redisValues = msgIds.Select(x => new RedisValue(x)).ToArray();
+            long rst = 0;
+            cfg.Get(db => {
+                rst = db.StreamDelete(redisKey, redisValues);
+                return rst>0;
+            });
+            return rst;
+        }
+
+        private static List<T> ConvertToList<T>(StreamEntry[] streamEntries) where T : RedisStreamEntriy
+        {
+            var results = new List<T>();
+            foreach (var item in streamEntries)
+            {
+                var value = item.Values.FirstOrDefault().Value;
+                var entry = ConvertValue<T>(value);
+                entry.Id = item.Id; // 把内部的id传到外部去，这样可以构造ack的id列表
+                results.Add(entry);
+            }
+            return results;
+        }
+
 
 
         private static string getKey(string logicName, string orgKey)
@@ -436,5 +597,9 @@ namespace SuperGMS.Redis
             string result = value is string ? value.ToString() : JsonConvert.SerializeObject(value,new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore });
             return result;
         }
+    }
+
+    public class RedisStreamEntriy { 
+        public string Id { get; set; }
     }
 }

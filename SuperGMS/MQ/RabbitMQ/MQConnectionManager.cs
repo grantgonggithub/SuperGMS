@@ -90,13 +90,13 @@ namespace SuperGMS.MQ.RabbitMQ
                     if (dicConnections.ContainsKey(key))
                     {
                         var pools = dicConnections[key];
-                        pools.Add(new ComboxClass<DateTime, MQConnection>(){ V1 = DateTime.Now, V2 = connection});
+                        pools.Add(new ComboxClass<DateTime, MQConnection>(){ V1 = DateTime.UtcNow, V2 = connection});
                     }
                     else
                     {
                         List<ComboxClass<DateTime,MQConnection>> li =new List<ComboxClass<DateTime, MQConnection>>();
                         dicConnections[key] = li;
-                        li.Add(new ComboxClass<DateTime, MQConnection>() { V1 = DateTime.Now, V2 = connection });
+                        li.Add(new ComboxClass<DateTime, MQConnection>() { V1 = DateTime.UtcNow, V2 = connection });
                     }
                 }
             }
@@ -129,11 +129,11 @@ namespace SuperGMS.MQ.RabbitMQ
                         continue;
                     }
                     string[] keys = dicConnections.Keys.ToArray();
-                    Random r=new Random(DateTime.Now.Millisecond);
+                    Random r=new Random(DateTime.UtcNow.Millisecond);
                     var k = keys[r.Next(0, keys.Length)];
                     var indxValue = dicConnections[k]; // 随机检查
                     var keyValuePairs =
-                        indxValue.Where(x => DateTime.Now.Subtract(x.V1).TotalMilliseconds > 2 * 60 * 1000)?.ToArray(); // 找到2分钟没有被用的连接，释放掉
+                        indxValue.Where(x => DateTime.UtcNow.Subtract(x.V1).TotalMilliseconds > 2 * 60 * 1000)?.ToArray(); // 找到2分钟没有被用的连接，释放掉
                     if (keyValuePairs == null || keyValuePairs.Length < 1)
                     {
                         continue;

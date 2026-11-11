@@ -17,7 +17,7 @@ namespace SuperGMS.Log
         /// </summary>
         public LogInfo()
         {
-            this.CreatedDate = DateTime.Now;
+            this.CreatedDate = DateTime.UtcNow;
             this.ComputerIp = ServiceEnvironment.ComputerAddress;
             this.ComputerName = ServiceEnvironment.ComputerName;
             this.AppNamespace = string.Empty;
